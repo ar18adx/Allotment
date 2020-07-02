@@ -9,7 +9,7 @@ if(isset($_POST["Submit"])){
 
     date_default_timezone_set("Africa/Lagos");
     $CurrentTime=time();
-    $DateTime=strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
+    $datetime=strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
 
     $firstName                 = $_POST["firstName"];
     $lastName                = $_POST["lastName"];
@@ -18,42 +18,45 @@ if(isset($_POST["Submit"])){
     $homeAddress                = $_POST["homeAddress"];
     $gender                = $_POST["gender"];
     $password                = $_POST["password"];
-    $addedby                = "Wale Borokini";
+    $confirmPassword        = $_POST["confirmPassword"];
+    $hash                   = password_hash($password, PASSWORD_BCRYPT);
+    $adminRole                = $_POST["adminRole"];
+    $addedBy                = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"];
  
 
   if(empty($firstName)||empty($lastName)||empty($emailAddress)||empty($telephone)){
     $_SESSION["ErrorMessage"]= "All fields must be filled out";
     Redirect_to("addNewAdmin.php");
-  }elseif (strlen($Password)<4) {
+  }elseif (strlen($password)<4) {
     $_SESSION["ErrorMessage"]= "Password should be greater than 3 characters";
     Redirect_to("addNewAdmin.php");
-  }elseif ($Password !== $ConfirmPassword) {
+  }elseif ($password !== $confirmPassword) {
     $_SESSION["ErrorMessage"]= "Password and Confirm Password should match";
-    Redirect_to("addNewAdmin.php");
-  }elseif (CheckUserNameExistsOrNot($Username)) {
-    $_SESSION["ErrorMessage"]= "Username Exists. Try Another One! ";
     Redirect_to("addNewAdmin.php");
   }else{
     // Query to insert new admin in DB When everything is fine
     global $ConnectingDB;
-    $sql = "INSERT INTO admins(firstName, lastName, emailAddress, telephone, homeAddress, gender, password, dateTime)";
-    $sql .= "VALUES(:firstNamE, :lastNamE, :emailAddresS, :telephonE, :homeAddresS, :gendeR, :passworD, deteTimE)";
+    $sql = "INSERT INTO admins(firstName, lastName, emailAddress, telephone, homeAddress, gender, password, adminRole, addedBy, datetime )";
+    $sql .= "VALUES(:firstNamE, :lastNamE, :emailAddresS, :telephonE, :homeAddresS, :gendeR, :passworD, :adminRolE, :addedBY, :datetimE )";
     $stmt = $ConnectingDB->prepare($sql);
     $stmt->bindValue(':firstNamE', $firstName);
     $stmt->bindValue(':lastNamE', $lastName);
-    $stmt->bindValue(':emailAddresE', $hash);
-    $stmt->bindValue(':telephonE', $AdminName);
-    $stmt->bindValue(':homeAddresS', $AdminRole);
-    $stmt->bindValue(':gendeR', $AdminImage);
-    $stmt->bindValue(':passworD', $Admin);
+    $stmt->bindValue(':emailAddresS', $emailAddress);
+    $stmt->bindValue(':telephonE', $telephone);
+    $stmt->bindValue(':homeAddresS', $homeAddress);
+    $stmt->bindValue(':gendeR', $gender);
+    $stmt->bindValue(':passworD', $hash);
+    $stmt->bindValue(':adminRolE', $adminRole);
+    $stmt->bindValue(':addedBY', $addedBy);
+    $stmt->bindValue(':datetimE', $datetime);
+
     $Execute=$stmt->execute();
-    move_uploaded_file($Temp_Admin_Image, $Target_Admin_Image);
     if($Execute){
-      $_SESSION["SuccessMessage"]="New Admin with the name of ".$AdminName." added Successfully";
-      Redirect_to("manage_admins.php");
+      $_SESSION["SuccessMessage"]="New Admin added Successfully";
+      Redirect_to("addNewAdmin.php");
     }else {
       $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-      Redirect_to("manage_admins.php");
+      Redirect_to("addNewAdmin.php");
     }
   }
 } //Ending of Submit Button If-Condition
@@ -69,9 +72,15 @@ if(isset($_POST["Submit"])){
 
 <div class="container">
     
-    <h1>Add New Admin</h1>
+    <h1>Add New Admin/Site Manager</h1>
 
-            <form>
+            <form class="mb-5" action="addNewAdmin.php" method="POST">
+            <br>
+            <?php
+                echo ErrorMessage();
+                echo SuccessMessage();
+                echo ErrorMessageForRg();
+            ?>
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">First Name</label>
@@ -89,7 +98,7 @@ if(isset($_POST["Submit"])){
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Email address</label>
-                        <input type="text" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         <small id="emailHelp" class="form-text text-muted"></small>
                     </div>
                 </div>
@@ -116,15 +125,24 @@ if(isset($_POST["Submit"])){
                 </div>
                 <div class="row">
                     <div class="form-group col-md-4">
+                        <label for="exampleInputEmail1">Admin Role</label>
+                        <select name="adminRole" class="custom-select">
+                            <option>Site Manager</option>
+                            <option>Super Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Password</label>
-                        <input type="text" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <input type="password" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         <small id="emailHelp" class="form-text text-muted"></small>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Confirm Password</label>
-                        <input type="text" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <input type="password" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         <small id="emailHelp" class="form-text text-muted"></small>
                     </div>
                 </div>

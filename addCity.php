@@ -14,7 +14,7 @@ if(isset($_POST["Submit"])){
   $cityShortCode          = $_POST["cityShortCode"];
   
 
-  $addedBy                = "Wale Borokini";
+  $addedBy                = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"];
   
 
   if(empty($cityName)){

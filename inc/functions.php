@@ -1,19 +1,5 @@
 <?php 
 
-function PropertyImageNameChange($length){
-  $token = "UpscaleHdImg";
-  $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-  $max = strlen($codeAlphabet);
-
-    for ($i=0; $i < $length; $i++)
-  {
-      $token .= $codeAlphabet [random_int(0, $max-1)];
-    }
-
-    return $token;
-
-}
 
 function plotNameGen($length){
   $plotSite                 = $_POST["plotSite"];
@@ -177,7 +163,22 @@ function userLoginAttempt($emailAddress){
   }
 }
 
-function confirmAdminLogin(){
+function adminLoginAttempt($emailAddress){
+  global $ConnectingDB;
+  $sql = "SELECT * FROM admins WHERE emailAddress = :emailAddresS LIMIT 1";
+  $stmt = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':emailAddresS',$emailAddress);
+  // $stmt->bindValue(':PassworD',$hash);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==1) {
+    return $Found_Account=$stmt->fetch();
+  }else {
+    return null;
+  }
+}
+
+function confirmUserLogin(){
 if (isset($_SESSION["UserId"])) {
   return true;
 }  else {
@@ -185,6 +186,15 @@ if (isset($_SESSION["UserId"])) {
   Redirect_to("index.php");
 }
 }
+
+function confirmAdminLogin(){
+  if (isset($_SESSION["adminId"])) {
+    return true;
+  }  else {
+    $_SESSION["ErrorMessage"]="Login Required !";
+    Redirect_to("index.php");
+  }
+  }
 
 
 

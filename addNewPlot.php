@@ -15,7 +15,7 @@ if(isset($_POST["Submit"])){
     $plotSite                 = $_POST["plotSite"];
     
     
-    $addedBy                  = "Wale Borokini";
+    $addedBy                  = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"] ;
     
 
   
@@ -60,7 +60,7 @@ if(isset($_POST["Submit"])){
 
 <div class="container">
     <div class="mt-4 mb-4">
-        <h1>Add New Site</h1>
+        <h1>Add New Plot</h1>
     </div>
             <form class="mb-4 mt-4" action="addNewPlot.php" method="POST">
             <br>
@@ -88,23 +88,23 @@ if(isset($_POST["Submit"])){
                     </div>
                 </div>
                 <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Plot Site</label>
-                            <select name="plotSite" class="custom-select">
-                                <?php
-                                //Fetching all cities from table
-                                global $ConnectingDB;
-                                $sql = "SELECT id, cityName FROM cities";
-                                $stmt = $ConnectingDB->query($sql);
-                                while ($DataRows = $stmt->fetch()) {
-                                $Id = $DataRows["id"];
-                                $cityName = $DataRows["cityName"];
-                                ?>
-                                <option> <?php echo $cityName; ?> </option>
-                                <?php } ?>
-                            </select>
-                        </div>
+                    <div class="form-group col-md-4">
+                        <label for="exampleInputEmail1">Plot Site</label>
+                        <select name="plotSite" class="custom-select">
+                            <?php
+                            //Fetching all cities from table
+                            global $ConnectingDB;
+                            $sql = "SELECT id, cityName FROM cities";
+                            $stmt = $ConnectingDB->query($sql);
+                            while ($DataRows = $stmt->fetch()) {
+                            $Id = $DataRows["id"];
+                            $cityName = $DataRows["cityName"];
+                            ?>
+                            <option> <?php echo $cityName; ?> </option>
+                            <?php } ?>
+                        </select>
                     </div>
+                </div>
                 <div class="row">
                 
                 

@@ -1,10 +1,15 @@
+<?php require_once("inc/db.php"); ?>
+<?php require_once("inc/sessions.php"); ?>
+<?php require_once("inc/functions.php"); ?>
+
+
 <!-- Admin Header Start -->
 <?php include("inc/adminHeader.php"); ?>
 <!-- Admin Header End -->
 
     <div class="container"> 
     
-        <h1>Hello, Admin!</h1>
+        <h1>Hello, <?php echo $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"] ;?></h1>
         <div class="row">
             <div class="col-md-3">
                 <div>
