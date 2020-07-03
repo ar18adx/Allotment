@@ -135,13 +135,13 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Password</label>
-                            <input type="text" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="password" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Confirm Password</label>
-                            <input type="text" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="password" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                             
                         </div>
                     </div>

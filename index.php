@@ -26,6 +26,7 @@ if (isset($_POST["Submit"])) {
       $_SESSION["userFirstName"]=$Found_Account["firstName"];
       $_SESSION["userLastName"]=$Found_Account["lastName"];
       $_SESSION["userEmailAddress"]=$Found_Account["emailAddress"];
+      $_SESSION["userTelephone"]=$Found_Account["telephone"];
       $_SESSION["userHomeAddress"]=$Found_Account["homeAddress"];
       $_SESSION["userCity"]=$Found_Account["city"];
       $_SESSION["userGender"]=$Found_Account["gender"];
@@ -33,7 +34,7 @@ if (isset($_POST["Submit"])) {
     if (isset($_SESSION["TrackingURL"])) {
     Redirect_to($_SESSION["TrackingURL"]);
     }else{
-    Redirect_to("postsPage.php");
+    Redirect_to("findPlots.php");
     }
     }else {
       $_SESSION["ErrorMessage"]="Incorrect Email OR Password";
@@ -78,7 +79,7 @@ if (isset($_POST["Submit"])) {
                 <div class="mt-5">
                     <div class="card text-center" style="width: 18rem;">
                         <p class="list-group list-group-flush">
-                            Don't have an account? <a href="#" class="card-link">Register</a>
+                            Don't have an account? <a href="registerUser.php" class="card-link">Register</a>
                         </p>
                     </div>
                 </div>
