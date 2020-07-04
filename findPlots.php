@@ -21,9 +21,8 @@
 
         <div class="row">
         <?php
-            
-            global $ConnectingDB;
             $userCity = $_SESSION["userCity"];
+            global $ConnectingDB;
             $sql ="SELECT * FROM plots WHERE plotSite ='$userCity'";
             $stmt = $ConnectingDB->query($sql);
             while ($DataRows=$stmt->fetch()) {
@@ -34,55 +33,6 @@
             $plotSite         = $DataRows["plotSite"];
                     
         ?> 
-
-        <?php
-
-        if(isset($_POST["Apply"])){
-            date_default_timezone_set("Africa/Lagos");
-            $CurrentTime            =  time();
-            $dateApplied               = strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
-            $userId                 =   $_SESSION["userId"];
-            $firstName               = $_SESSION["userFirstName"];
-            $lastName               = $_SESSION["userLastName"];
-            $emailAddress           = $_SESSION["userEmailAddress"];
-            $telephoneNumber               = $_SESSION["userTelephone"];
-            $userCity               = $_SESSION["userCity"];
-            $siteCity               = $plotSite;
-            $plotNumberApp          = $plotNumber;
-            $applicationStatus      = "Pending";
-            
-            
-            // Query to insert records in DB When everything is fine
-            global $ConnectingDB;
-            $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteCity, plotNumberApp, applicationStatus, dateApplied )";
-            $sql .= "VALUES(:userID, :firstNamE, :lastNamE, :emailAddresS, :telephoneNumbeR, :userCitY, :siteCitY, :plotNumberApP, :applicationStatuS, :dateApplieD  )";
-            $stmt = $ConnectingDB->prepare($sql);
-            $stmt->bindValue(':userID', $userId);
-            $stmt->bindValue(':firstNamE', $firstName);
-            $stmt->bindValue(':lastNamE', $lastName);
-            $stmt->bindValue(':emailAddresS', $emailAddress);
-            $stmt->bindValue(':telephoneNumbeR', $telephoneNumber);
-            $stmt->bindValue(':userCitY', $userCity);
-            $stmt->bindValue(':siteCitY', $siteCity);
-            $stmt->bindValue(':plotNumberApP', $plotNumberApp);
-            $stmt->bindValue(':applicationStatuS', $applicationStatus);
-            $stmt->bindValue(':dateApplieD', $dateApplied);
-            
-            $Execute=$stmt->execute();
-            if($Execute){
-            $_SESSION["SuccessMessage"]="Application For Plot Was Successful";
-            Redirect_to("findPlots.php");
-            }else {
-            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-            Redirect_to("findPlots.php");
-            }
-
-        } //Ending of Submit Button If-Condition
-
-
-        ?>
-
-
             <div class="col-sm-4 mb-4">
                 <div class="card">
                     <img src="..." class="card-img-top" alt="...">
@@ -92,9 +42,66 @@
                         <h5 class="card-title"><b>Plot Site :</b> <?php echo htmlentities($plotSite); ?> </h5>
                         <h5 class="card-title"><b>Plot Size :</b> <?php echo htmlentities($plotSize); ?></h5>
                         <p class="card-text"><b>Plot Description :</b> <?php echo htmlentities($plotDescription); ?></p>
+                        <?php
+
+                            if(isset($_POST["Apply"])){
+                                date_default_timezone_set("Africa/Lagos");
+                                $CurrentTime            =  time();
+                                $dateApplied            = strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
+                                $userId                 =   $_SESSION["userId"];
+                                $firstName              = $_SESSION["userFirstName"];
+                                $lastName               = $_SESSION["userLastName"];
+                                $emailAddress           = $_SESSION["userEmailAddress"];
+                                $telephoneNumber        = $_SESSION["userTelephone"];
+                                $userCity               = $_SESSION["userCity"];
+                                $siteCity               = $_POST["siteCity"];
+                                $plotNumberApp          = $_POST["plotNumberApp"];
+                                $applicationStatus      = "Pending";
+
+                                // // if (checkPltNumExists($plotNumberApp)) {
+                                // //     $_SESSION["ErrorMessage"]= "You have previously Applied for this plot!. ";
+                                // //     Redirect_to("findPlots.php");
+                                // }
+                                if (checkUserIdPltExists($userId)) {
+                                    $_SESSION["ErrorMessage"]= "You can only apply for one Plot within your city. ";
+                                    Redirect_to("findPlots.php");
+                                }
+                                
+
+
+                                // Query to insert records in DB When everything is fine
+                                global $ConnectingDB;
+                                $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteCity, plotNumberApp, applicationStatus, dateApplied )";
+                                $sql .= "VALUES(:userID, :firstNamE, :lastNamE, :emailAddresS, :telephoneNumbeR, :userCitY, :siteCitY, :plotNumberApP, :applicationStatuS, :dateApplieD  )";
+                                $stmt = $ConnectingDB->prepare($sql);
+                                $stmt->bindValue(':userID', $userId);
+                                $stmt->bindValue(':firstNamE', $firstName);
+                                $stmt->bindValue(':lastNamE', $lastName);
+                                $stmt->bindValue(':emailAddresS', $emailAddress);
+                                $stmt->bindValue(':telephoneNumbeR', $telephoneNumber);
+                                $stmt->bindValue(':userCitY', $userCity);
+                                $stmt->bindValue(':siteCitY', $siteCity);
+                                $stmt->bindValue(':plotNumberApP', $plotNumberApp);
+                                $stmt->bindValue(':applicationStatuS', $applicationStatus);
+                                $stmt->bindValue(':dateApplieD', $dateApplied);
+                                
+                                $Execute=$stmt->execute();
+                                if($Execute){
+                                $_SESSION["SuccessMessage"]="Application For Plot Was Successful";
+                                Redirect_to("findPlots.php");
+                                }else {
+                                $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+                                Redirect_to("findPlots.php");
+                                }
+
+                            } //Ending of Submit Button If-Condition
+
+                            ?>
 
                         <form action="findPlots.php" method="POST">
                         <!-- <a href="#" class="btn btn-primary">Apply For Plot</a> -->
+                        <input type="hidden" name="siteCity" value="<?php echo htmlentities($plotSite); ?>">
+                        <input type="hidden" name="plotNumberApp" value="<?php echo htmlentities($plotNumber); ?>">
                         <button type="submit" name="Apply" class="btn btn-primary">Apply For Plot</button>
 
                         </form>

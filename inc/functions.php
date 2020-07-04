@@ -146,6 +146,37 @@ function CheckUserNameExistsOrNot($Username){
   }
 }
 
+function checkUserIdPltExists($userId){
+  global $ConnectingDB;
+  $sql    = "SELECT userId FROM waitinglist WHERE userId=:userID";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':userID',$userId);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==1) {
+    return true;
+  }else {
+    return false;
+  }
+}
+
+// function checkPltNumExists($plotNumberApp){
+//   global $ConnectingDB;
+//   // $sql    = "SELECT userId AND plotNumberApp FROM waitinglist WHERE userId=:userID AND plotNumberApp=:plotNumberApP LIMIT 1 " ;
+//   $sql = "SELECT plotNumberApp FROM waitinglist WHERE userId = :userID OR plotNumberApp=:plotNumberApP";
+//   // $sql    = "SELECT plotNumberApp FROM waitinglist WHERE plotNumberApp=:plotNumberApP";
+//   $stmt   = $ConnectingDB->prepare($sql);
+//   $stmt->bindValue(':userID',$userId);
+//   $stmt->bindValue(':plotNumberApP',$plotNumberApp);
+//   $stmt->execute();
+//   $Result = $stmt->rowcount();
+//   if ($Result == 1 ) {
+//     return true;
+//   }else {
+//     return false;
+//   }
+// }
+
 
 
 function userLoginAttempt($emailAddress){
