@@ -11,7 +11,8 @@
 
     <div class="container">
     
-        <h1>Hello, world!</h1>
+        <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
+        <h3>You haven't applied for a plot yet. Complete the form below to apply</p>
                     <br>
                     <?php
                     echo ErrorMessage();
@@ -58,18 +59,18 @@
                                 $plotNumberApp          = $_POST["plotNumberApp"];
                                 $applicationStatus      = "Pending";
 
-                                // // if (checkPltNumExists($plotNumberApp)) {
-                                // //     $_SESSION["ErrorMessage"]= "You have previously Applied for this plot!. ";
-                                // //     Redirect_to("findPlots.php");
-                                // }
-                                if (checkUserIdPltExists($userId)) {
-                                    $_SESSION["ErrorMessage"]= "You can only apply for one Plot within your city. ";
+                                //Code to check if A user has previously applied for a particular Plot
+                                if (checkPltNumExists($userId, $plotNumberApp)) {
+                                    $_SESSION["ErrorMessage"]= "You have previously Applied for this plot!. ";
+                                    Redirect_to("findPlots.php");
+                                // Code to make sure a User only apply for a plot twice  
+                                }elseif (checkUserIdPltExists($userId)) {
+                                    $_SESSION["ErrorMessage"]= "You can only apply for two(2) Plot within your city. ";
                                     Redirect_to("findPlots.php");
                                 }
                                 
-
-
-                                // Query to insert records in DB When everything is fine
+                                
+                                // Query to insert values in DB When everything is fine
                                 global $ConnectingDB;
                                 $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteCity, plotNumberApp, applicationStatus, dateApplied )";
                                 $sql .= "VALUES(:userID, :firstNamE, :lastNamE, :emailAddresS, :telephoneNumbeR, :userCitY, :siteCitY, :plotNumberApP, :applicationStatuS, :dateApplieD  )";
@@ -98,12 +99,13 @@
 
                             ?>
 
+
                         <form action="findPlots.php" method="POST">
                         <!-- <a href="#" class="btn btn-primary">Apply For Plot</a> -->
                         <input type="hidden" name="siteCity" value="<?php echo htmlentities($plotSite); ?>">
                         <input type="hidden" name="plotNumberApp" value="<?php echo htmlentities($plotNumber); ?>">
                         <button type="submit" name="Apply" class="btn btn-primary">Apply For Plot</button>
-
+                        
                         </form>
                     </div>
                 </div>

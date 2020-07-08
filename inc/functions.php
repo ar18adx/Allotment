@@ -132,20 +132,21 @@ function Redirect_to($New_Location){
 
 
 
-function CheckUserNameExistsOrNot($Username){
-  global $ConnectingDB;
-  $sql    = "SELECT Username FROM admins WHERE Username=:userName";
-  $stmt   = $ConnectingDB->prepare($sql);
-  $stmt->bindValue(':userName',$Username);
-  $stmt->execute();
-  $Result = $stmt->rowcount();
-  if ($Result==1) {
-    return true;
-  }else {
-    return false;
-  }
-}
+// function CheckUserNameExistsOrNot($Username){
+//   global $ConnectingDB;
+//   $sql    = "SELECT Username FROM admins WHERE Username=:userName";
+//   $stmt   = $ConnectingDB->prepare($sql);
+//   $stmt->bindValue(':userName',$Username);
+//   $stmt->execute();
+//   $Result = $stmt->rowcount();
+//   if ($Result==1) {
+//     return true;
+//   }else {
+//     return false;
+//   }
+// }
 
+// Function to make sure a user does not apply for a plot more than once.
 function checkUserIdPltExists($userId){
   global $ConnectingDB;
   $sql    = "SELECT userId FROM waitinglist WHERE userId=:userID";
@@ -153,32 +154,33 @@ function checkUserIdPltExists($userId){
   $stmt->bindValue(':userID',$userId);
   $stmt->execute();
   $Result = $stmt->rowcount();
-  if ($Result==1) {
+  if ($Result==2) {
     return true;
   }else {
     return false;
   }
 }
 
-// function checkPltNumExists($plotNumberApp){
-//   global $ConnectingDB;
-//   // $sql    = "SELECT userId AND plotNumberApp FROM waitinglist WHERE userId=:userID AND plotNumberApp=:plotNumberApP LIMIT 1 " ;
-//   $sql = "SELECT plotNumberApp FROM waitinglist WHERE userId = :userID OR plotNumberApp=:plotNumberApP";
-//   // $sql    = "SELECT plotNumberApp FROM waitinglist WHERE plotNumberApp=:plotNumberApP";
-//   $stmt   = $ConnectingDB->prepare($sql);
-//   $stmt->bindValue(':userID',$userId);
-//   $stmt->bindValue(':plotNumberApP',$plotNumberApp);
-//   $stmt->execute();
-//   $Result = $stmt->rowcount();
-//   if ($Result == 1 ) {
-//     return true;
-//   }else {
-//     return false;
-//   }
-// }
+// Function to check if A user has previously applied for a particular Plot
+function checkPltNumExists($userId, $plotNumberApp){
+  global $ConnectingDB;
+  $sql    = "SELECT userId AND plotNumberApp FROM waitinglist WHERE userId=:userID AND plotNumberApp=:plotNumberApP " ;
+  // $sql = "SELECT plotNumberApp FROM waitinglist WHERE userId = :userID OR plotNumberApp=:plotNumberApP";
+  // $sql    = "SELECT plotNumberApp FROM waitinglist WHERE plotNumberApp=:plotNumberApP";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':userID',$userId);
+  $stmt->bindValue(':plotNumberApP',$plotNumberApp);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result == 1 ) {
+    return true;
+  }else {
+    return false;
+  }
+}
 
 
-
+// User Login Function
 function userLoginAttempt($emailAddress){
   global $ConnectingDB;
   $sql = "SELECT * FROM users WHERE emailAddress = :emailAddresS LIMIT 1";
@@ -194,6 +196,7 @@ function userLoginAttempt($emailAddress){
   }
 }
 
+//Admin Login Function
 function adminLoginAttempt($emailAddress){
   global $ConnectingDB;
   $sql = "SELECT * FROM admins WHERE emailAddress = :emailAddresS LIMIT 1";

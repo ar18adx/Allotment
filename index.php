@@ -30,11 +30,12 @@ if (isset($_POST["Submit"])) {
       $_SESSION["userHomeAddress"]=$Found_Account["homeAddress"];
       $_SESSION["userCity"]=$Found_Account["city"];
       $_SESSION["userGender"]=$Found_Account["gender"];
+      $_SESSION["userStatus"]=$Found_Account["userStatus"];
       
     if (isset($_SESSION["TrackingURL"])) {
     Redirect_to($_SESSION["TrackingURL"]);
     }else{
-    Redirect_to("findPlots.php");
+    Redirect_to("applyForPlots.php");
     }
     }else {
       $_SESSION["ErrorMessage"]="Incorrect Email OR Password";

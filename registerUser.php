@@ -18,6 +18,7 @@
         $password               = $_POST["password"];
         $confirmPassword        = $_POST["confirmPassword"];
         $hash                   = password_hash($password, PASSWORD_BCRYPT);
+        $userStatus             = "New_User";
     
     
 
@@ -34,8 +35,8 @@
     }else{
         // Query to insert new city in DB When everything is fine
         global $ConnectingDB;
-        $sql = "INSERT INTO users(datetime, firstName, lastName, emailAddress, telephone, homeAddress, city, gender, password )";
-        $sql .= "VALUES(:dateTIme, :firstNAme, :lastNAme, :emailADdress, :telePhone, :homeADdress, :citY, :gendeR, :passworD)";
+        $sql = "INSERT INTO users(datetime, firstName, lastName, emailAddress, telephone, homeAddress, city, gender, password, userStatus )";
+        $sql .= "VALUES(:dateTIme, :firstNAme, :lastNAme, :emailADdress, :telePhone, :homeADdress, :citY, :gendeR, :passworD, :userStatuS)";
         $stmt = $ConnectingDB->prepare($sql);
         $stmt->bindValue(':dateTIme', $datetime);
         $stmt->bindValue(':firstNAme', $firstName);
@@ -46,6 +47,7 @@
         $stmt->bindValue(':citY', $city);
         $stmt->bindValue(':gendeR', $gender);
         $stmt->bindValue(':passworD', $hash);
+        $stmt->bindValue(':userStatuS', $userStatus);
         
         $Execute=$stmt->execute();
         if($Execute){

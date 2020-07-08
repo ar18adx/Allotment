@@ -13,6 +13,7 @@ if(isset($_POST["Submit"])){
     $plotSize                 = $_POST["plotSize"];
     $plotDescription          = $_POST["plotDescription"];
     $plotSite                 = $_POST["plotSite"];
+    $plotStatus                 = "Vacant";
     
     
     $addedBy                  = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"] ;
@@ -27,13 +28,14 @@ if(isset($_POST["Submit"])){
   }else{
     // Query to insert new Plot in DB When everything is fine
     global $ConnectingDB;
-    $sql = "INSERT INTO plots(plotNumber, plotSize, plotDescription, plotSite, addedBy, dateCreated, dateLastModified )";
-    $sql .= "VALUES( :plotNumbeR, :plotSizE, :plotDescriptioN, :plotSitE, :addedBY, :dateCreateD, :dateLastModifieD )";
+    $sql = "INSERT INTO plots(plotNumber, plotSize, plotDescription, plotSite, plotStatus, addedBy, dateCreated, dateLastModified )";
+    $sql .= "VALUES( :plotNumbeR, :plotSizE, :plotDescriptioN, :plotSitE, :plotStatuS, :addedBY, :dateCreateD, :dateLastModifieD )";
     $stmt = $ConnectingDB->prepare($sql);
     $stmt->bindValue(':plotNumbeR', $plotNumber);
     $stmt->bindValue(':plotSizE', $plotSize);
     $stmt->bindValue(':plotDescriptioN', $plotDescription);
     $stmt->bindValue(':plotSitE', $plotSite);
+    $stmt->bindValue(':plotStatuS', $plotStatus);
     $stmt->bindValue(':addedBY', $addedBy);
     $stmt->bindValue(':dateCreateD', $dateCreated);
     $stmt->bindValue(':dateLastModifieD', $dateLastModified);
