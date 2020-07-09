@@ -4,26 +4,103 @@
 
     <?php
 
-    $userId                 =   $_SESSION["userId"];
+    $tenantId                 =   $_SESSION["userId"];
 
     global $ConnectingDB;
-    $sql ="SELECT * FROM waitinglist WHERE userId = '$userId'  ";
+    $sql ="SELECT * FROM waitinglist WHERE userId = '$tenantId'  ";
     $stmt = $ConnectingDB->query($sql);
     $DataRows=$stmt->fetch();
     $id                     = $DataRows["id"];
-    $userIdRow                     = $DataRows["userId"];
+    // $userIdRow                     = $DataRows["userId"];
     $firstName          = $DataRows["firstName"];
     $lastName          = $DataRows["lastName"];
     $emailAddress	          = $DataRows["emailAddress"];
     $telephoneNumber          = $DataRows["telephoneNumber"];
     $userCity          = $DataRows["userCity"];
+    $siteIdNum           = $DataRows["siteIdNum"];
     $siteCity          = $DataRows["siteCity"];
+    $plotIdNum          = $DataRows["plotIdNum"];
     $plotNumberApp          = $DataRows["plotNumberApp"];
-    $applicationStatus	          = $DataRows["applicationStatus"];
-    $offerCount          = $DataRows["offerCount"];
-    $dateApplied          = $DataRows["dateApplied"];
+    
+    
 
     ?>
+
+    
+    <?php
+
+    if(isset($_POST["Accept"])){
+        
+        $tenantId               =   $_SESSION["userId"];;
+        $tenantFirstName        =   $firstName;
+        $tenantLastName         =   $lastName;
+        $tenantEmailAddress     =   $emailAddress;
+        $tenantPhoneNum         =   $telephoneNumber;
+        $tenantCity             =   $userCity;
+        $siteIdNumRw            =   $siteIdNum;
+        $siteCity               =   $siteCity;
+        $plotIdNumRw            =   $plotIdNum;
+        $plotNumber             =   $plotNumberApp;
+        
+        date_default_timezone_set("Africa/Lagos");
+        
+        $leaseDate              = date("d-F-Y ");
+
+        $date=date_create($leaseDate);
+        date_add($date,date_interval_create_from_date_string("1 years"));
+        $expirationDate = date_format($date,"d-F-Y");
+        
+
+        //Code to 
+        //
+            
+        
+        // Query to insert values in DB When everything is fine
+        global $ConnectingDB;
+        $sql = "INSERT INTO tenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteId, siteCity, plotId, plotNumber, leaseDate, expirationDate )";
+        $sql .= "VALUES(:tenantID, :tenantFirstNamE, :tenantLastNamE, :tenantEmailAddresS, :tenantPhoneNuM, :tenantCitY, :siteID, :siteCitY,  :plotID, :plotNumbeR, :leaseDatE, :expirationDatE )";
+        
+        $sql2 = "UPDATE plots SET plotStatus = 'Occupied', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
+        $stmt2 = $ConnectingDB->prepare($sql2);
+        $Execute2=$stmt2->execute();
+
+        $sql3 = "UPDATE users SET userStatus = 'Tenant' WHERE id ='$tenantId' ";
+        $stmt3 = $ConnectingDB->prepare($sql3);
+        $Execute3=$stmt3->execute();
+
+        $stmt = $ConnectingDB->prepare($sql);
+        $stmt->bindValue(':tenantID', $tenantId);
+        $stmt->bindValue(':tenantFirstNamE', $firstName);
+        $stmt->bindValue(':tenantLastNamE', $lastName);
+        $stmt->bindValue(':tenantEmailAddresS', $tenantEmailAddress);
+        $stmt->bindValue(':tenantPhoneNuM', $tenantPhoneNum);
+        $stmt->bindValue(':tenantCitY', $tenantCity);
+        $stmt->bindValue(':siteID', $siteIdNumRw);
+        $stmt->bindValue(':siteCitY', $siteCity);
+        $stmt->bindValue(':plotID', $plotIdNumRw);
+        $stmt->bindValue(':plotNumbeR', $plotNumber);
+        $stmt->bindValue(':leaseDatE', $leaseDate);
+        $stmt->bindValue(':expirationDatE', $expirationDate);
+
+        // $sql2 = "UPDATE plots SET plotStatus = 'Pending_Acceptance' WHERE plotNumber ='$plotNumberApp' ";
+        // $stmt = $ConnectingDB->prepare($sql2);
+        
+        
+        
+        $Execute=$stmt->execute();
+        if($Execute && $Execute2 && $Execute3){
+        $_SESSION["SuccessMessage"]="You have accepted the plot";
+        Redirect_to("confirmOffer.php");
+        }else {
+        $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+        Redirect_to("confirmOffer.php");
+        }
+        
+
+    } //Ending of Apply Button If-Condition
+
+    ?>
+
 
 
 <!-- Header Start -->
@@ -40,7 +117,7 @@
                     echo SuccessMessage();
                     echo ErrorMessageForRg();
                     ?>
-        <form action="applyForPlots.php" method="POST">
+        <form action="confirmOffer.php" method="POST">
             <div class="row">
                 <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Accept</label>

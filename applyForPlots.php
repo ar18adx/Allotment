@@ -27,10 +27,10 @@
             $sql ="SELECT * FROM plots WHERE plotSite ='$siteCity' AND plotStatus = 'Vacant' ORDER BY RAND() ";
             $stmt = $ConnectingDB->query($sql);
             $DataRows=$stmt->fetch();
-            $id                     = $DataRows["id"];
+            $plotIdNum                     = $DataRows["id"];
             $plotNumber          = $DataRows["plotNumber"];
             $plotStatus          = $DataRows["plotStatus"];
-            
+            $siteIdNum           = $DataRows["siteIdNum"];
             if(empty($plotNumberApp)){
                 $plotNumberApp = $plotNumber;
             }    
@@ -40,12 +40,16 @@
         
         // Query to insert values in DB When everything is fine
         global $ConnectingDB;
-        $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteCity, plotNumberApp, applicationStatus, offerCount, dateApplied )";
-        $sql .= "VALUES(:userID, :firstNamE, :lastNamE, :emailAddresS, :telephoneNumbeR, :userCitY, :siteCitY, :plotNumberApP, :applicationStatuS, :offerCounT, :dateApplieD  )";
+        $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
+        $sql .= "VALUES(:userID, :firstNamE, :lastNamE, :emailAddresS, :telephoneNumbeR, :userCitY, :siteIdNuM, :siteCitY, :plotIdNuM, :plotNumberApP, :applicationStatuS, :offerCounT, :dateApplieD  )";
         
         $sql2 = "UPDATE plots SET plotStatus = 'Pending_Acceptance', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumberApp' ";
         $stmt2 = $ConnectingDB->prepare($sql2);
         $Execute2=$stmt2->execute();
+
+        $sql3 = "UPDATE users SET userStatus = 'Applied_For_Plot' WHERE id ='$userId' ";
+        $stmt3 = $ConnectingDB->prepare($sql3);
+        $Execute3=$stmt3->execute();
 
         $stmt = $ConnectingDB->prepare($sql);
         $stmt->bindValue(':userID', $userId);
@@ -54,7 +58,9 @@
         $stmt->bindValue(':emailAddresS', $emailAddress);
         $stmt->bindValue(':telephoneNumbeR', $telephoneNumber);
         $stmt->bindValue(':userCitY', $userCity);
+        $stmt->bindValue(':siteIdNuM',$siteIdNum);
         $stmt->bindValue(':siteCitY', $siteCity);
+        $stmt->bindValue(':plotIdNuM', $plotIdNum);
         $stmt->bindValue(':plotNumberApP', $plotNumberApp);
         $stmt->bindValue(':applicationStatuS', $applicationStatus);
         $stmt->bindValue(':offerCounT', $offerCount);
@@ -69,7 +75,7 @@
         if($plotStatus == "Vacant"){
         Redirect_to("confirmOffer.php");
         }
-        if($Execute && $Execute2){
+        if($Execute && $Execute2 && $Execute3){
         $_SESSION["SuccessMessage"]="Your Application For a Plot Was Successful";
         Redirect_to("applyForPlots.php");
         }else {
@@ -78,7 +84,7 @@
         }
         
 
-    } //Ending of Submit Button If-Condition
+    } //Ending of Apply Button If-Condition
 
 ?>
 

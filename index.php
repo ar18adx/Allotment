@@ -9,6 +9,16 @@ if(isset($_SESSION["userId"])){
   Redirect_to("postsPage.php");
 }
 
+// if($_SESSION["userStatus"] == "New_User"){
+//   Redirect_to("applyForPlots.php");
+// }
+// if($_SESSION["userStatus"] == "Applied_For_Plot"){
+//   Redirect_to("confirmOffer.php");
+// }
+// if($_SESSION["userStatus"] == "Tenant"){
+//   Redirect_to("tenantProfile.php");
+// }
+
 if (isset($_POST["Submit"])) {
   $emailAddress = $_POST["emailAddress"];
   $password = $_POST["password"];
@@ -22,25 +32,31 @@ if (isset($_POST["Submit"])) {
     $Found_Account=userLoginAttempt($emailAddress);
     if ($Found_Account && password_verify($_POST["password"], $Found_Account["password"])) {
 
-      $_SESSION["userId"]=$Found_Account["id"];
-      $_SESSION["userFirstName"]=$Found_Account["firstName"];
-      $_SESSION["userLastName"]=$Found_Account["lastName"];
-      $_SESSION["userEmailAddress"]=$Found_Account["emailAddress"];
-      $_SESSION["userTelephone"]=$Found_Account["telephone"];
-      $_SESSION["userHomeAddress"]=$Found_Account["homeAddress"];
-      $_SESSION["userCity"]=$Found_Account["city"];
-      $_SESSION["userGender"]=$Found_Account["gender"];
-      $_SESSION["userStatus"]=$Found_Account["userStatus"];
-      
-    if (isset($_SESSION["TrackingURL"])) {
-    Redirect_to($_SESSION["TrackingURL"]);
-    }else{
-    Redirect_to("applyForPlots.php");
-    }
-    }else {
-      $_SESSION["ErrorMessage"]="Incorrect Email OR Password";
-      Redirect_to("index.php");
-    }
+        $_SESSION["userId"]=$Found_Account["id"];
+        $_SESSION["userFirstName"]=$Found_Account["firstName"];
+        $_SESSION["userLastName"]=$Found_Account["lastName"];
+        $_SESSION["userEmailAddress"]=$Found_Account["emailAddress"];
+        $_SESSION["userTelephone"]=$Found_Account["telephone"];
+        $_SESSION["userHomeAddress"]=$Found_Account["homeAddress"];
+        $_SESSION["userCity"]=$Found_Account["city"];
+        $_SESSION["userGender"]=$Found_Account["gender"];
+        $_SESSION["userStatus"]=$Found_Account["userStatus"];
+        
+        if (isset($_SESSION["TrackingURL"])) {
+        Redirect_to($_SESSION["TrackingURL"]);
+        }elseif($_SESSION["userStatus"] == "Applied_For_Plot"){
+          Redirect_to("confirmOffer.php");
+        }elseif($_SESSION["userStatus"] == "Tenant"){
+        Redirect_to("tenantProfile.php");
+        }else{
+        Redirect_to("applyForPlots.php");
+        }
+    
+      }else {
+        $_SESSION["ErrorMessage"]="Incorrect Email OR Password";
+        Redirect_to("index.php");
+      }
+    
   }
 }
 

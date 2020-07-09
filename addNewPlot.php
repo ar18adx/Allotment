@@ -2,7 +2,13 @@
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
 
+    
+
 <?php
+
+    
+
+    // $siteIdNum = $cityId;
 
 if(isset($_POST["Submit"])){
     date_default_timezone_set("Africa/Lagos");
@@ -15,8 +21,17 @@ if(isset($_POST["Submit"])){
     $plotSite                 = $_POST["plotSite"];
     $plotStatus                 = "Vacant";
     
+    global $ConnectingDB;
+    $sql    = "SELECT id FROM cities WHERE cityName=:plotSitE";
+    $stmt   = $ConnectingDB->prepare($sql);
+    $stmt->bindValue(':plotSitE',$plotSite);
+    $stmt->execute();
+    $DataRows = $stmt->fetch();
+    $cityId              = $DataRows["id"];
+    $cityName          = $DataRows["cityName"];
     
     $addedBy                  = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"] ;
+    $siteIdNum                = $cityId ;
     
 
   
@@ -28,8 +43,8 @@ if(isset($_POST["Submit"])){
   }else{
     // Query to insert new Plot in DB When everything is fine
     global $ConnectingDB;
-    $sql = "INSERT INTO plots(plotNumber, plotSize, plotDescription, plotSite, plotStatus, addedBy, dateCreated, dateLastModified )";
-    $sql .= "VALUES( :plotNumbeR, :plotSizE, :plotDescriptioN, :plotSitE, :plotStatuS, :addedBY, :dateCreateD, :dateLastModifieD )";
+    $sql = "INSERT INTO plots(plotNumber, plotSize, plotDescription, plotSite, plotStatus, addedBy, siteIdNum, dateCreated, dateLastModified )";
+    $sql .= "VALUES( :plotNumbeR, :plotSizE, :plotDescriptioN, :plotSitE, :plotStatuS, :addedBY, :siteIdNuM, :dateCreateD, :dateLastModifieD )";
     $stmt = $ConnectingDB->prepare($sql);
     $stmt->bindValue(':plotNumbeR', $plotNumber);
     $stmt->bindValue(':plotSizE', $plotSize);
@@ -37,6 +52,7 @@ if(isset($_POST["Submit"])){
     $stmt->bindValue(':plotSitE', $plotSite);
     $stmt->bindValue(':plotStatuS', $plotStatus);
     $stmt->bindValue(':addedBY', $addedBy);
+    $stmt->bindValue(':siteIdNuM', $siteIdNum);
     $stmt->bindValue(':dateCreateD', $dateCreated);
     $stmt->bindValue(':dateLastModifieD', $dateLastModified);
     
