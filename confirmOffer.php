@@ -44,11 +44,14 @@
         
         date_default_timezone_set("Africa/Lagos");
         
-        $leaseDate              = date("d-F-Y ");
+        $leaseDate              = date("Y-m-d "); 
 
-        $date=date_create($leaseDate);
-        date_add($date,date_interval_create_from_date_string("1 years"));
-        $expirationDate = date_format($date,"d-F-Y");
+        // $leaseDate              = '';
+
+        // $date=date_create($leaseDate);
+        // date_add($date,date_interval_create_from_date_string("1 years"));
+        $expirationDate         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 365 day "));
+        $renewalStatus          = "Will_Not_Retain";
         
 
         //Code to 
@@ -57,8 +60,8 @@
         
         // Query to insert values in DB When everything is fine
         global $ConnectingDB;
-        $sql = "INSERT INTO tenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteId, siteCity, plotId, plotNumber, leaseDate, expirationDate )";
-        $sql .= "VALUES(:tenantID, :tenantFirstNamE, :tenantLastNamE, :tenantEmailAddresS, :tenantPhoneNuM, :tenantCitY, :siteID, :siteCitY,  :plotID, :plotNumbeR, :leaseDatE, :expirationDatE )";
+        $sql = "INSERT INTO tenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteId, siteCity, plotId, plotNumber, leaseDate, expirationDate, renewalStatus )";
+        $sql .= "VALUES(:tenantID, :tenantFirstNamE, :tenantLastNamE, :tenantEmailAddresS, :tenantPhoneNuM, :tenantCitY, :siteID, :siteCitY,  :plotID, :plotNumbeR, :leaseDatE, :expirationDatE, :renewalStatuS )";
         
         $sql2 = "UPDATE plots SET plotStatus = 'Occupied', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
         $stmt2 = $ConnectingDB->prepare($sql2);
@@ -81,6 +84,7 @@
         $stmt->bindValue(':plotNumbeR', $plotNumber);
         $stmt->bindValue(':leaseDatE', $leaseDate);
         $stmt->bindValue(':expirationDatE', $expirationDate);
+        $stmt->bindValue(':renewalStatuS', $renewalStatus);
 
         // $sql2 = "UPDATE plots SET plotStatus = 'Pending_Acceptance' WHERE plotNumber ='$plotNumberApp' ";
         // $stmt = $ConnectingDB->prepare($sql2);
