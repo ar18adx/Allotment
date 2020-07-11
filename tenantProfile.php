@@ -29,7 +29,11 @@
 
     $oneMonthToExp        = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 30 day "));
 
+    $expirationDateTrigger =    date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 91 day "));
+
     echo $expirationDateNotification. "<br>";
+    echo $expirationDateTrigger. "<br>";
+    echo date("Y-m-d"). "<br>";
     
     echo $oneMonthToExp;
 
@@ -40,10 +44,26 @@
             //difference between two dates
             $diff = date_diff($start_date,$end_date);
 
-    // Code to set Plot Status to "Soon Vacant" If user does not renew lease
+    // if(date("Y-m-d") == $expirationDateTrigger ){
+    //     global $ConnectingDB;
+    //     $sql = "UPDATE tenants SET renewalStatus = 'Will_Not_Renew' WHERE tenantId ='$tenantId' ";
+    //     $stmt = $ConnectingDB->prepare($sql);
+    //     $Execute=$stmt->execute();
 
-            
-        
+    // }
+
+    if($oneMonthToExp <= date("Y-m-d")){
+        global $ConnectingDB;
+        $sql = "UPDATE plots SET plotStatus = 'Soon_Vacant' WHERE plotNumber ='$plotNumber' ";
+        $stmt = $ConnectingDB->prepare($sql);
+        $Execute=$stmt->execute();
+
+    }
+
+    
+    
+
+    
     ?>
 
 <?php
@@ -56,7 +76,12 @@ if(isset($_POST["oneYear"])){
         global $ConnectingDB;
         $sql = "UPDATE tenants SET expirationDate = '$renewLeaseForOneYear' WHERE tenantId ='$tenantId' ";
         $stmt = $ConnectingDB->prepare($sql);
-        $Execute=$stmt->execute();    
+        $Execute=$stmt->execute(); 
+        
+            global $ConnectingDB;
+            $sql2 = "UPDATE tenants SET renewalStatus = 'Will_Renew' WHERE tenantId ='$tenantId' ";
+            $stmt2 = $ConnectingDB->prepare($sql2);
+            $Execute2=$stmt2->execute();
     
     $Execute=$stmt->execute();
     if($Execute){
@@ -78,7 +103,12 @@ if(isset($_POST["sixMonths"])){
         global $ConnectingDB;
         $sql = "UPDATE tenants SET expirationDate = '$renewLeaseForSixMonths' WHERE tenantId ='$tenantId' ";
         $stmt = $ConnectingDB->prepare($sql);
-        $Execute=$stmt->execute();    
+        $Execute=$stmt->execute();  
+        
+            global $ConnectingDB;
+            $sql3 = "UPDATE tenants SET renewalStatus = 'Will_Renew' WHERE tenantId ='$tenantId' ";
+            $stmt3 = $ConnectingDB->prepare($sql3);
+            $Execute3=$stmt3->execute();
     
     $Execute=$stmt->execute();
     if($Execute){

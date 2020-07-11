@@ -51,7 +51,7 @@
         // $date=date_create($leaseDate);
         // date_add($date,date_interval_create_from_date_string("1 years"));
         $expirationDate         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 365 day "));
-        $renewalStatus          = "Will_Not_Retain";
+        $renewalStatus          = "Pending";
         
 
         //Code to 
