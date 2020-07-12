@@ -3,6 +3,12 @@
 <?php require_once("inc/functions.php"); ?>
 
     <?php
+        if($_SESSION["userStatus"] == "New_User"){
+            Redirect_to("applyForPlots.php");
+          }
+    ?>
+
+    <?php
 
     $tenantId                 =   $_SESSION["userId"];
 
@@ -31,11 +37,19 @@
 
     $expirationDateTrigger =    date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 91 day "));
 
+    $expirationDateTrnsf =    date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 3 day "));
+
+    $expirationDateMinus1 =    date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 1 day "));
+
     echo $expirationDateNotification. "<br>";
     echo $expirationDateTrigger. "<br>";
     echo date("Y-m-d"). "<br>";
     
-    echo $oneMonthToExp;
+    echo $oneMonthToExp . "<br>";
+    echo $expirationDateTrnsf . "<br>";
+    echo $expirationDateMinus1;
+
+    
 
             // Code to notify the tenant on the number of days before expiry 
             $start_date = date_create(date("Y-m-d"));
@@ -52,17 +66,52 @@
 
     // }
 
-    if($oneMonthToExp <= date("Y-m-d")){
+    if(date("Y-m-d") >= $oneMonthToExp){
         global $ConnectingDB;
-        $sql = "UPDATE plots SET plotStatus = 'Soon_Vacant' WHERE plotNumber ='$plotNumber' ";
-        $stmt = $ConnectingDB->prepare($sql);
-        $Execute=$stmt->execute();
+        $sqlSv = "UPDATE plots SET plotStatus = 'Soon_Vacant' WHERE plotNumber ='$plotNumber' ";
+        $stmtSv = $ConnectingDB->prepare($sqlSv);
+        $ExecuteSv=$stmtSv->execute();
 
     }
 
-    
-    
+    if(date("Y-m-d") >= $expirationDateTrnsf){
+        global $ConnectingDB;
+        $sqlTrn = "INSERT INTO formertenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteCity, plotNumber, leaseDate, expirationDate )";
+        $sqlTrn .= "VALUES('$tenantId', '$tenantFirstName', '$tenantLastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteCity', '$plotNumber', '$leaseDate', '$expirationDate')";
+        $stmtTrn = $ConnectingDB->prepare($sqlTrn);
+        $ExecuteTrn=$stmtTrn->execute();
 
+    }
+    
+    if(date("Y-m-d") >= $expirationDate){
+        global $ConnectingDB;
+        $sqlExp = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumber' ";
+        $stmtExp = $ConnectingDB->prepare($sqlExp);
+        $ExecuteExp=$stmtExp->execute();
+
+    }
+
+    // if(date("Y-m-d") >= $expirationDateMinus1){
+    //     global $ConnectingDB;
+    //     $sqlInct = "UPDATE tenants SET tenantStatus = 'Inactive' WHERE tenantId ='$tenantId' ";;
+    //     $stmtInct = $ConnectingDB->prepare($sqlInct);
+    //     $ExecuteInct=$stmtInct->execute();
+
+    // }
+
+    if(date("Y-m-d") >= $expirationDate){
+    
+        $sqlUpd = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+        $stmtUpd = $ConnectingDB->prepare($sqlUpd);
+        $ExecuteUpd=$stmtUpd->execute();
+
+        $sqlDel = "DELETE FROM tenants WHERE tenantId='$tenantId' ";
+        $stmtDel = $ConnectingDB->prepare($sqlDel);
+        $ExecuteDel=$stmtDel->execute();
+
+        
+
+    }
     
     ?>
 
@@ -74,17 +123,17 @@ if(isset($_POST["oneYear"])){
     
     // Query to insert values in DB When everything is fine
         global $ConnectingDB;
-        $sql = "UPDATE tenants SET expirationDate = '$renewLeaseForOneYear' WHERE tenantId ='$tenantId' ";
-        $stmt = $ConnectingDB->prepare($sql);
-        $Execute=$stmt->execute(); 
+        $sqlR1 = "UPDATE tenants SET expirationDate = '$renewLeaseForOneYear' WHERE tenantId ='$tenantId' ";
+        $stmtR1 = $ConnectingDB->prepare($sqlR1);
+        $ExecuteR1=$stmtR1->execute(); 
         
             global $ConnectingDB;
             $sql2 = "UPDATE tenants SET renewalStatus = 'Will_Renew' WHERE tenantId ='$tenantId' ";
             $stmt2 = $ConnectingDB->prepare($sql2);
             $Execute2=$stmt2->execute();
     
-    $Execute=$stmt->execute();
-    if($Execute){
+    
+    if($ExecuteR1 && $execute2){
     $_SESSION["SuccessMessage"]="You have renewed successfully Your lease for One Year";
     Redirect_to("tenantProfile.php");
     }else {
@@ -101,17 +150,17 @@ if(isset($_POST["sixMonths"])){
     
     // Query to insert values in DB When everything is fine
         global $ConnectingDB;
-        $sql = "UPDATE tenants SET expirationDate = '$renewLeaseForSixMonths' WHERE tenantId ='$tenantId' ";
-        $stmt = $ConnectingDB->prepare($sql);
-        $Execute=$stmt->execute();  
+        $sqlR6 = "UPDATE tenants SET expirationDate = '$renewLeaseForSixMonths' WHERE tenantId ='$tenantId' ";
+        $stmtR6 = $ConnectingDB->prepare($sqlR6);
+        $ExecuteR6=$stmtR6->execute();  
         
             global $ConnectingDB;
             $sql3 = "UPDATE tenants SET renewalStatus = 'Will_Renew' WHERE tenantId ='$tenantId' ";
             $stmt3 = $ConnectingDB->prepare($sql3);
             $Execute3=$stmt3->execute();
     
-    $Execute=$stmt->execute();
-    if($Execute){
+    // $Execute3=$stmt3->execute();
+    if($ExecuteR6 && $Execute3){
     $_SESSION["SuccessMessage"]="You have renewed successfully Your lease for six months";
     Redirect_to("tenantProfile.php");
     }else {

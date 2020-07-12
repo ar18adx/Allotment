@@ -7,7 +7,7 @@
     if(isset($_POST["Apply"])){
         date_default_timezone_set("Africa/Lagos");
         $CurrentTime            =  time();
-        $dateApplied            = strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
+        $dateApplied            = date("Y-m-d");
         $userId                 =   $_SESSION["userId"];
         $firstName              = $_SESSION["userFirstName"];
         $lastName               = $_SESSION["userLastName"];
@@ -43,9 +43,12 @@
         $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
         $sql .= "VALUES(:userID, :firstNamE, :lastNamE, :emailAddresS, :telephoneNumbeR, :userCitY, :siteIdNuM, :siteCitY, :plotIdNuM, :plotNumberApP, :applicationStatuS, :offerCounT, :dateApplieD  )";
         
-        $sql2 = "UPDATE plots SET plotStatus = 'Pending_Acceptance', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumberApp' ";
-        $stmt2 = $ConnectingDB->prepare($sql2);
-        $Execute2=$stmt2->execute();
+        // if($plotStatus == "Vacant"){
+
+            $sql2 = "UPDATE plots SET plotStatus = 'On_Offer', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumberApp' ";
+            $stmt2 = $ConnectingDB->prepare($sql2);
+            $Execute2=$stmt2->execute();
+        //}
 
         $sql3 = "UPDATE users SET userStatus = 'Applied_For_Plot' WHERE id ='$userId' ";
         $stmt3 = $ConnectingDB->prepare($sql3);
@@ -72,16 +75,25 @@
         
         
         $Execute=$stmt->execute();
-        if($plotStatus == "Vacant"){
-        Redirect_to("confirmOffer.php");
-        }
-        if($Execute && $Execute2 && $Execute3){
-        $_SESSION["SuccessMessage"]="Your Application For a Plot Was Successful";
-        Redirect_to("applyForPlots.php");
-        }else {
-        $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-        Redirect_to("applyForPlots.php");
-        }
+        // if($plotStatus == "Vacant"){
+        // Redirect_to("confirmOffer.php");
+        // }else
+        // if($Execute && $Execute2 && $Execute3 && $plotStatus =="Vacant"){
+        //     $_SESSION["SuccessMessage"]="Your Application For a Plot Was Successful Vacant";
+        //     Redirect_to("confirmOffer.php");
+        // }else
+        
+        // if($Execute && $Execute2 && $Execute3){
+        //     $_SESSION["SuccessMessage"]="Your Application For a Plot Was Successful On Offer";
+        //     Redirect_to("applyForPlots.php");
+        // }else {
+        //     $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+        //     Redirect_to("applyForPlots.php");
+        // }
+        
+            if($plotStatus == "Vacant"){
+                Redirect_to("confirmOffer.php");
+            }
         
 
     } //Ending of Apply Button If-Condition
