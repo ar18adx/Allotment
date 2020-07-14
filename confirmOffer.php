@@ -72,8 +72,10 @@
         // Query to insert values in DB When everything is fine
         global $ConnectingDB;
         $sql = "INSERT INTO tenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteId, siteCity, plotId, plotNumber, leaseDate, expirationDate, renewalStatus, tenantStatus )";
-        $sql .= "VALUES(:tenantID, :tenantFirstNamE, :tenantLastNamE, :tenantEmailAddresS, :tenantPhoneNuM, :tenantCitY, :siteID, :siteCitY,  :plotID, :plotNumbeR, :leaseDatE, :expirationDatE, :renewalStatuS, :tenantStatuS )";
-        
+        $sql .= "VALUES('$tenantId', '$firstName', '$lastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteIdNumRw', '$siteCity', '$plotIdNumRw', '$plotNumber', '$leaseDate', '$expirationDate', '$renewalStatus', '$tenantStatus' )";
+        $stmt = $ConnectingDB->prepare($sql);
+        $Execute=$stmt->execute();
+
         $sql2 = "UPDATE plots SET plotStatus = 'Occupied', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
         $stmt2 = $ConnectingDB->prepare($sql2);
         $Execute2=$stmt2->execute();
@@ -82,31 +84,39 @@
         $stmt3 = $ConnectingDB->prepare($sql3);
         $Execute3=$stmt3->execute();
 
-        $stmt = $ConnectingDB->prepare($sql);
-        $stmt->bindValue(':tenantID', $tenantId);
-        $stmt->bindValue(':tenantFirstNamE', $firstName);
-        $stmt->bindValue(':tenantLastNamE', $lastName);
-        $stmt->bindValue(':tenantEmailAddresS', $tenantEmailAddress);
-        $stmt->bindValue(':tenantPhoneNuM', $tenantPhoneNum);
-        $stmt->bindValue(':tenantCitY', $tenantCity);
-        $stmt->bindValue(':siteID', $siteIdNumRw);
-        $stmt->bindValue(':siteCitY', $siteCity);
-        $stmt->bindValue(':plotID', $plotIdNumRw);
-        $stmt->bindValue(':plotNumbeR', $plotNumber);
-        $stmt->bindValue(':leaseDatE', $leaseDate);
-        $stmt->bindValue(':expirationDatE', $expirationDate);
-        $stmt->bindValue(':renewalStatuS', $renewalStatus);
-        $stmt->bindValue(':tenantStatuS', $tenantStatus);
+        
+
+        // $stmt = $ConnectingDB->prepare($sql);
+        // $stmt->bindValue(':tenantID', $tenantId);
+        // $stmt->bindValue(':tenantFirstNamE', $firstName);
+        // $stmt->bindValue(':tenantLastNamE', $lastName);
+        // $stmt->bindValue(':tenantEmailAddresS', $tenantEmailAddress);
+        // $stmt->bindValue(':tenantPhoneNuM', $tenantPhoneNum);
+        // $stmt->bindValue(':tenantCitY', $tenantCity);
+        // $stmt->bindValue(':siteID', $siteIdNumRw);
+        // $stmt->bindValue(':siteCitY', $siteCity);
+        // $stmt->bindValue(':plotID', $plotIdNumRw);
+        // $stmt->bindValue(':plotNumbeR', $plotNumber);
+        // $stmt->bindValue(':leaseDatE', $leaseDate);
+        // $stmt->bindValue(':expirationDatE', $expirationDate);
+        // $stmt->bindValue(':renewalStatuS', $renewalStatus);
+        // $stmt->bindValue(':tenantStatuS', $tenantStatus);
 
         // $sql2 = "UPDATE plots SET plotStatus = 'Pending_Acceptance' WHERE plotNumber ='$plotNumberApp' ";
         // $stmt = $ConnectingDB->prepare($sql2);
         
         
         
-        $Execute=$stmt->execute();
+        
         if($Execute && $Execute2 && $Execute3){
+            
+            $sql43 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+            $stmt43 = $ConnectingDB->prepare($sql43);
+            $Execute43=$stmt43->execute();
+
         $_SESSION["SuccessMessage"]="You have accepted the plot";
-        Redirect_to("confirmOffer.php");
+        Redirect_to("tenantProfile.php");
+
         }else {
         $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
         Redirect_to("confirmOffer.php");
