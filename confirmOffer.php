@@ -83,30 +83,6 @@
         $sql3 = "UPDATE users SET userStatus = 'Tenant' WHERE id ='$tenantId' ";
         $stmt3 = $ConnectingDB->prepare($sql3);
         $Execute3=$stmt3->execute();
-
-        
-
-        // $stmt = $ConnectingDB->prepare($sql);
-        // $stmt->bindValue(':tenantID', $tenantId);
-        // $stmt->bindValue(':tenantFirstNamE', $firstName);
-        // $stmt->bindValue(':tenantLastNamE', $lastName);
-        // $stmt->bindValue(':tenantEmailAddresS', $tenantEmailAddress);
-        // $stmt->bindValue(':tenantPhoneNuM', $tenantPhoneNum);
-        // $stmt->bindValue(':tenantCitY', $tenantCity);
-        // $stmt->bindValue(':siteID', $siteIdNumRw);
-        // $stmt->bindValue(':siteCitY', $siteCity);
-        // $stmt->bindValue(':plotID', $plotIdNumRw);
-        // $stmt->bindValue(':plotNumbeR', $plotNumber);
-        // $stmt->bindValue(':leaseDatE', $leaseDate);
-        // $stmt->bindValue(':expirationDatE', $expirationDate);
-        // $stmt->bindValue(':renewalStatuS', $renewalStatus);
-        // $stmt->bindValue(':tenantStatuS', $tenantStatus);
-
-        // $sql2 = "UPDATE plots SET plotStatus = 'Pending_Acceptance' WHERE plotNumber ='$plotNumberApp' ";
-        // $stmt = $ConnectingDB->prepare($sql2);
-        
-        
-        
         
         if($Execute && $Execute2 && $Execute3){
             
@@ -123,7 +99,62 @@
         }
         
 
-    } //Ending of Apply Button If-Condition
+    } //Ending of Accept Button If-Condition
+
+    if(isset($_POST["Reject"])){
+        
+        
+        if($offerCount <1){
+            // Query to insert values in DB When everything is fine
+            $sqlRjc = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = 'None', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+            $stmtRjc = $ConnectingDB->prepare($sqlRjc);
+            $ExecuteRjc=$stmtRjc->execute();
+
+            $sqlCp22 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = '$siteCity' ORDER BY id ASC LIMIT 1 ";
+            $stmtCp22 = $ConnectingDB->prepare($sqlCp22);
+            $ExecuteCp22=$stmtCp22->execute();
+                
+            if($ExecuteRjc && $ExecuteCp22){
+                
+            $_SESSION["SuccessMessage"]="You have Rejected the plot";
+            Redirect_to("applyForPlots.php");
+
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("confirmOffer.php");
+            }
+
+        }elseif($offerCount >=1){
+            $sqlSt8 = "UPDATE plots SET plotStatus = 'Vacant', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
+            $stmtSt8 = $ConnectingDB->prepare($sqlSt8);
+            $ExecuteSt8=$stmtSt8->execute();
+
+            $sqlCp1 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = '$siteCity' ORDER BY id ASC LIMIT 1 ";
+            $stmtCp1 = $ConnectingDB->prepare($sqlCp1);
+            $ExecuteCp1=$stmtCp1->execute();
+
+            $sqlNu3 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+            $stmtNu3 = $ConnectingDB->prepare($sqlNu3);
+            $ExecuteNu3=$stmtNu3->execute();
+
+            if($ExecuteNu3 && $ExecuteSt8 && $ExecuteCp1){
+                $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+                $ExecuteDel2=$stmtDel2->execute();
+
+            $_SESSION["SuccessMessage"]="You have Rejected the 2 plots that were allocated to You. You will have to apply as a new user in order to get a plot";
+            Redirect_to("applyForPlots.php");
+
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("confirmOffer.php");
+            }
+        }
+        
+
+    } //Ending of Reject Button If-Condition
+
+
 
         $daysCountFourteen         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateApplied)). " + 14 day "));
         $start_dateF = date_create(date("Y-m-d"));
@@ -133,20 +164,21 @@
         $diff4 = date_diff($start_dateF,$end_dateF);
 
         echo $daysCountFourteen;
+        echo $plotNumberApp;
     
 
-        if(date("2020-07-26") >= $daysCountFourteen){
-            $sqlExp = "UPDATE waitinglist SET offerCount = offerCount + 1 WHERE userId ='$tenantId' ";
-            $stmtExp = $ConnectingDB->prepare($sqlExp);
-            $ExecuteExp=$stmtExp->execute();
+        // if(date("2020-07-26") >= $daysCountFourteen){
+        //     $sqlExp = "UPDATE waitinglist SET offerCount = offerCount + 1 WHERE userId ='$tenantId' ";
+        //     $stmtExp = $ConnectingDB->prepare($sqlExp);
+        //     $ExecuteExp=$stmtExp->execute();
     
-        }
+        // }
 
-        if($offerCount >= 1){
-            $sqlDelof = "DELETE FROM waitinglist WHERE tenantId = '$tenantId' ";
-            $stmtDelof = $ConnectingDB->prepare($sqlDelof);
-            $ExecuteDelof=$stmtDelof->execute();
-        }
+        // if($offerCount >= 1){
+        //     $sqlDelof = "DELETE FROM waitinglist WHERE tenantId = '$tenantId' ";
+        //     $stmtDelof = $ConnectingDB->prepare($sqlDelof);
+        //     $ExecuteDelof=$stmtDelof->execute();
+        // }
     ?>
 
 
@@ -158,30 +190,34 @@
     <div class="container">
     
         <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
-        <h3>You have been allocated Plot "<?php echo htmlentities($plotNumberApp);?>" in "<?php echo htmlentities($siteCity); ?>" Site. If you are OK with this. You have <?php echo htmlentities($diff4->format("%a")) ; ?> days to ACCEPT or REJECT the offer.</p>
+        <?php if ($plotNumberApp == "None"){?>
+            <h3>Your Application for a plot was successful. A plot will be allocated to you soon.</h3>
+            <?php }else{?>
+            <h3>You have been allocated Plot "<?php echo htmlentities($plotNumberApp);?>" in "<?php echo htmlentities($siteCity); ?>" Site. If you are OK with this. You have <?php echo htmlentities($diff4->format("%a")) ; ?> days to ACCEPT or REJECT the offer.</h3>
+                   
                     <br>
                     <?php
                     echo ErrorMessage();
                     echo SuccessMessage();
                     echo ErrorMessageForRg();
                     ?>
-        <form action="confirmOffer.php" method="POST">
-            <div class="row">
-                <div class="form-group col-md-4">
-                        <label for="exampleInputEmail1">Accept</label>
-                        <div class="">
-                            <button type="submit" name="Accept" class="btn btn-success">Accept</button>
-                        </div>
+            <form action="confirmOffer.php" method="POST">
+                <div class="row">
+                    <div class="form-group col-md-4">
+                            <label for="exampleInputEmail1">Accept</label>
+                            <div class="">
+                                <button type="submit" name="Accept" class="btn btn-success">Accept</button>
+                            </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                            <label for="exampleInputEmail1">Reject</label>
+                            <div class="">
+                                <button type="submit" name="Reject" class="btn btn-success">Reject</button>
+                            </div>
+                    </div>
                 </div>
-                <div class="form-group col-md-4">
-                        <label for="exampleInputEmail1">Reject</label>
-                        <div class="">
-                            <button type="submit" name="Reject" class="btn btn-success">Reject</button>
-                        </div>
-                </div>
-            </div>
-        </form>
-
+            </form>
+        <?php }?>
     
 
     </div>
