@@ -131,7 +131,10 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Gender</label>
-                            <input type="text" name="gender" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <select name="gender" class="custom-select">
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
                         </div>
                     </div>
                     <div class="row">

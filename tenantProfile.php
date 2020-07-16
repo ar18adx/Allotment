@@ -88,12 +88,12 @@
 
     }
 
-    if(date("Y-m-d") >= $expirationDate){
-        $sql303 = "INSERT INTO waitinglist ( siteCity, plotNumberApp) SELECT siteCity, plotNumberApp FROM tenant WHERE Country='Germany' ";
-        $stmt303 = $ConnectingDB->prepare($sql303);
-        $Execute303=$stmt303->execute();
+    // if(date("Y-m-d") >= $expirationDate){
+    //     $sql303 = "INSERT INTO waitinglist ( siteCity, plotNumberApp) SELECT siteCity, plotNumberApp FROM tenant WHERE Country='Germany' ";
+    //     $stmt303 = $ConnectingDB->prepare($sql303);
+    //     $Execute303=$stmt303->execute();
 
-    }
+    // }
 
     // if(date("Y-m-d") >= $expirationDateMinus1){
     //     global $ConnectingDB;

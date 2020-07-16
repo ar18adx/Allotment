@@ -110,11 +110,11 @@
             $stmtRjc = $ConnectingDB->prepare($sqlRjc);
             $ExecuteRjc=$stmtRjc->execute();
 
-            $sqlCp22 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = '$siteCity' ORDER BY id ASC LIMIT 1 ";
-            $stmtCp22 = $ConnectingDB->prepare($sqlCp22);
-            $ExecuteCp22=$stmtCp22->execute();
+            $sql77 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity = '$siteCity', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = 'None' ORDER BY id ASC LIMIT 1 ";
+            $stmt77 = $ConnectingDB->prepare($sql77);
+            $Execute77=$stmt77->execute();
                 
-            if($ExecuteRjc && $ExecuteCp22){
+            if($ExecuteRjc && $Execute77){
                 
             $_SESSION["SuccessMessage"]="You have Rejected the plot";
             Redirect_to("applyForPlots.php");
@@ -190,9 +190,9 @@
     <div class="container">
     
         <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
-        <?php if ($plotNumberApp == "None"){?>
-            <h3>Your Application for a plot was successful. A plot will be allocated to you soon.</h3>
-            <?php }else{?>
+        <?php// if ($plotNumberApp == "None"){?>
+            <!-- <h3>Your Application for a plot was successful. A plot will be allocated to you soon.</h3> -->
+            <?php //}else{?>
             <h3>You have been allocated Plot "<?php echo htmlentities($plotNumberApp);?>" in "<?php echo htmlentities($siteCity); ?>" Site. If you are OK with this. You have <?php echo htmlentities($diff4->format("%a")) ; ?> days to ACCEPT or REJECT the offer.</h3>
                    
                     <br>
@@ -217,7 +217,7 @@
                     </div>
                 </div>
             </form>
-        <?php }?>
+        <?php // }?>
     
 
     </div>

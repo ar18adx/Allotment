@@ -16,24 +16,24 @@ if(isset($_POST["Submit"])){
     $emailAddress                = $_POST["emailAddress"];
     $telephone                = $_POST["telephone"];
     $homeAddress                = $_POST["homeAddress"];
-    $siteName                       = "All";
+    $siteName                   = $_POST["siteName"];
     $gender                = $_POST["gender"];
     $password                = $_POST["password"];
     $confirmPassword        = $_POST["confirmPassword"];
     $hash                   = password_hash($password, PASSWORD_BCRYPT);
-    $adminRole                = "Super_Admin";
+    $adminRole                = "Site_Manager";
     $addedBy                = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"];
  
 
   if(empty($firstName)||empty($lastName)||empty($emailAddress)||empty($telephone)){
     $_SESSION["ErrorMessage"]= "All fields must be filled out";
-    Redirect_to("addNewAdmin.php");
+    Redirect_to("addSiteManager.php");
   }elseif (strlen($password)<4) {
     $_SESSION["ErrorMessage"]= "Password should be greater than 3 characters";
-    Redirect_to("addNewAdmin.php");
+    Redirect_to("addSiteManager.php");
   }elseif ($password !== $confirmPassword) {
     $_SESSION["ErrorMessage"]= "Password and Confirm Password should match";
-    Redirect_to("addNewAdmin.php");
+    Redirect_to("addSiteManager.php");
   }else{
     // Query to insert new admin in DB When everything is fine
     global $ConnectingDB;
@@ -54,11 +54,11 @@ if(isset($_POST["Submit"])){
 
     $Execute=$stmt->execute();
     if($Execute){
-      $_SESSION["SuccessMessage"]="New Admin added Successfully";
-      Redirect_to("addNewAdmin.php");
+      $_SESSION["SuccessMessage"]="New Site Manager added Successfully";
+      Redirect_to("addSiteManager.php");
     }else {
       $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-      Redirect_to("addNewAdmin.php");
+      Redirect_to("addSiteManager.php");
     }
   }
 } //Ending of Submit Button If-Condition
@@ -74,9 +74,9 @@ if(isset($_POST["Submit"])){
 
 <div class="container">
     
-    <h1>Add New Admin/Site Manager</h1>
+    <h1>Add Site Manager</h1>
 
-            <form class="mb-5" action="addNewAdmin.php" method="POST">
+            <form class="mb-5" action="addSiteManager.php" method="POST">
             <br>
             <?php
                 echo ErrorMessage();
@@ -119,6 +119,24 @@ if(isset($_POST["Submit"])){
                     </div>
                 </div>
                 <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="exampleInputEmail1">Site</label>
+                            <select name="siteName" class="custom-select">
+                                <?php
+                                //Fetchinng all the categories from category table
+                                global $ConnectingDB;
+                                $sql = "SELECT id, cityName FROM cities";
+                                $stmt = $ConnectingDB->query($sql);
+                                while ($DataRows = $stmt->fetch()) {
+                                $Id = $DataRows["id"];
+                                $cityName = $DataRows["cityName"];
+                                ?>
+                                <option> <?php echo $cityName; ?> </option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                <div class="row">
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Gender</label>
                         <select name="gender" class="custom-select">
@@ -126,6 +144,9 @@ if(isset($_POST["Submit"])){
                             <option>Female</option>
                         </select>
                     </div>
+                </div>
+                <div class="row">
+                
                 </div>
                 <div class="row">
                     <div class="form-group col-md-4">

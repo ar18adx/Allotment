@@ -27,6 +27,8 @@ if (isset($_POST["Submit"])) {
       $_SESSION["adminLastName"]=$Found_Account["lastName"];
       $_SESSION["adminEmailAddress"]=$Found_Account["emailAddress"];
       $_SESSION["adminHomeAddress"]=$Found_Account["homeAddress"];
+      $_SESSION["adminSiteName"]=$Found_Account["siteName"];
+      $_SESSION["adminRole"]=$Found_Account["adminRole"];
       $_SESSION["adminGender"]=$Found_Account["gender"];
       
     if (isset($_SESSION["TrackingURL"])) {

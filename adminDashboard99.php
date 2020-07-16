@@ -9,16 +9,11 @@
 
     <div class="container"> 
     
-        <h1>Hello, <?php echo $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"] ;?></h1>
+        <h1 class="mb-5">Hello, <?php echo $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"] ;?></h1>
         <div class="row">
-            <div class="col-md-3">
-                <div>
-                    <button type="button" class="mb-2 btn btn-success">View Waiting List</button>
-                </div>
-                <div>
-                    <button type="button" class="mb-2 btn btn-success">View Waiting List</button>
-                </div>
-            </div>    
+            <!-- Include Admin Sidebar -->
+            <?php include("inc/adminSidebar.php");?>
+            <!-- Include Admin Sidebar -->    
             <div class="col-md-9">
                 <div class="row">
                     <div class="col-sm-4">
