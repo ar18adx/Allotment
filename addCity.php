@@ -33,7 +33,7 @@ if(isset($_POST["Submit"])){
     
     $Execute=$stmt->execute();
     if($Execute){
-      $_SESSION["SuccessMessage"]="New City added Successfully";
+      $_SESSION["SuccessMessage"]="New Site added Successfully";
       Redirect_to("addCity.php");
     }else {
       $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
@@ -52,7 +52,7 @@ if(isset($_POST["Submit"])){
 
 <div class="container">
     <div class="mt-4">
-        <h1>Add City</h1>
+        <h1>Add New Site</h1>
     </div>
 
             <form action="addCity.php" method="POST">
@@ -64,7 +64,7 @@ if(isset($_POST["Submit"])){
             ?>
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="exampleInputEmail1">City Name</label>
+                        <label for="exampleInputEmail1">Site Name</label>
                         <input type="text" name="cityName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         <small id="emailHelp" class="form-text text-muted">.</small>
                     </div>
@@ -74,7 +74,7 @@ if(isset($_POST["Submit"])){
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">City Short Code</label>
                         <input type="text" name="cityShortCode" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                        <small id="emailHelp" class="form-text text-muted">.</small>
+                        <small id="emailHelp" class="form-text text-muted"><i>IKJ, ABC, WST, GGE </i></small>
                     </div>
                     <!-- Must Be in Caps -->
                 </div>

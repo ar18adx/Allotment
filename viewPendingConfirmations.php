@@ -7,6 +7,8 @@ $adminSiteName = $_SESSION["adminSiteName"];
 
 
 
+
+
 ?>
 
 <!-- Admin Header Start -->
@@ -16,7 +18,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
         <?php if($_SESSION["adminRole"] == "Super_Admin" ){ ?>
         <div class="container"> 
             <div class="text-center mb-4 mt-4">
-                <h2>Waiting List (All Sites)</h2>
+                <h2>Pending Confirmations (All Sites)</h2>
             </div>
             <div class="row">
                 <!-- Include Admin Sidebar -->
@@ -39,11 +41,12 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <th scope="col">Application Status</th>
                             <th scope="col">Offer Count</th>
                             <th scope="col">Date Applied</th>
+                            <th scope="col">Days Count</th>
                             </tr>
                         </thead>
                         <?php 
                         global $ConnectingDB;
-                        $sql = "SELECT * FROM waitinglist ORDER BY id asc";
+                        $sql = "SELECT * FROM waitinglist WHERE applicationStatus = 'Pending_Confirmation' ORDER BY id asc";
                         $Execute =$ConnectingDB->query($sql);
                         $SrNo = 0;
                         while ($DataRows=$Execute->fetch()) {
@@ -60,6 +63,13 @@ $adminSiteName = $_SESSION["adminSiteName"];
                         $offerCount         = $DataRows["offerCount"];
                         $dateApplied        = $DataRows["dateApplied"];
                         $SrNo++;
+
+                        $daysCountFourteen         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateApplied)). " + 14 day "));
+                        $start_dateF = date_create(date("Y-m-d"));
+                        $end_dateF   = date_create($daysCountFourteen);
+                        
+                        //difference between two dates
+                        $diff4 = date_diff($start_dateF,$end_dateF);
                         
                         ?>
                         <tbody>
@@ -77,12 +87,13 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <td><?php echo htmlentities($applicationStatus)?></td>
                             <td><?php echo htmlentities($offerCount)?></td>
                             <td><?php echo htmlentities($dateApplied)?></td>
+                            <td><?php echo htmlentities($diff4->format("%a"))?> Days</td>
                             </tr>   
                         </tbody>
                         <?php }?>
                     </table>
                     <div class="mb-3 mt-4 text-center">
-                        <a class="btn btn-success btn-lg" href="viewPendingConfirmations.php" role="button">View Pending Confirmations</a>
+                        <a class="btn btn-success btn-lg" href="viewWaitingList.php" role="button">View Waiting List</a>
                     </div>
                 </div>
             </div>
@@ -92,7 +103,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
         <?php }elseif($_SESSION["adminRole"] == "Site_Manager"){ ?>
         <div class="container"> 
             <div class="text-center mb-4 mt-4">
-                <h2>Waiting List (<?php echo htmlentities($adminSiteName) ?>)</h2>
+                <h2>Pending Confirmations (<?php echo htmlentities($adminSiteName) ?>)</h2>
             </div>
             <div class="row">
                 <!-- Include Admin Sidebar -->
@@ -115,11 +126,12 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <th scope="col">Application Status</th>
                             <th scope="col">Offer Count</th>
                             <th scope="col">Date Applied</th>
+                            <th scope="col">Days Count</th>
                             </tr>
                         </thead>
                         <?php 
                         global $ConnectingDB;
-                        $sql = "SELECT * FROM waitinglist WHERE siteCity = '$adminSiteName' ORDER BY id asc";
+                        $sql = "SELECT * FROM waitinglist WHERE siteCity = '$adminSiteName' AND applicationStatus = 'Pending_Confirmation' ORDER BY id asc";
                         $Execute =$ConnectingDB->query($sql);
                         $SrNo = 0;
                         while ($DataRows=$Execute->fetch()) {
@@ -137,6 +149,13 @@ $adminSiteName = $_SESSION["adminSiteName"];
                         $dateApplied        = $DataRows["dateApplied"];
                         $SrNo++;
 
+                        $daysCountFourteen         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateApplied)). " + 14 day "));
+                        $start_dateF = date_create(date("Y-m-d"));
+                        $end_dateF   = date_create($daysCountFourteen);
+                        
+                        //difference between two dates
+                        $diff4 = date_diff($start_dateF,$end_dateF);
+
                         ?>
                         <tbody>
                             <tr>
@@ -153,12 +172,13 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <td><?php echo htmlentities($applicationStatus)?></td>
                             <td><?php echo htmlentities($offerCount)?></td>
                             <td><?php echo htmlentities($dateApplied)?></td>
+                            <td><?php echo htmlentities($diff4->format("%a"))?> Days</td>
                             </tr>   
                         </tbody>
                         <?php }?>
                     </table>
                     <div class="mb-3 mt-4 text-center">
-                        <a class="btn btn-success btn-lg" href="viewPendingConfirmations.php" role="button">View Pending Confirmations</a>
+                        <a class="btn btn-success btn-lg" href="viewWaitingList.php" role="button">View Waiting List</a>
                     </div>
                 </div>
             </div>           

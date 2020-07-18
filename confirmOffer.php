@@ -163,16 +163,59 @@
         //difference between two dates
         $diff4 = date_diff($start_dateF,$end_dateF);
 
-        echo $daysCountFourteen;
+        echo $daysCountFourteen ."<br>";
         echo $plotNumberApp;
     
 
-        // if(date("2020-07-26") >= $daysCountFourteen){
-        //     $sqlExp = "UPDATE waitinglist SET offerCount = offerCount + 1 WHERE userId ='$tenantId' ";
-        //     $stmtExp = $ConnectingDB->prepare($sqlExp);
-        //     $ExecuteExp=$stmtExp->execute();
+        if(date("Y-m-d") >= $daysCountFourteen && $offerCount <1){
+
+            $sqlD14 = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = 'None', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+            $stmtD14 = $ConnectingDB->prepare($sqlD14);
+            $ExecuteD14=$stmtD14->execute();
+
+            $sqlU4 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity = '$siteCity', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = 'None' ORDER BY id ASC LIMIT 1 ";
+            $stmtU4 = $ConnectingDB->prepare($sqlU4);
+            $ExecuteU4=$stmtU4->execute();
+
+            if($ExecuteD14 && $ExecuteU4){
+
+            $_SESSION["SuccessMessage"]="You did not accept the plot within 14 days";
+            Redirect_to("applyForPlots.php");
+
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("confirmOffer.php");
+            }
+            
+        }elseif(date("Y-m-d") >= $daysCountFourteen && $offerCount >=1){
+            $sqlD1 = "UPDATE plots SET plotStatus = 'Vacant', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
+            $stmtD1 = $ConnectingDB->prepare($sqlD1);
+            $ExecuteD1=$stmtD1->execute();
+
+            $sqlB14 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = '$siteCity' ORDER BY id ASC LIMIT 1 ";
+            $stmtB14 = $ConnectingDB->prepare($sqlB14);
+            $ExecuteB14=$stmtB14->execute();
+
+            $sqlA1 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+            $stmtA1 = $ConnectingDB->prepare($sqlA1);
+            $ExecuteA1=$stmtA1->execute();
+
+            if($ExecuteD1 && $ExecuteB14 && $ExecuteA1){
+                $sqlDelb = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                $stmtDelb = $ConnectingDB->prepare($sqlDelb);
+                $ExecuteDelb=$stmtDelb->execute();
+
+            $_SESSION["SuccessMessage"]="You did not accept the 2 plots that were allocated to You. You will have to apply as a new user in order to get a plot";
+            Redirect_to("applyForPlots.php");
+
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("confirmOffer.php");
+            }
     
-        // }
+        }
+
+        
 
         // if($offerCount >= 1){
         //     $sqlDelof = "DELETE FROM waitinglist WHERE tenantId = '$tenantId' ";

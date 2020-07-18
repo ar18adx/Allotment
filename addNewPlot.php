@@ -128,7 +128,7 @@ if(isset($_POST["Submit"])){
                 
 
                 
-                <button type="submit" name="Submit" class="btn btn-success">Register</button>
+                <button type="submit" name="Submit" class="btn btn-success">Add Plot</button>
 
             </form>
             

@@ -230,12 +230,75 @@ function confirmAdminLogin(){
   }
   }
 
+  function TotalSitesAdded(){
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM cities ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalSitesAdded=array_shift($TotalRows);
+    echo $TotalSitesAdded;
 
+  }
 
+  function TotalPlotsAdded(){
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM plots ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalPlotsAdded=array_shift($TotalRows);
+    echo $TotalPlotsAdded;
+  
+  }
 
+  function TotalTenants(){
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM tenants ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalTenants=array_shift($TotalRows);
+    echo $TotalTenants;
+  
+  }
 
+  function TotalWaitingListNum(){
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM waitinglist ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalWaitingListNum=array_shift($TotalRows);
+    echo $TotalWaitingListNum;
+  
+  }
 
+  function TotalSiteManager(){
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM admins WHERE adminRole = 'Site_Manager' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalSiteManager=array_shift($TotalRows);
+    echo $TotalSiteManager;
+  
+  }
 
+  function TotalPlotsPerSite(){
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM plots WHERE plotSite = '$cityName' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalPlotsPerSite=array_shift($TotalRows);
+    echo $TotalPlotsPerSite;
+  
+  }
+
+  function userPositionOnList(){
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM waitinglist WHERE plotSite = '$cityName' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $userPositionOnList=array_shift($TotalRows);
+    echo $userPositionOnList;
+  
+  }
 
 
 
