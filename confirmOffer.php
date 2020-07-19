@@ -29,6 +29,7 @@
     $siteCity          = $DataRows["siteCity"];
     $plotIdNum          = $DataRows["plotIdNum"];
     $plotNumberApp          = $DataRows["plotNumberApp"];
+    $applicationStatus          = $DataRows["applicationStatus"];
     $offerCount          = $DataRows["offerCount"];
     $dateApplied        =   $DataRows["dateApplied"];
     
@@ -222,6 +223,24 @@
         //     $stmtDelof = $ConnectingDB->prepare($sqlDelof);
         //     $ExecuteDelof=$stmtDelof->execute();
         // }
+
+            $sqlRc ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' ORDER BY id ASC ";
+            $stmtRc = $ConnectingDB->prepare($sqlRc);
+            $stmtRc->execute();
+            $ResultRc = $stmtRc->rowcount();
+
+            // $sqlUps ="SELECT COUNT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND id <'$id' ";
+            // $stmtUps = $ConnectingDB->prepare($sqlUps);
+            // $stmtUps->execute();
+            // $ResultUps = $stmtUps->rowcount();
+
+            $sql = "SELECT COUNT(*) FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND id<=$id ";
+            $stmt = $ConnectingDB->query($sql);
+            $TotalRows= $stmt->fetch();
+            $userPositionOnList=array_shift($TotalRows);
+
+            // echo $ResultUps ."<br>";
+            // echo $ResultUps;
     ?>
 
 
@@ -233,9 +252,9 @@
     <div class="container">
     
         <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
-        <?php// if ($plotNumberApp == "None"){?>
-            <!-- <h3>Your Application for a plot was successful. A plot will be allocated to you soon.</h3> -->
-            <?php //}else{?>
+        <?php if ($applicationStatus == "Awaiting_Plot"){?>
+            <h3>Your Application for a plot was successful. You are in number <?php echo $userPositionOnList ?> position on the Waiting List out of <?php echo $ResultRc ?> applicants</h3>
+            <?php }else{?>
             <h3>You have been allocated Plot "<?php echo htmlentities($plotNumberApp);?>" in "<?php echo htmlentities($siteCity); ?>" Site. If you are OK with this. You have <?php echo htmlentities($diff4->format("%a")) ; ?> days to ACCEPT or REJECT the offer.</h3>
                    
                     <br>
@@ -260,7 +279,7 @@
                     </div>
                 </div>
             </form>
-        <?php // }?>
+        <?php }?>
     
 
     </div>

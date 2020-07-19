@@ -290,15 +290,15 @@ function confirmAdminLogin(){
   
   }
 
-  function userPositionOnList(){
-    global $ConnectingDB;
-    $sql = "SELECT COUNT(*) FROM waitinglist WHERE plotSite = '$cityName' ";
-    $stmt = $ConnectingDB->query($sql);
-    $TotalRows= $stmt->fetch();
-    $userPositionOnList=array_shift($TotalRows);
-    echo $userPositionOnList;
+  // function userPositionOnList(){
+  //   global $ConnectingDB;
+  //   $sql = "SELECT COUNT(*) FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND id = ";
+  //   $stmt = $ConnectingDB->query($sql);
+  //   $TotalRows= $stmt->fetch();
+  //   $userPositionOnList=array_shift($TotalRows);
+  //   echo $userPositionOnList;
   
-  }
+  // }
 
 
 

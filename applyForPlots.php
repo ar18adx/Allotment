@@ -27,9 +27,7 @@
             $userCity = $_SESSION["userCity"];
             global $ConnectingDB;
             $sql ="SELECT * FROM plots WHERE plotSite ='$siteCity' AND plotStatus = 'Vacant' ORDER BY RAND() LIMIT 1 ";
-            // $stmt = $ConnectingDB->query($sql);
             $stmt = $ConnectingDB->prepare($sql);
-            // $stmt->bindValue(':siteCitY',$siteCity);
             $stmt->execute();
             $Result = $stmt->rowcount();
             if ($Result > 0) {
@@ -77,7 +75,7 @@
                 $stmt77 = $ConnectingDB->prepare($sql77);
                 $Execute77=$stmt77->execute();
 
-                $sql44 = "UPDATE users SET userStatus = 'Applied_For_Plot' WHERE id ='$userId' ";
+                $sql44 = "UPDATE users SET userStatus = 'Awaiting_Plot' WHERE id ='$userId' ";
                 $stmt44 = $ConnectingDB->prepare($sql44);
                 $Execute44=$stmt44->execute();
 
@@ -130,6 +128,9 @@
            
 
     } //Ending of Apply Button If-Condition
+
+    
+            
 
 ?>
 
