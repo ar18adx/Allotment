@@ -39,6 +39,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <th scope="col">Renewal Status</th>
                             <th scope="col">Tenant Status</th>
                             <th scope="col">Days Count</th>
+                            <th scope="col">Send Message</th>
                             
                             </tr>
                         </thead>
@@ -93,6 +94,8 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <?php }elseif($diff->format("%a") > 90){?>
                             <td class="bg-success text-white"><?php echo htmlentities($diff->format("%a"))?> day(s)</td>
                             <?php }?>
+                            <td><a class="btn btn-success" href="#" role="button">Send Message</a></td>
+                            
                             </tr>   
                         </tbody>
                         <?php }?>
@@ -128,6 +131,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <th scope="col">Renewal Status</th>
                             <th scope="col">Tenant Status</th>
                             <th scope="col">Days Count</th>
+                            <th scope="col">Send Message</th>
                             
                             </tr>
                         </thead>
@@ -181,6 +185,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <?php }elseif($diff->format("%a") > 90){?>
                             <td class="bg-success text-white"><?php echo htmlentities($diff->format("%a"))?> day(s)</td>
                             <?php }?>
+                            <td><a class="btn btn-success" href="adminSendMsg.php?id=<?php echo $id; ?>" role="button">Send Message</a></td>
                             </tr>   
                         </tbody>
                         <?php }?>

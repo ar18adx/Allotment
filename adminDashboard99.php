@@ -49,7 +49,7 @@
                 <div class="row">
                     
                     <div class="col-sm-4">
-                        <a href="viewSites.php">
+                        <a href="viewSites.php?page=1">
                             <div class="card text-white bg-info">
                             <div class="card-body">
                                 <h3 class="card-title"><?php TotalSitesAdded()?> Sites</h3>

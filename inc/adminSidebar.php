@@ -1,9 +1,9 @@
-<div class="col-md-3">
+<div class="col-md-3 mt-5">
     <div class="mb-3">
         <a class="btn btn-success" href="adminDashboard99.php" role="button">Dashboard</a>
     </div>
     <div class="mb-3">
-        <a class="btn btn-success" href="#" role="button">Messages</a>
+        <a class="btn btn-success" href="adminMessages.php" role="button">Messages</a>
     </div>
     <div class="mb-3">
         <a class="btn btn-success" href="#" role="button">Reports</a>

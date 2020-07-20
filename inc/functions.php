@@ -30,10 +30,10 @@ function plotNameGen($length){
 
 
 
-function time_ago($DateTime){
+function time_ago($dateTime){
   
   date_default_timezone_set("Africa/Lagos");         
-  $time_ago        = strtotime($DateTime);
+  $time_ago        = strtotime($dateTime);
   $current_time    = time();
   $time_difference = $current_time - $time_ago;
   $seconds         = $time_difference;
