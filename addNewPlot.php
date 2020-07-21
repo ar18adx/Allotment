@@ -1,3 +1,5 @@
+<?php $pageTitle = "Add New Plot";?>
+
 <?php require_once("inc/db.php"); ?>
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
@@ -7,18 +9,22 @@
 <?php
 
     
-
-    // $siteIdNum = $cityId;
+$adminCity = $_SESSION["adminSiteName"];
 
 if(isset($_POST["Submit"])){
+    $adminCity = $_SESSION["adminSiteName"];
     date_default_timezone_set("Africa/Lagos");
-    $CurrentTime        =time();
-    $dateCreated        =strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
-    $dateLastModified  =        strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
+    $CurrentTime                 =time();
+    $dateCreated                =strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
+    $dateLastModified           =        strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
     $plotNumber                 = plotNameGen(10);
-    $plotSize                 = $_POST["plotSize"];
-    $plotDescription          = $_POST["plotDescription"];
-    $plotSite                 = $_POST["plotSite"];
+    $plotSize                   = $_POST["plotSize"];
+    $plotDescription            = $_POST["plotDescription"];
+    if($_SESSION["adminRole"] == "Super_Admin"){
+        $plotSite                 = $_POST["plotSite"];
+    }elseif($_SESSION["adminRole"] == "Site_Manager"){
+        $plotSite               = $adminCity;
+    }
     $plotStatus                 = "Vacant";
     
     global $ConnectingDB;
@@ -105,40 +111,36 @@ if(isset($_POST["Submit"])){
                         <input type="text" name="plotDescription" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-4">
-                        <label for="exampleInputEmail1">Plot Site</label>
-                        <select name="plotSite" class="custom-select">
-                            <?php
-                            //Fetching all cities from table
-                            global $ConnectingDB;
-                            $sql = "SELECT id, cityName FROM cities";
-                            $stmt = $ConnectingDB->query($sql);
-                            while ($DataRows = $stmt->fetch()) {
-                            $Id = $DataRows["id"];
-                            $cityName = $DataRows["cityName"];
-                            ?>
-                            <option> <?php echo $cityName; ?> </option>
-                            <?php } ?>
-                        </select>
+                <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="exampleInputEmail1">Plot Site</label>
+                            <select name="plotSite" class="custom-select">
+                                <?php
+                                //Fetching all cities from table
+                                global $ConnectingDB;
+                                $sql = "SELECT id, cityName FROM cities";
+                                $stmt = $ConnectingDB->query($sql);
+                                while ($DataRows = $stmt->fetch()) {
+                                $Id = $DataRows["id"];
+                                $cityName = $DataRows["cityName"];
+                                ?>
+                                <option> <?php echo $cityName; ?> </option>
+                                <?php } ?>
+                            </select>
+                        </div>
                     </div>
-                </div>
+                <?php }?>
                 <div class="row">
-                
-                
-
-                
-                <button type="submit" name="Submit" class="btn btn-success">Add Plot</button>
+                    <button type="submit" name="Submit" class="btn btn-success">Add Plot</button>
+                </div>
 
             </form>
             
 
 
 </div>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-  </body>
-</html>
+   
+<!-- Admin Footer Start -->
+<?php include("inc/adminFooter.php"); ?>
+<!-- Admin Footer End -->

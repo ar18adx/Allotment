@@ -1,3 +1,6 @@
+<?php $pageTitle = "Dashboard";?>
+
+
 <?php require_once("inc/db.php"); ?>
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
@@ -47,8 +50,8 @@
             <!-- Include Admin Sidebar -->    
             <div class="col-md-9">
                 <div class="row">
-                    
-                    <div class="col-sm-4">
+                    <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
+                    <div class="col-sm-4 mb-4">
                         <a href="viewSites.php?page=1">
                             <div class="card text-white bg-info">
                             <div class="card-body">
@@ -58,7 +61,9 @@
                             </div>
                         </a>
                     </div>
+                    <?php }?>
                     
+                    <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
                     <div class="col-sm-4">
                         <div class="card text-white bg-secondary">
                         <div class="card-body">
@@ -67,6 +72,18 @@
                         </div>
                         </div>
                     </div>
+                    <?php }elseif($_SESSION["adminRole"] == "Site_Manager"){?>
+                    <div class="col-sm-4">
+                        <div class="card text-white bg-secondary">
+                        <div class="card-body">
+                            <h3 class="card-title"><?php TotalPlotsSm()?> Plots</h3>
+                            <p class="card-text">Total number of Plots</p>
+                        </div>
+                        </div>
+                    </div>
+                    <?php }?>
+                    
+                    <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
                     <div class="col-sm-4">
                         <div class="card text-white bg-success">
                         <div class="card-body">
@@ -75,9 +92,18 @@
                         </div>
                         </div>
                     </div>
-                </div>
+                    <?php }elseif($_SESSION["adminRole"] == "Site_Manager"){?>
+                    <div class="col-sm-4">
+                        <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h3 class="card-title"><?php TotalTenantsSm()?> Tenant(s)</h3>
+                            <p class="card-text">Total number of Tenants</p>
+                        </div>
+                        </div>
+                    </div>
+                    <?php }?>
 
-                <div class="row mt-5 mb-5">
+                    <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
                     <div class="col-sm-4">
                         <div class="card text-white text-white bg-warning">
                         <div class="card-body">
@@ -87,6 +113,17 @@
                         </div>
                         </div>
                     </div>
+                    <?php }elseif($_SESSION["adminRole"] == "Site_Manager"){?>
+                    <div class="col-sm-4">
+                        <div class="card text-white text-white bg-warning">
+                        <div class="card-body">
+                            <h3 class="card-title"><?php TotalWaitingListSm()?> User(s) are on the waiting list</h3>
+                            <p class="card-text">Number of users on waiting list</p>
+                            <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                        </div>
+                        </div>
+                    </div>
+                    <?php }?>
                     <div class="col-sm-4">
                         <div class="card text-white bg-danger">
                         <div class="card-body">
@@ -95,6 +132,7 @@
                         </div>
                         </div>
                     </div>
+                    <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
                     <div class="col-sm-4">
                         <div class="card text-white bg-info">
                         <div class="card-body">
@@ -103,6 +141,8 @@
                         </div>
                         </div>
                     </div>
+                    <?php }?>
+
                 </div>
 
                 <!-- <div class="row">
@@ -144,3 +184,7 @@
         
         
     </div>
+
+<!-- Admin Footer Start -->
+<?php include("inc/adminFooter.php"); ?>
+<!-- Admin Footer End -->

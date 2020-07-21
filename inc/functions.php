@@ -2,7 +2,14 @@
 
 
 function plotNameGen($length){
-  $plotSite                 = $_POST["plotSite"];
+  
+  $adminCity = $_SESSION["adminSiteName"];
+
+  if($_SESSION["adminRole"] == "Super_Admin"){
+    $plotSite                 = $_POST["plotSite"];
+  }elseif($_SESSION["adminRole"] == "Site_Manager"){
+      $plotSite               = $adminCity;
+  }
   
   global $ConnectingDB;
   $sql    = "SELECT cityShortCode FROM cities WHERE cityName=:plotSitE";
@@ -250,6 +257,17 @@ function confirmAdminLogin(){
   
   }
 
+  function TotalPlotsSm(){
+    $adminCity = $_SESSION["adminSiteName"];
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM plots WHERE plotSite = '$adminCity' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalPlotsSm=array_shift($TotalRows);
+    echo $TotalPlotsSm;
+  
+  }
+
   function TotalTenants(){
     global $ConnectingDB;
     $sql = "SELECT COUNT(*) FROM tenants ";
@@ -260,6 +278,17 @@ function confirmAdminLogin(){
   
   }
 
+  function TotalTenantsSm(){
+    $adminCity = $_SESSION["adminSiteName"];
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM tenants  WHERE siteCity ='$adminCity' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalTenantsSm=array_shift($TotalRows);
+    echo $TotalTenantsSm;
+  
+  }
+
   function TotalWaitingListNum(){
     global $ConnectingDB;
     $sql = "SELECT COUNT(*) FROM waitinglist ";
@@ -267,6 +296,17 @@ function confirmAdminLogin(){
     $TotalRows= $stmt->fetch();
     $TotalWaitingListNum=array_shift($TotalRows);
     echo $TotalWaitingListNum;
+  
+  }
+
+  function TotalWaitingListSm(){
+    $adminCity = $_SESSION["adminSiteName"];
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM waitinglist WHERE siteCity ='$adminCity' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalWaitingListSm=array_shift($TotalRows);
+    echo $TotalWaitingListSm;
   
   }
 
