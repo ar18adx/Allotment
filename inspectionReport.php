@@ -6,31 +6,124 @@
 <?php require_once("inc/functions.php"); ?>
 
 <?php 
+    if(isset($_POST["Send"])){
+        date_default_timezone_set("Africa/Lagos");
+        $CurrentTime                 =time();
+        $inspectionDate              =strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
+        $plotNumber                  = $_POST["plotNumber"];
+        $inspectionReport            = $_POST["inspectionReport"];
+        $inspectionOfficer           = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"];
+        
 
-    // global $ConnectingDB;
-    // $sql ="SELECT * FROM waitinglist";
-    // $stmt = $ConnectingDB->query($sql);
-    // $DataRows=$stmt->fetch();
-    // $id1                     = $DataRows["id"];
-    // // $userIdRow                     = $DataRows["userId"];
-    // $firstName1         = $DataRows["firstName"];
-    // $lastName1          = $DataRows["lastName"];
-    // $emailAddress1	          = $DataRows["emailAddress"];
-    // $telephoneNumber1          = $DataRows["telephoneNumber"];
-    // $userCity1          = $DataRows["userCity"];
-    // $siteIdNum1           = $DataRows["siteIdNum"];
-    // $siteCity1          = $DataRows["siteCity"];
-    // $plotIdNum1          = $DataRows["plotIdNum"];
-    // $plotNumberApp1          = $DataRows["plotNumberApp"];
-    // $offerCount1          = $DataRows["offerCount"];
-    // $dateApplied1        =   $DataRows["dateApplied"];
-    // $todayDate1          = date("2020-08-15") ;
+        
+        global $ConnectingDB;
+        $sql    = "SELECT tenantFirstName, tenantLastName, siteCity FROM tenants WHERE plotNumber ='$plotNumber' ";
+        $stmt   = $ConnectingDB->prepare($sql);
+        // $stmt->bindValue(':plotNumbeR',$plotNumber);
+        $stmt->execute();
+        $DataRows = $stmt->fetch();
+        $id                     = $DataRows["id"];
+        $tenantFnRow              = $DataRows["tenantFirstName"];
+        $tenantLnRow              = $DataRows["tenantLastName"];
+        $siteCityRow              = $DataRows["siteCity"];
 
-    // $daysCountFourteen1         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateApplied1)). " + 14 day "));
-    
-    // $sql13 = "DELETE FROM waitinglist WHERE offerCount1 > 1 AND '$todayDate1' >= '$daysCountFourteen1' ";
-    // $stmt13 = $ConnectingDB->prepare($sql13);
-    // $Execute13=$stmt13->execute();
+        $tenantFirstName       = $tenantFnRow;
+        $tenantLastName         = $tenantLnRow;
+        $siteCity               = $siteCityRow;
+
+        $evidence        = $_FILES['evidence']['tmp_name'];
+                    foreach($_FILES['evidence']['name'] as $i => $name) {
+                        $name = $_FILES['evidence']['name'][$i];
+                        $size = $_FILES['evidence']['size'][$i];
+                        $type = $_FILES['evidence']['type'][$i];
+                        $tmp = $_FILES['evidence']['tmp_name'][$i];
+
+                        $explode = explode('.', $name);
+
+                        $ext = end($explode);
+                        $updatdName = $explode[0] . time() .'.'. $ext;
+                        $path = 'Uploads/Reports/';
+                        $path = $path . basename( $updatdName );
+
+                            if(empty($_FILES['evidence']['tmp_name'][$i])) {
+                                $_SESSION["ErrorMessage"] = 'Please choose at least 1 file to be uploaded.';
+                                Redirect_to("inspectionReport.php");
+
+                            }else {
+
+                                $allowed = array('jpg','jpeg','gif','bmp','png', 'PNG');
+
+                                $max_size = 6000000; // 6MB
+
+                                if(in_array($ext, $allowed) === false) {
+                                    $_SESSION["ErrorMessage"] = 'The file '.$name.' extension is not allowed.';
+                                    Redirect_to("inspectionReport.php");
+                                }
+
+                                if($size > $max_size) {
+                                    $_SESSION["ErrorMessage"] = 'The file '.$name.'size is too high.';
+                                    Redirect_to("inspectionReport.php");
+                                }
+                    }
+
+                            if(empty($errors)) {
+
+                                // if there is no error then set values
+                                $evidence['evidence'][] = $updatdName;
+                                $errors = array();
+                                if(!file_exists('Uploads/Reports/')) {
+                                    mkdir('Uploads/Reports/', 0777);
+                                }
+
+                                if(move_uploaded_file($tmp, $path)) {
+                                    // echo '<p>The file <b>'.$name.'</b> successful upload</p>';
+                                }else {
+                             //        echo 'Something went wrong while uploading 
+                             // <b>'.$name.'</b>';
+                                }
+
+                            }else {
+                                foreach($errors as $error) {
+                                    echo '<p>'.$error.'<p>';
+                                }
+                            }
+
+                        }
+
+                        if(!empty($evidence)) {
+
+                            $evidence['evidence'][] = $updatdName;
+                            $evidence = implode(',', $evidence['evidence']);
+                        }
+
+
+        if(empty($plotNumber)){
+            $_SESSION["ErrorMessage"]= "All fields must be filled out";
+            Redirect_to("inspectionReport.php");
+        }elseif (CheckPlotNumExistsOrNot($plotNumber)) {
+            $_SESSION["ErrorMessage"]= "Plot Number Does Not Exists.!! ";
+            Redirect_to("inspectionReport.php");
+        }else{
+            // Query to insert new Plot in DB When everything is fine
+            global $ConnectingDB;
+            $sql = "INSERT INTO inspectionreport(siteName, plotNumber, inspectionDate, tenantFirstName, tenantLastName, inspectionOfficer, inspectionReport, evidence)";
+            $sql .= "VALUES( '$siteCity', :plotNumbeR, '$inspectionDate', '$tenantFirstName', '$tenantLastName', '$inspectionOfficer', '$inspectionReport', '$evidence' )";
+            $stmt = $ConnectingDB->prepare($sql);
+            $stmt->bindValue(':plotNumbeR', $plotNumber);
+            
+            
+            
+            $Execute=$stmt->execute();
+            if($Execute){
+            $_SESSION["SuccessMessage"]="Inspection Report was Successfully";
+            Redirect_to("inspectionReport.php");
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("inspectionReport.php");
+            }
+        }
+    } //Ending of Submit Button If-Condition
+   
 
 
 
@@ -53,40 +146,31 @@
                     <h1>Please fill in inspection details correctly!</h1>
                 </div>
 
-                <form class="mb-5" action="inspectionReport.php" method="POST">
+                <form class="mb-5" action="inspectionReport.php" method="POST" enctype="multipart/form-data" >
                     <br>
                     <?php
                         echo ErrorMessage();
                         echo SuccessMessage();
                         echo ErrorMessageForRg();
                     ?>
+                    
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">First Name</label>
-                            <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">Plot Number</label>
+                            <input type="text" name="plotNumber" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <small id="emailHelp" class="form-text text-muted">Please enter a correct plot Number.</small>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Last Name</label>
-                            <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                        </div>
-                    </div>
-            
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Email address</label>
-                            <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Telephone</label>
-                            <input type="text" name="telephone" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">Evidence</label>
+                            <input type="file" name="evidence[]" class="form-control-file" id="exampleFormControlFile1" multiple>
+                            <small id="emailHelp" class="form-text text-muted">Choose a picture or video file.</small>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="form-group col-md-8">
-                            <label for="exampleInputEmail1">Message</label>
-                            <textarea placeholder="Message" name="message" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                            <label for="exampleInputEmail1">Inspection Report</label>
+                            <textarea placeholder="Inspection Report" name="inspectionReport" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                         </div>
                     </div>
                     

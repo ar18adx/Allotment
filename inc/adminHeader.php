@@ -10,7 +10,7 @@
 
     <title><?php echo $pageTitle?></title>
   </head>
-  <body style="padding-top: 50px;">
+  <body style="padding-top: 70px;">
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark mb-5">
         <a class="navbar-brand" href="adminDashboard.php">Admin Dashboard</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

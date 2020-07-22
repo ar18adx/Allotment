@@ -153,6 +153,35 @@ function Redirect_to($New_Location){
 //   }
 // }
 
+function CheckPlotNumExistsOrNot($plotNumber){
+  global $ConnectingDB;
+  $sql    = "SELECT plotNumber FROM plots WHERE plotNumber=:plotNuMber";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':plotNuMber',$plotNumber);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==0) {
+    return true;
+  }else {
+    return false;
+  }
+}
+
+function CheckPlotNumAppExistsOrNot($plotNumberApp){
+  global $ConnectingDB;
+  $sql    = "SELECT plotNumber FROM plots WHERE plotNumber=:plotNuMberApp";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':plotNuMberApp',$plotNumberApp);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==0) {
+    return true;
+  }else {
+    return false;
+  }
+}
+
+
 // Function to make sure a user does not apply for a plot more than once.
 function checkUserIdPltExists($userId){
   global $ConnectingDB;

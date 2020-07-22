@@ -44,7 +44,10 @@
                     $plotNumberApp = $plotNumber;
                 }    
         
-        
+                if (CheckPlotNumExistsOrNot($plotNumberApp)) {
+                    $_SESSION["ErrorMessage"]= "Plot Number Does Not Exists.!! ";
+                    Redirect_to("applyForPlots.php");
+                }
            
         
                 // Query to insert values in DB
