@@ -5,6 +5,11 @@
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
 
+<?php 
+confirmUserLogin();
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+?>
+
 <?php
 
         $tenantId              = $_SESSION["userId"];

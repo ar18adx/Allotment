@@ -137,7 +137,33 @@ function Redirect_to($New_Location){
 }
 
 
+function CheckEmailExistsOrNot($emailAddress){
+  global $ConnectingDB;
+  $sql    = "SELECT emailAddress FROM users WHERE emailAddress=:emailAddresS";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':emailAddresS',$emailAddress);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==1) {
+    return true;
+  }else {
+    return false;
+  }
+}
 
+function CheckCityExistsOrNot($cityName){
+  global $ConnectingDB;
+  $sql    = "SELECT cityName FROM cities WHERE cityName=:cityName";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':cityName',$cityName);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==1) {
+    return true;
+  }else {
+    return false;
+  }
+}
 
 // function CheckUserNameExistsOrNot($Username){
 //   global $ConnectingDB;
@@ -249,7 +275,7 @@ function adminLoginAttempt($emailAddress){
 }
 
 function confirmUserLogin(){
-if (isset($_SESSION["UserId"])) {
+if (isset($_SESSION["userId"])) {
   return true;
 }  else {
   $_SESSION["ErrorMessage"]="Login Required !";

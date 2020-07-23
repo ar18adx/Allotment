@@ -5,6 +5,10 @@
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
 
+<?php 
+confirmUserLogin()
+?>
+
     <?php
         // if($_SESSION["userStatus"] == "New_User"){
         //     Redirect_to("applyForPlots.php");

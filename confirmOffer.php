@@ -1,8 +1,13 @@
-<?php $pageTitle = "confirm Offer";?>
+<?php $pageTitle = "Confirm Offer";?>
 
 <?php require_once("inc/db.php"); ?>
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
+
+<?php 
+confirmUserLogin();
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+?>
 
     <?php
         // if($_SESSION["userStatus"] == "New_User"){

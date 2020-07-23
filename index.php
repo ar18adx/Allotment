@@ -7,8 +7,14 @@
 
 <?php 
 
-if(isset($_SESSION["userId"])){
-  Redirect_to("postsPage.php");
+if(isset($_SESSION["userId"]) && ($_SESSION["userStatus"]=="New_User")){
+  Redirect_to("applyForPlots.php");
+}elseif(isset($_SESSION["userId"]) && ($_SESSION["userStatus"]=="Awaiting_Plot")){
+  Redirect_to("confirmOffer.php");
+}elseif(isset($_SESSION["userId"]) && ($_SESSION["userStatus"]=="Pending_Confirmation")){
+  Redirect_to("confirmOffer.php");
+}elseif(isset($_SESSION["userId"]) && ($_SESSION["userStatus"]=="Tenant")){
+  Redirect_to("tenantProfile.php");
 }
 
 // if($_SESSION["userStatus"] == "New_User"){
@@ -45,13 +51,15 @@ if (isset($_POST["Submit"])) {
         $_SESSION["userStatus"]=$Found_Account["userStatus"];
         
         if (isset($_SESSION["TrackingURL"])) {
-        Redirect_to($_SESSION["TrackingURL"]);
-        }elseif($_SESSION["userStatus"] == "Applied_For_Plot"){
+          Redirect_to($_SESSION["TrackingURL"]);
+        }elseif($_SESSION["userStatus"] == "Awaiting_Plot"){
           Redirect_to("confirmOffer.php");
         }elseif($_SESSION["userStatus"] == "Tenant"){
-        Redirect_to("tenantProfile.php");
+          Redirect_to("tenantProfile.php");
+        }elseif($_SESSION["userStatus"] == "Pending_Confirmation"){
+          Redirect_to("confirmOffer.php");
         }else{
-        Redirect_to("applyForPlots.php");
+          Redirect_to("applyForPlots.php");
         }
     
       }else {

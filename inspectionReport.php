@@ -29,6 +29,7 @@
 
         $tenantFirstName       = $tenantFnRow;
         $tenantLastName         = $tenantLnRow;
+        $adminId                = $_SESSION["adminId"];
         $siteCity               = $siteCityRow;
 
         $evidence        = $_FILES['evidence']['tmp_name'];
@@ -106,8 +107,8 @@
         }else{
             // Query to insert new Plot in DB When everything is fine
             global $ConnectingDB;
-            $sql = "INSERT INTO inspectionreport(siteName, plotNumber, inspectionDate, tenantFirstName, tenantLastName, inspectionOfficer, inspectionReport, evidence)";
-            $sql .= "VALUES( '$siteCity', :plotNumbeR, '$inspectionDate', '$tenantFirstName', '$tenantLastName', '$inspectionOfficer', '$inspectionReport', '$evidence' )";
+            $sql = "INSERT INTO inspectionreport(siteName, plotNumber, inspectionDate, tenantFirstName, tenantLastName, adminId, inspectionOfficer, inspectionReport, evidence)";
+            $sql .= "VALUES( '$siteCity', :plotNumbeR, '$inspectionDate', '$tenantFirstName', '$tenantLastName', '$adminId', '$inspectionOfficer', '$inspectionReport', '$evidence' )";
             $stmt = $ConnectingDB->prepare($sql);
             $stmt->bindValue(':plotNumbeR', $plotNumber);
             
@@ -142,7 +143,10 @@
             <?php include("inc/adminSidebar.php");?>
             <!-- Include Admin Sidebar -->    
             <div class="col-md-9">
-                <div class="mt-5 mb-5">
+                <div class="text-center mt-5 mb-2">
+                    <a class="btn btn-success" href="viewInspectionReports.php" role="button">View Inspection Reports</a>
+                </div>
+                <div class="mt-5 mb-2">
                     <h1>Please fill in inspection details correctly!</h1>
                 </div>
 

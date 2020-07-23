@@ -5,6 +5,11 @@
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
 
+<?php 
+confirmUserLogin();
+
+?>
+
 <?php
 
     if(isset($_POST["Apply"])){
@@ -22,10 +27,11 @@
         // $applicationStatus      = "Pending";
         $offerCount             = 0;
         
-
-        //Code to 
-        //
-        // $sql ="SELECT * FROM plots WHERE plotSite ='$siteCity' AND plotStatus = 'Vacant' ORDER BY RAND() ";    
+            // if (CheckPlotNumExistsOrNot($plotNumberApp)) {
+            //     $_SESSION["ErrorMessage"]= "Plot Number Does Not Exists.!! ";
+            //     Redirect_to("applyForPlots.php");
+            // }
+           
 
             $userCity = $_SESSION["userCity"];
             global $ConnectingDB;
@@ -44,10 +50,7 @@
                     $plotNumberApp = $plotNumber;
                 }    
         
-                if (CheckPlotNumExistsOrNot($plotNumberApp)) {
-                    $_SESSION["ErrorMessage"]= "Plot Number Does Not Exists.!! ";
-                    Redirect_to("applyForPlots.php");
-                }
+                
            
         
                 // Query to insert values in DB

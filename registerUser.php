@@ -25,7 +25,7 @@
     
     
 
-    if(empty($firstName) ||empty($lastName) ||empty($emailAddress)){
+    if(empty($firstName) ||empty($lastName) ||empty($emailAddress) ||empty($telephone) ||empty($homeAddress) ||empty($password) ||empty($confirmPassword)){
         $_SESSION["ErrorMessage"]= "All fields must be filled out";
         Redirect_to("registerUser.php");
     }elseif (strlen($password)<4) {
@@ -34,7 +34,9 @@
     }elseif ($password !== $confirmPassword) {
         $_SESSION["ErrorMessage"]= "Password and Confirm Password should match";
         Redirect_to("registerUser.php");
-        
+    }elseif(CheckEmailExistsOrNot($emailAddress)){
+        $_SESSION["ErrorMessage"]= "Your email address exists in our system";
+        Redirect_to("registerUser.php");
     }else{
         // Query to insert new city in DB When everything is fine
         global $ConnectingDB;
@@ -55,7 +57,7 @@
         $Execute=$stmt->execute();
         if($Execute){
         $_SESSION["SuccessMessage"]="New User added Successfully";
-        Redirect_to("registerUser.php");
+        Redirect_to("index.php");
         }else {
         $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
         Redirect_to("registerUser.php");

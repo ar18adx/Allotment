@@ -14,6 +14,9 @@ if(isset($_POST["Submit"])){
 
   $cityName               = $_POST["cityName"];
   $cityShortCode          = $_POST["cityShortCode"];
+  $availabilityStatus     = "Open";
+  $asUpdatedBy            = "None";
+  $updateTime             = "None";
   
 
   $addedBy                = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"];
@@ -22,14 +25,19 @@ if(isset($_POST["Submit"])){
   if(empty($cityName)){
     $_SESSION["ErrorMessage"]= "All fields must be filled out";
     Redirect_to("addCity.php");
+  }elseif (strlen($cityShortCode)>3) {
+    $_SESSION["ErrorMessage"]= "City Short Code should be Not be greater than 3 characters";
+    Redirect_to("addCity.php");
+  }elseif(CheckCityExistsOrNot($cityName)){
+    $_SESSION["ErrorMessage"]= "Site Name already exists";
   }else{
     // Query to insert new city in DB When everything is fine
     global $ConnectingDB;
-    $sql = "INSERT INTO cities(cityName, cityShortCode, addedBy, datetime)";
-    $sql .= "VALUES(:cityNAme, :cityShortCodE, :addeDBy, :dateTIme)";
+    $sql = "INSERT INTO cities(cityName, cityShortCode, addedBy, datetime, availabilityStatus, asUpdatedBy, updateTime)";
+    $sql .= "VALUES(:cityNAme, :cityShortCodE, :addeDBy, :dateTIme, '$availabilityStatus', '$asUpdatedBy', '$updateTime')";
     $stmt = $ConnectingDB->prepare($sql);
-    $stmt->bindValue(':cityNAme', $cityName);
-    $stmt->bindValue(':cityShortCodE', $cityShortCode);
+    $stmt->bindValue(':cityNAme', ucfirst($cityName));
+    $stmt->bindValue(':cityShortCodE', strtoupper($cityShortCode));
     $stmt->bindValue(':addeDBy', $addedBy);
     $stmt->bindValue(':dateTIme', $DateTime);
     

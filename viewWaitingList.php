@@ -20,6 +20,9 @@ $adminSiteName = $_SESSION["adminSiteName"];
         <div class="container"> 
             <div class="text-center mb-4 mt-4">
                 <h2>Waiting List (All Sites)</h2>
+                <div class="mb-3 mt-3">
+                    <a class="btn btn-success" href="closeOpenApplication.php" role="button">Close/Open Application</a>
+                </div>
             </div>
             <div class="row">
                 <!-- Include Admin Sidebar -->
