@@ -6,6 +6,7 @@
 <?php require_once("inc/functions.php"); ?>
 
 <?php 
+
     if(isset($_POST["Send"])){
         date_default_timezone_set("Africa/Lagos");
         $CurrentTime                 =time();
@@ -116,7 +117,7 @@
             
             $Execute=$stmt->execute();
             if($Execute){
-            $_SESSION["SuccessMessage"]="Inspection Report was Successfully";
+            $_SESSION["SuccessMessage"]="Inspection Report was Successfully Sent";
             Redirect_to("inspectionReport.php");
             }else {
             $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
@@ -144,7 +145,7 @@
             <!-- Include Admin Sidebar -->    
             <div class="col-md-9">
                 <div class="text-center mt-5 mb-2">
-                    <a class="btn btn-success" href="viewInspectionReports.php" role="button">View Inspection Reports</a>
+                    <a class="btn btn-success" href="viewInspectionReports.php?page=1" role="button">View Inspection Reports</a>
                 </div>
                 <div class="mt-5 mb-2">
                     <h1>Please fill in inspection details correctly!</h1>

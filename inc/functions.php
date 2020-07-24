@@ -165,6 +165,20 @@ function CheckCityExistsOrNot($cityName){
   }
 }
 
+function CheckCityCSCOrNot($cityShortCode){
+  global $ConnectingDB;
+  $sql    = "SELECT cityShortCode FROM cities WHERE cityShortCode=:cityShortCoDe";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':cityShortCoDe',$cityShortCode);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==1) {
+    return true;
+  }else {
+    return false;
+  }
+}
+
 // function CheckUserNameExistsOrNot($Username){
 //   global $ConnectingDB;
 //   $sql    = "SELECT Username FROM admins WHERE Username=:userName";

@@ -103,7 +103,13 @@
     </div>
 
     <!-- code for adding a class to the first-child in the carousel -->    
- <script type="text/javascript">
+ 
+
+<!-- Admin Footer Start -->
+<?php include("inc/adminFooter.php"); ?>
+<!-- Admin Footer End -->
+
+<script type="text/javascript">
     // $('.carousel-indicators > :first-child > :first-child')
     // .addClass("selected");
 
@@ -119,7 +125,3 @@
         const indicatorClasses = document.querySelectorAll('.indicatorClass');
         indicatorClasses[0].className +=" active";
 </script>
-
-<!-- Admin Footer Start -->
-<?php include("inc/adminFooter.php"); ?>
-<!-- Admin Footer End -->

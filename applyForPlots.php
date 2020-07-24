@@ -6,6 +6,7 @@
 <?php require_once("inc/functions.php"); ?>
 
 <?php 
+
 confirmUserLogin();
 
 ?>
@@ -16,7 +17,7 @@ confirmUserLogin();
         date_default_timezone_set("Africa/Lagos");
         $CurrentTime            =  time();
         $dateApplied            = date("Y-m-d");
-        $userId                 =   $_SESSION["userId"];
+        $userId                 = $_SESSION["userId"];
         $firstName              = $_SESSION["userFirstName"];
         $lastName               = $_SESSION["userLastName"];
         $emailAddress           = $_SESSION["userEmailAddress"];
@@ -27,76 +28,93 @@ confirmUserLogin();
         // $applicationStatus      = "Pending";
         $offerCount             = 0;
         
-            // if (CheckPlotNumExistsOrNot($plotNumberApp)) {
-            //     $_SESSION["ErrorMessage"]= "Plot Number Does Not Exists.!! ";
-            //     Redirect_to("applyForPlots.php");
-            // }
+            
+            
+            if(!empty($plotNumberApp)){
+
+                if (CheckPlotNumExistsOrNot($plotNumberApp)) {
+                    $_SESSION["ErrorMessage"]= "Plot Number Does Not Exist !!! ";
+                    Redirect_to("applyForPlots.php");
+                }
+                // Query to insert values in DB
+                $sqlA1 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
+                $sqlA1 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNum', '$siteCity', '$plotIdNum', '$plotNumberApp', 'Awaiting_Specific_Plot', '$offerCount', '$dateApplied'  )";
+                $stmtA1 = $ConnectingDB->prepare($sqlA1);
+                $ExecuteA1=$stmtA1->execute();
+
+                if($ExecuteA1){
+                    $_SESSION["SuccessMessage"]="Your application for a plot was successful";
+                    Redirect_to("applyForPlots.php");
+                }
+
+            }elseif(empty($plotNumberApp)){
+            
            
 
-            $userCity = $_SESSION["userCity"];
-            global $ConnectingDB;
-            $sql ="SELECT * FROM plots WHERE plotSite ='$siteCity' AND plotStatus = 'Vacant' ORDER BY RAND() LIMIT 1 ";
-            $stmt = $ConnectingDB->prepare($sql);
-            $stmt->execute();
-            $Result = $stmt->rowcount();
-            if ($Result > 0) {
-                 
-                $DataRows=$stmt->fetch();
-                $plotIdNum                     = $DataRows["id"];
-                $plotNumber          = $DataRows["plotNumber"];
-                $plotStatus          = $DataRows["plotStatus"];
-                $siteIdNum           = $DataRows["siteIdNum"];
-                if(empty($plotNumberApp)){
-                    $plotNumberApp = $plotNumber;
-                }    
-        
+                $userCity = $_SESSION["userCity"];
+                global $ConnectingDB;
+                $sql ="SELECT * FROM plots WHERE plotSite ='$siteCity' AND plotStatus = 'Vacant' ORDER BY RAND() LIMIT 1 ";
+                $stmt = $ConnectingDB->prepare($sql);
+                $stmt->execute();
+                $Result = $stmt->rowcount();
+                if ($Result > 0) {
+                    
+                    $DataRows=$stmt->fetch();
+                    $plotIdNum                     = $DataRows["id"];
+                    $plotNumber          = $DataRows["plotNumber"];
+                    $plotStatus          = $DataRows["plotStatus"];
+                    $siteIdNum           = $DataRows["siteIdNum"];
+                    if(empty($plotNumberApp)){
+                        $plotNumberApp = $plotNumber;
+                    }    
+            
                 
            
         
-                // Query to insert values in DB
-                $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
-                $sql .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNum', '$siteCity', '$plotIdNum', '$plotNumberApp', 'Pending_Confirmation', '$offerCount', '$dateApplied'  )";
-                $stmt = $ConnectingDB->prepare($sql);
-                $Execute=$stmt->execute();
-                // if($plotStatus == "Vacant"){
+                    // Query to insert values in DB
+                    $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
+                    $sql .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNum', '$siteCity', '$plotIdNum', '$plotNumberApp', 'Pending_Confirmation', '$offerCount', '$dateApplied'  )";
+                    $stmt = $ConnectingDB->prepare($sql);
+                    $Execute=$stmt->execute();
+                    // if($plotStatus == "Vacant"){
 
                     $sql2 = "UPDATE plots SET plotStatus = 'On_Offer', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumberApp' ";
                     $stmt2 = $ConnectingDB->prepare($sql2);
                     $Execute2=$stmt2->execute();
                 //}
 
-                $sql3 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$userId' ";
-                $stmt3 = $ConnectingDB->prepare($sql3);
-                $Execute3=$stmt3->execute();
+                    $sql3 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$userId' ";
+                    $stmt3 = $ConnectingDB->prepare($sql3);
+                    $Execute3=$stmt3->execute();
 
-                Redirect_to("confirmOffer.php");
+                    Redirect_to("confirmOffer.php");
         
-            }elseif($Result == 0){
+                }elseif($Result == 0){
 
-                $noValEmpty    = "None";
-                
-                // if(empty($plotNumberApp)){
-                //     $plotNumberApp = $noValEmpty;
-                // } 
+                    $noValEmpty    = "None";
+                    
+                    // if(empty($plotNumberApp)){
+                    //     $plotNumberApp = $noValEmpty;
+                    // } 
 
-                $sql77 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
-                $sql77 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', 'None', '$siteCity', 'None', 'None', 'Awaiting_Plot', '$offerCount', '$dateApplied'  )";
-                $stmt77 = $ConnectingDB->prepare($sql77);
-                $Execute77=$stmt77->execute();
+                    $sql77 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
+                    $sql77 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', 'None', '$siteCity', 'None', 'None', 'Awaiting_Plot', '$offerCount', '$dateApplied'  )";
+                    $stmt77 = $ConnectingDB->prepare($sql77);
+                    $Execute77=$stmt77->execute();
 
-                $sql44 = "UPDATE users SET userStatus = 'Awaiting_Plot' WHERE id ='$userId' ";
-                $stmt44 = $ConnectingDB->prepare($sql44);
-                $Execute44=$stmt44->execute();
+                    $sql44 = "UPDATE users SET userStatus = 'Awaiting_Plot' WHERE id ='$userId' ";
+                    $stmt44 = $ConnectingDB->prepare($sql44);
+                    $Execute44=$stmt44->execute();
 
-                if($Execute77 && $Execute44 && $Result == 0){
-                    $_SESSION["SuccessMessage"]="Your application for a plot was successful. But no plot is available";
-                    Redirect_to("applyForPlots.php");
-                }else {
-                    $_SESSION["ErrorMessage"]= "Something went wrong. Try Again later !";
-                    Redirect_to("applyForPlots.php");
+                    if($Execute77 && $Execute44 && $Result == 0){
+                        $_SESSION["SuccessMessage"]="Your application for a plot was successful. But no plot is available";
+                        Redirect_to("applyForPlots.php");
+                    }else {
+                        $_SESSION["ErrorMessage"]= "Something went wrong. Try Again later !";
+                        Redirect_to("applyForPlots.php");
+                    }
+
                 }
-
-            }
 
         
         // $stmt->bindValue(':userID', $userId);
@@ -135,7 +153,7 @@ confirmUserLogin();
         //     Redirect_to("applyForPlots.php");
         // }
            
-
+        }
     } //Ending of Apply Button If-Condition
 
     
@@ -151,7 +169,7 @@ confirmUserLogin();
     <div class="container">
     
         <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
-        <h3>You haven't applied for a plot yet. Complete the form below to apply</p>
+        <h3>You haven't applied for a plot yet. Complete the form below to apply</h3>
                     <br>
                     <?php
                     echo ErrorMessage();
@@ -166,7 +184,7 @@ confirmUserLogin();
                         <?php
                         //Fetching all cities from table
                         global $ConnectingDB;
-                        $sql = "SELECT id, cityName FROM cities";
+                        $sql = "SELECT id, cityName FROM cities WHERE availabilityStatus = 'Open' ";
                         $stmt = $ConnectingDB->query($sql);
                         while ($DataRows = $stmt->fetch()) {
                         $Id = $DataRows["id"];

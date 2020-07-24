@@ -22,7 +22,7 @@ if(isset($_POST["Submit"])){
   $addedBy                = $_SESSION["adminFirstName"]." ".$_SESSION["adminLastName"];
   
 
-  if(empty($cityName)){
+  if(empty($cityName) ||empty($cityShortCode)){
     $_SESSION["ErrorMessage"]= "All fields must be filled out";
     Redirect_to("addCity.php");
   }elseif (strlen($cityShortCode)>3) {
@@ -30,6 +30,8 @@ if(isset($_POST["Submit"])){
     Redirect_to("addCity.php");
   }elseif(CheckCityExistsOrNot($cityName)){
     $_SESSION["ErrorMessage"]= "Site Name already exists";
+  }elseif(CheckCityCSCOrNot($cityShortCode)){
+    $_SESSION["ErrorMessage"]= "City Short Code already exists";
   }else{
     // Query to insert new city in DB When everything is fine
     global $ConnectingDB;

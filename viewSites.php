@@ -7,31 +7,7 @@
 
 <?php 
 
-    // global $ConnectingDB;
-    // $sql ="SELECT * FROM waitinglist";
-    // $stmt = $ConnectingDB->query($sql);
-    // $DataRows=$stmt->fetch();
-    // $id1                     = $DataRows["id"];
-    // // $userIdRow                     = $DataRows["userId"];
-    // $firstName1         = $DataRows["firstName"];
-    // $lastName1          = $DataRows["lastName"];
-    // $emailAddress1	          = $DataRows["emailAddress"];
-    // $telephoneNumber1          = $DataRows["telephoneNumber"];
-    // $userCity1          = $DataRows["userCity"];
-    // $siteIdNum1           = $DataRows["siteIdNum"];
-    // $siteCity1          = $DataRows["siteCity"];
-    // $plotIdNum1          = $DataRows["plotIdNum"];
-    // $plotNumberApp1          = $DataRows["plotNumberApp"];
-    // $offerCount1          = $DataRows["offerCount"];
-    // $dateApplied1        =   $DataRows["dateApplied"];
-    // $todayDate1          = date("2020-08-15") ;
-
-    // $daysCountFourteen1         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateApplied1)). " + 14 day "));
     
-    // $sql13 = "DELETE FROM waitinglist WHERE offerCount1 > 1 AND '$todayDate1' >= '$daysCountFourteen1' ";
-    // $stmt13 = $ConnectingDB->prepare($sql13);
-    // $Execute13=$stmt13->execute();
-
 
 
 ?>

@@ -14,11 +14,11 @@ if(isset($_GET["id"])){
     $sql = "UPDATE cities SET availabilityStatus='Closed', asUpdatedBy ='$updatedBy', updateTime ='$updateTime' WHERE id='$closeOpen'";
     $Execute = $ConnectingDB->query($sql);
     if ($Execute) {
-      $_SESSION["SuccessMessage"]="Availability Status Has Been Changed To \"Closed\" ! ";
+      $_SESSION["WarningMessage"]="Availability Status Has Been Changed To \"Closed\" ! ";
       Redirect_to("closeOpenApplication.php");
       // code...
     }else {
-      $_SESSION["ErrorMessage"]="Something Went Wrong. Try Again !";
+      $_SESSION["WarningMessage"]="Something Went Wrong. Try Again !";
       Redirect_to("closeOpenApplication.php");
     }
   }

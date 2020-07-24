@@ -7,7 +7,7 @@
 
 <?php 
     
-
+    $adminSiteName = $_SESSION["adminSiteName"];
 
 
 ?>
@@ -32,6 +32,7 @@
                         <?php
                         echo ErrorMessage();
                         echo SuccessMessage();
+                        echo WarningMessage();
                         echo ErrorMessageForRg();
                         ?>
                     <table class="table table-bordered table-hover">
@@ -50,7 +51,11 @@
                         </thead>
                         <?php 
                         global $ConnectingDB;
-                        $sql = "SELECT * FROM cities ORDER BY id DESC";
+                         if($_SESSION["adminRole"] == "Super_Admin" ){ 
+                            $sql = "SELECT * FROM cities ORDER BY id DESC";
+                         }elseif($_SESSION["adminRole"] == "Site_Manager"){
+                            $sql = "SELECT * FROM cities WHERE cityName ='$adminSiteName' ORDER BY id DESC";
+                         }
                         $Execute =$ConnectingDB->query($sql);
                         $SrNo = 0;
                         while ($DataRows=$Execute->fetch()) {
@@ -80,9 +85,9 @@
                                 <td><button class="btn btn-danger"><?php echo htmlentities($availabilityStatus)?></button></td> 
                             <?php }?>
                             <?php if($availabilityStatus == "Open"){?>
-                                <td><a class="btn btn-danger" href="closeApplication.php?id=<?php echo $id?>" role="button">Set To "Closed"</a></td>
+                                <td><a class="btn btn-danger editConfirmMsg" href="closeApplication.php?id=<?php echo $id?>" role="button">Close Applications</a></td>
                             <?php }elseif($availabilityStatus == "Closed"){?>
-                                <td><a class="btn btn-success" href="openApplication.php?id=<?php echo $id?>" role="button">Set To "Open"</a></td>
+                                <td><a class="btn btn-success editConfirmMsg" href="openApplication.php?id=<?php echo $id?>" role="button">Open Applications</a></td>
                             <?php }?>
                             <td><?php echo htmlentities($asUpdatedBy)?></td>
                             <td><?php echo htmlentities($updateTime)?></td>
@@ -96,7 +101,15 @@
         
         
     </div>
+    
+    
 
 <!-- Admin Footer Start -->
 <?php include("inc/adminFooter.php"); ?>
 <!-- Admin Footer End -->
+
+    <script>
+         $('.editConfirmMsg').on('click', function () {
+        return confirm('Do You want to change the Availability Status for this Site?');
+    })
+    </script>

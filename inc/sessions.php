@@ -31,4 +31,14 @@ function SuccessMessage(){
   }
 }
 
+function WarningMessage(){
+  if(isset($_SESSION["WarningMessage"])){
+    $Output = "<div class=\"alert alert-warning text-center\">" ;
+    $Output .= htmlentities($_SESSION["WarningMessage"]);
+    $Output .= "</div>";
+    $_SESSION["WarningMessage"] = null;
+    return $Output;
+  }
+}
+
  ?>

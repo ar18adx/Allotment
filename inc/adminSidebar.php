@@ -9,10 +9,10 @@
         <a class="btn btn-success" href="inspectionReport.php" role="button">Inspection Report</a>
     </div>
     <div class="mb-3">
-        <a class="btn btn-success" href="viewWaitingList.php" role="button">View Waiting List</a>
+        <a class="btn btn-success" href="viewWaitingList.php?page=1" role="button">Waiting List</a>
     </div>
     <div class="mb-3">
-        <a class="btn btn-success" href="viewTenants.php" role="button">View Tenants</a>
+        <a class="btn btn-success" href="viewTenants.php?page=1" role="button">Tenants</a>
     </div>
 
     <?php if($_SESSION["adminRole"] == "Site_Manager"){?>
@@ -26,16 +26,10 @@
             <a class="btn btn-success" href="viewSites.php?page=1" role="button">Sites</a>
         </div>
         <div class="mb-3">
-            <a class="btn btn-success" href="addSiteManager.php" role="button">Add Site Manager</a>
+            <a class="btn btn-success" href="viewSiteManagers.php?page=1" role="button">Site Managers</a>
         </div>
         <div class="mb-3">
-            <a class="btn btn-success" href="#" role="button">View Site Managers</a>
-        </div>
-        <div class="mb-3">
-            <a class="btn btn-success" href="#" role="button">Delete Site Managers</a>
-        </div>
-        <div class="mb-3">
-            <a class="btn btn-success" href="addNewAdmin.php" role="button">Add New Allotment Officer</a>
+            <a class="btn btn-success" href="viewAllotmentOfficers.php?page=1" role="button">Allotment Officers</a>
         </div>
     <?php }?>
     
