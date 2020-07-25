@@ -11,7 +11,11 @@
 
 // echo $Result04
 
-
+        $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+        $stmt04 = $ConnectingDB->prepare($sql04);
+        $stmt04->execute();
+        $Result04 = $stmt04->rowcount();
+        echo $Result04;
 
 
 // echo date("d-F-Y ");

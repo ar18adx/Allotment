@@ -115,11 +115,65 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
             $stmtRjc = $ConnectingDB->prepare($sqlRjc);
             $ExecuteRjc=$stmtRjc->execute();
 
-            $sql77 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity = '$siteCity', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = 'None' ORDER BY id ASC LIMIT 1 ";
-            $stmt77 = $ConnectingDB->prepare($sql77);
-            $Execute77=$stmt77->execute();
+            // Code for users whoose city is the same as their site.
+            $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+            $stmt04 = $ConnectingDB->prepare($sql04);
+            $stmt04->execute();
+            $Result04 = $stmt04->rowcount();
+            if ($Result04 > 0) {
+
+                $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+                $stmtCpa = $ConnectingDB->prepare($sqlCpa);
+                $ExecuteCpa=$stmtCpa->execute();
+
+                $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+                $stmtSm = $ConnectingDB->query($sqlSm);
+                while ($DataRows=$stmtSm->fetch()) {
+                $applicantId                     = $DataRows["id"];
+                $applicantEmail          = $DataRows["emailAddress"];
+                }
+
+
+                $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+                $stmtE2 = $ConnectingDB->prepare($sqlE2);
+                $ExecuteE2=$stmtE2->execute();
+
+            }elseif($Result04 == 0){
+                // Code for users whoose city is different as their site.
+                $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
+                $stmt07 = $ConnectingDB->prepare($sql07);
+                $stmt07->execute();
+                $Result07 = $stmt07->rowcount();
+                    if ($Result07 > 0) {
+    
+                        $sql1x = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                        $stmt1x = $ConnectingDB->prepare($sql1x);
+                        $Execute1x=$stmt1x->execute();
+    
+                        $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                        $stmtSm = $ConnectingDB->query($sqlSm);
+                        while ($DataRows=$stmtSm->fetch()) {
+                        $applicantId                     = $DataRows["id"];
+                        $applicantEmail          = $DataRows["emailAddress"];
+                        }
+    
+    
+                        $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+                        $stmtE6 = $ConnectingDB->prepare($sqlE6);
+                        $ExecuteE6=$stmtE6->execute();
+    
+                    }
+                    
+                        if($Result07 == 0){
+    
+                            $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumberApp' ";
+                            $stmt92 = $ConnectingDB->prepare($sql92);
+                            $Execute92=$stmt92->execute();
+                        }
+    
+            }
                 
-            if($ExecuteRjc && $Execute77){
+            if($ExecuteRjc){
                 
             $_SESSION["SuccessMessage"]="You have Rejected the plot";
             Redirect_to("applyForPlots.php");
@@ -130,7 +184,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
             }
 
         }elseif($offerCount >=1){
-            $sqlSt8 = "UPDATE plots SET plotStatus = 'Vacant', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
+            $sqlSt8 = "UPDATE plots SET plotStatus = 'Vacant', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumberApp' ";
             $stmtSt8 = $ConnectingDB->prepare($sqlSt8);
             $ExecuteSt8=$stmtSt8->execute();
 
