@@ -4,6 +4,12 @@
 
 <?php 
 
+// $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity != siteCity ";
+// $stmt04 = $ConnectingDB->prepare($sql04);
+// $stmt04->execute();
+// $Result04 = $stmt04->rowcount();
+
+// echo $Result04
 
 
 
@@ -31,13 +37,13 @@
 
         // echo date("Y-M-d");
 
-        $start_date = date_create("2016-01-02");
-        $end_date   = date_create("2016-01-21");
+        // $start_date = date_create("2016-01-02");
+        // $end_date   = date_create("2016-01-21");
         
-        //difference between two dates
-        $diff = date_diff($start_date,$end_date);
+        // //difference between two dates
+        // $diff = date_diff($start_date,$end_date);
         
-        //find the number of days between two dates
-        echo "Difference between two dates: ".$diff->format("%a"). " Days ";
+        // //find the number of days between two dates
+        // echo "Difference between two dates: ".$diff->format("%a"). " Days ";
 
 ?>

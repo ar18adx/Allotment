@@ -31,12 +31,12 @@ confirmUserLogin()
     $tenantPhoneNum          = $DataRows["tenantPhoneNum"];
     $tenantCity           = $DataRows["tenantCity"];
     $siteCity          = $DataRows["siteCity"];
+    $siteId          = $DataRows["siteId"];
     $plotNumber          = $DataRows["plotNumber"];
     $leaseDate          = $DataRows["leaseDate"];
     $expirationDate          = $DataRows["expirationDate"];
     $renewalStatus          = $DataRows["renewalStatus"];
 
-    // $expirationDate         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 365 day "));
 
     $expirationDateNotification        = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 90 day "));
 
@@ -48,13 +48,13 @@ confirmUserLogin()
 
     $expirationDateMinus1 =    date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 1 day "));
 
-    echo $expirationDateNotification. "<br>";
-    echo $expirationDateTrigger. "<br>";
-    echo date("Y-m-d"). "<br>";
+    // echo $expirationDateNotification. "<br>";
+    // echo $expirationDateTrigger. "<br>";
+    // echo date("Y-m-d"). "<br>";
     
     echo $oneMonthToExp . "<br>";
-    echo $expirationDateTrnsf . "<br>";
-    echo $expirationDateMinus1;
+    // echo $expirationDateTrnsf . "<br>";
+    // echo $expirationDateMinus1;
 
     
 
@@ -80,49 +80,104 @@ confirmUserLogin()
 
     }
 
-    if(date("Y-m-d") >= $expirationDateTrnsf){
+    // if(date("Y-m-d") >= $expirationDateTrnsf){
+    //     $sqlTrn = "INSERT INTO formertenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteCity, plotNumber, leaseDate, expirationDate )";
+    //     $sqlTrn .= "VALUES('$tenantId', '$tenantFirstName', '$tenantLastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteCity', '$plotNumber', '$leaseDate', '$expirationDate')";
+    //     $stmtTrn = $ConnectingDB->prepare($sqlTrn);
+    //     $ExecuteTrn=$stmtTrn->execute();
+
+    // }
+
+            
+    
+    if(date("Y-m-d") >= $expirationDate){
         $sqlTrn = "INSERT INTO formertenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteCity, plotNumber, leaseDate, expirationDate )";
         $sqlTrn .= "VALUES('$tenantId', '$tenantFirstName', '$tenantLastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteCity', '$plotNumber', '$leaseDate', '$expirationDate')";
         $stmtTrn = $ConnectingDB->prepare($sqlTrn);
         $ExecuteTrn=$stmtTrn->execute();
 
-    }
-    
-    if(date("Y-m-d") >= $expirationDate){
         $sqlExp = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumber' ";
         $stmtExp = $ConnectingDB->prepare($sqlExp);
         $ExecuteExp=$stmtExp->execute();
 
-    }
+        // Code for users whoose city is the same as their site.
+        $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+        $stmt04 = $ConnectingDB->prepare($sql04);
+        $stmt04->execute();
+        $Result04 = $stmt04->rowcount();
+        if ($Result04 > 0) {
 
-    // if(date("Y-m-d") >= $expirationDate){
-    //     $sql303 = "INSERT INTO waitinglist ( siteCity, plotNumberApp) SELECT siteCity, plotNumberApp FROM tenant WHERE Country='Germany' ";
-    //     $stmt303 = $ConnectingDB->prepare($sql303);
-    //     $Execute303=$stmt303->execute();
+            $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteId', plotIdNum = '$id', plotNumberApp = '$plotNumber', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+            $stmtCpa = $ConnectingDB->prepare($sqlCpa);
+            $ExecuteCpa=$stmtCpa->execute();
 
-    // }
+            $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+            $stmtSm = $ConnectingDB->query($sqlSm);
+            while ($DataRows=$stmtSm->fetch()) {
+            $applicantId                     = $DataRows["id"];
+            $applicantEmail          = $DataRows["emailAddress"];
+            }
 
-    // if(date("Y-m-d") >= $expirationDateMinus1){
-    //     global $ConnectingDB;
-    //     $sqlInct = "UPDATE tenants SET tenantStatus = 'Inactive' WHERE tenantId ='$tenantId' ";;
-    //     $stmtInct = $ConnectingDB->prepare($sqlInct);
-    //     $ExecuteInct=$stmtInct->execute();
 
-    // }
+            $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumber' ";
+            $stmtE2 = $ConnectingDB->prepare($sqlE2);
+            $ExecuteE2=$stmtE2->execute();
 
-    if(date("Y-m-d") >= $expirationDate){
+
+        }elseif($Result04 == 0){
+            // Code for users whoose city is different as their site.
+            $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
+            $stmt07 = $ConnectingDB->prepare($sql07);
+            $stmt07->execute();
+            $Result07 = $stmt07->rowcount();
+                if ($Result07 > 0) {
+
+                    $sql1x = "UPDATE waitinglist SET siteIdNum = '$siteId', plotIdNum = '$id', plotNumberApp = '$plotNumber', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                    $stmt1x = $ConnectingDB->prepare($sql1x);
+                    $Execute1x=$stmt1x->execute();
+
+                    $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                    $stmtSm = $ConnectingDB->query($sqlSm);
+                    while ($DataRows=$stmtSm->fetch()) {
+                    $applicantId                     = $DataRows["id"];
+                    $applicantEmail          = $DataRows["emailAddress"];
+                    }
+
+
+                    $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumber' ";
+                    $stmtE6 = $ConnectingDB->prepare($sqlE6);
+                    $ExecuteE6=$stmtE6->execute();
+
+                }
+                
+                    if($Result07 == 0){
+
+                        $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumber' ";
+                        $stmt92 = $ConnectingDB->prepare($sql92);
+                        $Execute92=$stmt92->execute();
+                    }
+
+        }
     
-        $sqlUpd = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
-        $stmtUpd = $ConnectingDB->prepare($sqlUpd);
-        $ExecuteUpd=$stmtUpd->execute();
-
-        $sqlDel = "DELETE FROM tenants WHERE tenantId='$tenantId' ";
-        $stmtDel = $ConnectingDB->prepare($sqlDel);
-        $ExecuteDel=$stmtDel->execute();
+            $sqlUpd = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+            $stmtUpd = $ConnectingDB->prepare($sqlUpd);
+            $ExecuteUpd=$stmtUpd->execute();
 
         
+            if($ExecuteTrn){
+                    
+                $sqlDel = "DELETE FROM tenants WHERE tenantId='$tenantId' ";
+                $stmtDel = $ConnectingDB->prepare($sqlDel);
+                $ExecuteDel=$stmtDel->execute();
+
+                $_SESSION["userId"]=null;
+                session_destroy();
+                Redirect_to("index.php");
+
+            }
 
     }
+
     
     ?>
 
@@ -194,11 +249,9 @@ if(isset($_POST["sixMonths"])){
             <div class="col-md-9">
                 <div class="jumbotron mt-5">
                     <h1 class="">Hello, <?php echo $_SESSION["userFirstName"]." ".$_SESSION["userLastName"]; ?></h1>
-                    <h3 class=""><b>You are a Tenant in :</b></h3>
-                    <h3 class=""><b>Your Plot-Number is :</b></h3>
-                    <h3 class=""><b>Plot Size :</b></h3>
-                    <h3 class=""><b>Plot Description :</b></h3>
-                    <h3 class=""><b>Lease Date :</b> <?php  ?></h3>
+                    <h3 class=""><b>You are a Tenant in : </b><?php echo htmlentities($siteCity)?></h3>
+                    <h3 class=""><b>Your Plot-Number is : </b><?php echo htmlentities($plotNumber)?></h3>
+                    <h3 class=""><b>Lease Date :</b> <?php echo htmlentities($leaseDate) ?></h3>
                     <h3 class=""><b>Expiry Date :</b> <?php echo htmlentities($expirationDate) ?></h3>
                             <br>
                             <?php
@@ -209,8 +262,6 @@ if(isset($_POST["sixMonths"])){
                     <!-- <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p> -->
                     <hr class="my-4">
                     <!-- <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> -->
-                    <p><b>Expiry Date: <?php echo htmlentities($expirationDate) ?></p>
-
                     
                     <?php if(date("Y-m-d") >= $oneMonthToExp){?>
                         <div class="alert alert-danger" role="alert">

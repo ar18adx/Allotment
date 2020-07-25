@@ -207,6 +207,22 @@ function CheckPlotNumExistsOrNot($plotNumber){
   }
 }
 
+// Check if plot Number exists in Tenant's table
+
+function CheckPlotNumTnt($plotNumber){
+  global $ConnectingDB;
+  $sql    = "SELECT plotNumber FROM tenants WHERE plotNumber=:plotNuMber";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':plotNuMber',$plotNumber);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==1) {
+    return true;
+  }else {
+    return false;
+  }
+}
+
 function CheckPlotNumAppExistsOrNot($plotNumberApp){
   global $ConnectingDB;
   $sql    = "SELECT plotNumber FROM plots WHERE plotNumber=:plotNuMberApp";

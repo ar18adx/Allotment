@@ -63,50 +63,47 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         date_default_timezone_set("Africa/Lagos");
         
         $leaseDate              = date("Y-m-d "); 
-
-        // $leaseDate              = '';
-
-        // $date=date_create($leaseDate);
-        // date_add($date,date_interval_create_from_date_string("1 years"));
         $expirationDate         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 366 day "));
         $renewalStatus          = "Pending";
         $tenantStatus           = "Active";
         
 
-        //Code to 
-        //
+        if (CheckPlotNumTnt($plotNumberApp)) {
+            $_SESSION["ErrorMessage"]= "This Plot is occupied already !!! ";
+            Redirect_to("confirmOffer.php");
+        }else{
             
         
-        // Query to insert values in DB When everything is fine
-        global $ConnectingDB;
-        $sql = "INSERT INTO tenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteId, siteCity, plotId, plotNumber, leaseDate, expirationDate, renewalStatus, tenantStatus )";
-        $sql .= "VALUES('$tenantId', '$firstName', '$lastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteIdNumRw', '$siteCity', '$plotIdNumRw', '$plotNumber', '$leaseDate', '$expirationDate', '$renewalStatus', '$tenantStatus' )";
-        $stmt = $ConnectingDB->prepare($sql);
-        $Execute=$stmt->execute();
+            // Query to insert values in DB When everything is fine
+            global $ConnectingDB;
+            $sql = "INSERT INTO tenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteId, siteCity, plotId, plotNumber, leaseDate, expirationDate, renewalStatus, tenantStatus )";
+            $sql .= "VALUES('$tenantId', '$firstName', '$lastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteIdNumRw', '$siteCity', '$plotIdNumRw', '$plotNumber', '$leaseDate', '$expirationDate', '$renewalStatus', '$tenantStatus' )";
+            $stmt = $ConnectingDB->prepare($sql);
+            $Execute=$stmt->execute();
 
-        $sql2 = "UPDATE plots SET plotStatus = 'Occupied', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
-        $stmt2 = $ConnectingDB->prepare($sql2);
-        $Execute2=$stmt2->execute();
+            $sql2 = "UPDATE plots SET plotStatus = 'Occupied', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumber' ";
+            $stmt2 = $ConnectingDB->prepare($sql2);
+            $Execute2=$stmt2->execute();
 
-        $sql3 = "UPDATE users SET userStatus = 'Tenant' WHERE id ='$tenantId' ";
-        $stmt3 = $ConnectingDB->prepare($sql3);
-        $Execute3=$stmt3->execute();
-        
-        if($Execute && $Execute2 && $Execute3){
+            $sql3 = "UPDATE users SET userStatus = 'Tenant' WHERE id ='$tenantId' ";
+            $stmt3 = $ConnectingDB->prepare($sql3);
+            $Execute3=$stmt3->execute();
             
-            $sql43 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
-            $stmt43 = $ConnectingDB->prepare($sql43);
-            $Execute43=$stmt43->execute();
+            if($Execute && $Execute2 && $Execute3){
+                
+                $sql43 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                $stmt43 = $ConnectingDB->prepare($sql43);
+                $Execute43=$stmt43->execute();
 
-        $_SESSION["SuccessMessage"]="You have accepted the plot";
-        Redirect_to("tenantProfile.php");
+            $_SESSION["SuccessMessage"]="You have accepted the plot";
+            Redirect_to("tenantProfile.php");
 
-        }else {
-        $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-        Redirect_to("confirmOffer.php");
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("confirmOffer.php");
+            }
+        
         }
-        
-
     } //Ending of Accept Button If-Condition
 
     if(isset($_POST["Reject"])){

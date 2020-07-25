@@ -89,6 +89,8 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             
                             //difference between two dates
                             $diff = date_diff($start_date,$end_date);
+
+                            
                             
                             ?>
                             <tbody>
@@ -120,6 +122,9 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             </tbody>
                             <?php }?>
                         </table>
+                        <div class="mb-3 mt-4 text-center">
+                            <a class="btn btn-warning btn-lg" href="viewSoonTobeExpiredLease.php?page=1" role="button">Soon To Be Expired Lease</a>
+                        </div>
                         <!-- Pagination -->
                         <div class="col-lg-4 offset-lg-4 col-md-4 offset-md-4 col-sm-12 mt-4">
                             <nav>
@@ -292,6 +297,9 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             </tbody>
                             <?php }?>
                         </table>
+                        <div class="mb-3 mt-4 text-center">
+                            <a class="btn btn-warning btn-lg" href="viewSoonTobeExpiredLease.php?page=1" role="button">Soon To Be Expired Lease</a>
+                        </div>
                         <!-- Pagination -->
                         <div class="col-lg-4 offset-lg-4 col-md-4 offset-md-4 col-sm-12 mt-4">
                             <nav>

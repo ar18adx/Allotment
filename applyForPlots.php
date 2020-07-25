@@ -36,9 +36,20 @@ confirmUserLogin();
                     $_SESSION["ErrorMessage"]= "Plot Number Does Not Exist !!! ";
                     Redirect_to("applyForPlots.php");
                 }
+
+                global $ConnectingDB;
+                $sql ="SELECT * FROM plots WHERE plotNumber = '$plotNumberApp'  ";
+                $stmt = $ConnectingDB->query($sql);
+                $DataRows=$stmt->fetch();
+                $PlotId                     = $DataRows["id"];
+                
+                $plotSiteRw1          = $DataRows["plotSite"];
+                $siteIdNumRw1         = $DataRows["siteIdNum"];
+
+
                 // Query to insert values in DB
                 $sqlA1 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
-                $sqlA1 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNum', '$siteCity', '$plotIdNum', '$plotNumberApp', 'Awaiting_Specific_Plot', '$offerCount', '$dateApplied'  )";
+                $sqlA1 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNumRw1', '$plotSiteRw1', '$PlotId', '$plotNumberApp', 'Awaiting_Specific_Plot', '$offerCount', '$dateApplied'  )";
                 $stmtA1 = $ConnectingDB->prepare($sqlA1);
                 $ExecuteA1=$stmtA1->execute();
 
