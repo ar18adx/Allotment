@@ -28,7 +28,10 @@ confirmUserLogin();
         // $applicationStatus      = "Pending";
         $offerCount             = 0;
         
-            
+            if (CheckUserExistsOnWl($userId)) {
+                $_SESSION["ErrorMessage"]= "You have previously applied for a plot !!! ";
+                Redirect_to("applyForPlots.php");
+            }
             
             if(!empty($plotNumberApp)){
 
@@ -119,50 +122,13 @@ confirmUserLogin();
 
                     if($Execute77 && $Execute44 && $Result == 0){
                         $_SESSION["SuccessMessage"]="Your application for a plot was successful. But no plot is available";
-                        Redirect_to("applyForPlots.php");
+                        Redirect_to("confirmOffer.php");
                     }else {
                         $_SESSION["ErrorMessage"]= "Something went wrong. Try Again later !";
                         Redirect_to("applyForPlots.php");
                     }
 
                 }
-
-        
-        // $stmt->bindValue(':userID', $userId);
-        // $stmt->bindValue(':firstNamE', $firstName);
-        // $stmt->bindValue(':lastNamE', $lastName);
-        // $stmt->bindValue(':emailAddresS', $emailAddress);
-        // $stmt->bindValue(':telephoneNumbeR', $telephoneNumber);
-        // $stmt->bindValue(':userCitY', $userCity);
-        // $stmt->bindValue(':siteIdNuM',$siteIdNum);
-        // $stmt->bindValue(':siteCitY', $siteCity);
-        // $stmt->bindValue(':plotIdNuM', $plotIdNum);
-        // $stmt->bindValue(':plotNumberApP', $plotNumberApp);
-        // $stmt->bindValue(':applicationStatuS', $applicationStatus);
-        // $stmt->bindValue(':offerCounT', $offerCount);
-        // $stmt->bindValue(':dateApplieD', $dateApplied);
-
-        // $sql2 = "UPDATE plots SET plotStatus = 'Pending_Acceptance' WHERE plotNumber ='$plotNumberApp' ";
-        // $stmt = $ConnectingDB->prepare($sql2);
-        
-        
-        
-        
-        // if($plotStatus == "Vacant"){
-        // Redirect_to("confirmOffer.php");
-        // }else
-        // if($Execute && $Execute2 && $Execute3 && $plotStatus =="Vacant"){
-        //     $_SESSION["SuccessMessage"]="Your Application For a Plot Was Successful Vacant";
-        //     Redirect_to("confirmOffer.php");
-        // }else
-        
-        // if($Execute && $Execute2 && $Execute3){
-        //     $_SESSION["SuccessMessage"]="Your Application For a Plot Was Successful On Offer";
-        //     Redirect_to("applyForPlots.php");
-        // }else {
-        //     $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-        //     Redirect_to("applyForPlots.php");
-        // }
            
         }
     } //Ending of Apply Button If-Condition
@@ -195,7 +161,7 @@ confirmUserLogin();
                         <?php
                         //Fetching all cities from table
                         global $ConnectingDB;
-                        $sql = "SELECT id, cityName FROM cities WHERE availabilityStatus = 'Open' ";
+                        $sql = "SELECT id, cityName FROM cities WHERE availabilityStatus = 'Open' ORDER BY cityName ASC ";
                         $stmt = $ConnectingDB->query($sql);
                         while ($DataRows = $stmt->fetch()) {
                         $Id = $DataRows["id"];

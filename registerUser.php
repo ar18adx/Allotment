@@ -25,44 +25,44 @@
     
     
 
-    if(empty($firstName) ||empty($lastName) ||empty($emailAddress) ||empty($telephone) ||empty($homeAddress) ||empty($password) ||empty($confirmPassword)){
-        $_SESSION["ErrorMessage"]= "All fields must be filled out";
-        Redirect_to("registerUser.php");
-    }elseif (strlen($password)<4) {
-        $_SESSION["ErrorMessage"]= "Password should be greater than 3 characters";
-        Redirect_to("registerUser.php");
-    }elseif ($password !== $confirmPassword) {
-        $_SESSION["ErrorMessage"]= "Password and Confirm Password should match";
-        Redirect_to("registerUser.php");
-    }elseif(CheckEmailExistsOrNot($emailAddress)){
-        $_SESSION["ErrorMessage"]= "Your email address exists in our system";
-        Redirect_to("registerUser.php");
-    }else{
-        // Query to insert new city in DB When everything is fine
-        global $ConnectingDB;
-        $sql = "INSERT INTO users(datetime, firstName, lastName, emailAddress, telephone, homeAddress, city, gender, password, userStatus )";
-        $sql .= "VALUES(:dateTIme, :firstNAme, :lastNAme, :emailADdress, :telePhone, :homeADdress, :citY, :gendeR, :passworD, :userStatuS)";
-        $stmt = $ConnectingDB->prepare($sql);
-        $stmt->bindValue(':dateTIme', $datetime);
-        $stmt->bindValue(':firstNAme', $firstName);
-        $stmt->bindValue(':lastNAme', $lastName);
-        $stmt->bindValue(':emailADdress', $emailAddress);
-        $stmt->bindValue(':telePhone', $telephone);
-        $stmt->bindValue(':homeADdress', $homeAddress);
-        $stmt->bindValue(':citY', $city);
-        $stmt->bindValue(':gendeR', $gender);
-        $stmt->bindValue(':passworD', $hash);
-        $stmt->bindValue(':userStatuS', $userStatus);
-        
-        $Execute=$stmt->execute();
-        if($Execute){
-        $_SESSION["SuccessMessage"]="New User added Successfully";
-        Redirect_to("index.php");
-        }else {
-        $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-        Redirect_to("registerUser.php");
+        if(empty($firstName) ||empty($lastName) ||empty($emailAddress) ||empty($telephone) ||empty($homeAddress) ||empty($password) ||empty($confirmPassword)){
+            $_SESSION["ErrorMessage"]= "All fields must be filled out";
+            Redirect_to("registerUser.php");
+        }elseif (strlen($password)<4) {
+            $_SESSION["ErrorMessage"]= "Password should be greater than 3 characters";
+            Redirect_to("registerUser.php");
+        }elseif ($password !== $confirmPassword) {
+            $_SESSION["ErrorMessage"]= "Password and Confirm Password should match";
+            Redirect_to("registerUser.php");
+        }elseif(CheckEmailExistsOrNot($emailAddress)){
+            $_SESSION["ErrorMessage"]= "Your email address exists in our system";
+            Redirect_to("registerUser.php");
+        }else{
+            // Query to insert new city in DB When everything is fine
+            global $ConnectingDB;
+            $sql = "INSERT INTO users(datetime, firstName, lastName, emailAddress, telephone, homeAddress, city, gender, password, userStatus )";
+            $sql .= "VALUES(:dateTIme, :firstNAme, :lastNAme, :emailADdress, :telePhone, :homeADdress, :citY, :gendeR, :passworD, :userStatuS)";
+            $stmt = $ConnectingDB->prepare($sql);
+            $stmt->bindValue(':dateTIme', $datetime);
+            $stmt->bindValue(':firstNAme', $firstName);
+            $stmt->bindValue(':lastNAme', $lastName);
+            $stmt->bindValue(':emailADdress', $emailAddress);
+            $stmt->bindValue(':telePhone', $telephone);
+            $stmt->bindValue(':homeADdress', $homeAddress);
+            $stmt->bindValue(':citY', $city);
+            $stmt->bindValue(':gendeR', $gender);
+            $stmt->bindValue(':passworD', $hash);
+            $stmt->bindValue(':userStatuS', $userStatus);
+            
+            $Execute=$stmt->execute();
+            if($Execute){
+            $_SESSION["SuccessMessage"]="New User added Successfully";
+            Redirect_to("index.php");
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("registerUser.php");
+            }
         }
-    }
     } //Ending of Submit Button If-Condition
 
 
@@ -122,7 +122,7 @@
                                 <?php
                                 //Fetchinng all the categories from category table
                                 global $ConnectingDB;
-                                $sql = "SELECT id, cityName FROM cities";
+                                $sql = "SELECT id, cityName FROM cities ORDER BY cityName ASC";
                                 $stmt = $ConnectingDB->query($sql);
                                 while ($DataRows = $stmt->fetch()) {
                                 $Id = $DataRows["id"];

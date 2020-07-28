@@ -47,6 +47,33 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
     
     <?php
 
+    if(isset($_POST["cancelApplication"])){
+
+        $tenantId                 =   $_SESSION["userId"];
+        
+        $sqlD = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+        $stmtD = $ConnectingDB->prepare($sqlD);
+        $ExecuteD=$stmtD->execute();
+
+        $sqlGu = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+        $stmtGu = $ConnectingDB->prepare($sqlGu);
+        $ExecuteGu=$stmtGu->execute();
+
+            if($ExecuteD && $ExecuteGu){
+                    
+                $_SESSION["SuccessMessage"]="You have Cancelled Your application for a plot. You can now apply as a new user";
+                Redirect_to("applyForPlots.php");
+
+                }else {
+                $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+                Redirect_to("confirmOffer.php");
+            }
+
+        
+    } //Ending of Cancel Application Button If-Condition
+
+
+
     if(isset($_POST["Accept"])){
         
         $tenantId               =   $_SESSION["userId"];;
@@ -108,36 +135,46 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 
     if(isset($_POST["Reject"])){
         
-        
         if($offerCount <1){
             // Query to insert values in DB When everything is fine
-            $sqlRjc = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = 'None', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
-            $stmtRjc = $ConnectingDB->prepare($sqlRjc);
-            $ExecuteRjc=$stmtRjc->execute();
-
+            global $ConnectingDB;
             // Code for users whoose city is the same as their site.
             $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
             $stmt04 = $ConnectingDB->prepare($sql04);
             $stmt04->execute();
             $Result04 = $stmt04->rowcount();
-            if ($Result04 > 0) {
+            if($Result04 > 0) {
 
                 $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
                 $stmtCpa = $ConnectingDB->prepare($sqlCpa);
                 $ExecuteCpa=$stmtCpa->execute();
-
+    
                 $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
                 $stmtSm = $ConnectingDB->query($sqlSm);
-                while ($DataRows=$stmtSm->fetch()) {
-                $applicantId                     = $DataRows["id"];
+                $DataRows=$stmtSm->fetch();
+                $applicantId             = $DataRows["id"];
                 $applicantEmail          = $DataRows["emailAddress"];
-                }
+                $applicantUserId         = $DataRows["userId"];
 
+                    $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+                    $stmtC = $ConnectingDB->prepare($sqlC);
+                    $ExecuteC=$stmtC->execute();
 
+                
                 $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
                 $stmtE2 = $ConnectingDB->prepare($sqlE2);
                 $ExecuteE2=$stmtE2->execute();
 
+                $sqlG4 = "UPDATE users SET userStatus = 'Awaiting_Plot' WHERE id ='$tenantId' ";
+                $stmtG4 = $ConnectingDB->prepare($sqlG4);
+                $ExecuteG4=$stmtG4->execute();
+
+                $sqlRjc = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = '$siteCity', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+                $stmtRjc = $ConnectingDB->prepare($sqlRjc);
+                $ExecuteRjc=$stmtRjc->execute();
+
+                
+                
             }elseif($Result04 == 0){
                 // Code for users whoose city is different as their site.
                 $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
@@ -155,12 +192,22 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
                         while ($DataRows=$stmtSm->fetch()) {
                         $applicantId                     = $DataRows["id"];
                         $applicantEmail          = $DataRows["emailAddress"];
+                        $applicantUserId          = $DataRows["userId"];
+
+                            $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+                            $stmtC2 = $ConnectingDB->prepare($sqlC2);
+                            $ExecuteC2=$stmtC2->execute();
+
                         }
     
     
                         $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
                         $stmtE6 = $ConnectingDB->prepare($sqlE6);
                         $ExecuteE6=$stmtE6->execute();
+
+                        // $sqlPc = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+                        // $stmtPc = $ConnectingDB->prepare($sqlPc);
+                        // $ExecutePc=$stmtPc->execute();
     
                     }
                     
@@ -196,10 +243,10 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
             $stmtNu3 = $ConnectingDB->prepare($sqlNu3);
             $ExecuteNu3=$stmtNu3->execute();
 
-            if($ExecuteNu3 && $ExecuteSt8 && $ExecuteCp1){
-                $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
-                $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
-                $ExecuteDel2=$stmtDel2->execute();
+                if($ExecuteNu3 && $ExecuteSt8 && $ExecuteCp1){
+                    $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                    $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+                    $ExecuteDel2=$stmtDel2->execute();
 
             $_SESSION["SuccessMessage"]="You have Rejected the 2 plots that were allocated to You. You will have to apply as a new user in order to get a plot";
             Redirect_to("applyForPlots.php");
@@ -312,6 +359,22 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
         <?php if ($applicationStatus == "Awaiting_Plot"){?>
             <h3>Your Application for a plot was successful. You are in number <?php echo $userPositionOnList ?> position on the Waiting List out of <?php echo $ResultRc ?> applicants</h3>
+
+                <div class="mt-3">
+                    <h4>Cancel Application?</h4>
+                    <p><i>cancelling this application will make You apply as a New User</i></p>
+
+                        <div class="card alert-warning">
+                            <div class="card-body">
+                                <form action="confirmOffer.php" method="POST">
+                                    <h5 class="card-title">Cancel Application</h5>
+                                    <p class="card-text"></p>
+                                        <button type="submit" name="cancelApplication" class="btn btn-lg btn-danger">Cancel Application</button>
+                                </form>
+                            </div>
+                        </div>
+
+                </div>
             <?php }else{?>
             <h3>You have been allocated Plot "<?php echo htmlentities($plotNumberApp);?>" in "<?php echo htmlentities($siteCity); ?>" Site. If you are OK with this. You have <?php echo htmlentities($diff4->format("%a")) ; ?> days to ACCEPT or REJECT the offer.</h3>
                    
@@ -323,17 +386,23 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
                     ?>
             <form action="confirmOffer.php" method="POST">
                 <div class="row">
-                    <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Accept</label>
-                            <div class="">
-                                <button type="submit" name="Accept" class="btn btn-success">Accept</button>
-                            </div>
+                    <div class="col-sm-6">
+                        <div class="card alert-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Accept</h5>
+                            <p class="card-text"></p>
+                                <button type="submit" name="Accept" class="btn btn-lg btn-success">Accept</button>
+                        </div>
+                        </div>
                     </div>
-                    <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Reject</label>
-                            <div class="">
-                                <button type="submit" name="Reject" class="btn btn-success">Reject</button>
-                            </div>
+                    <div class="col-sm-6">
+                        <div class="card alert-danger">
+                        <div class="card-body">
+                            <h5 class="card-title">Reject</h5>
+                            <p class="card-text"></p>
+                                <button type="submit" name="Reject" class="btn btn-lg btn-danger">Reject</button>
+                        </div>
+                        </div>
                     </div>
                 </div>
             </form>

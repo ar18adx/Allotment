@@ -25,6 +25,12 @@
             <li class="nav-item">
                 <a class="nav-link" href="Contact.php">Contact Us</a>
             </li>
+            <?php if(isset($_SESSION["userId"])) {?>
+                <li class="nav-item">
+                    <a class="nav-link" href="userLogout.php">Log Out</a>
+                </li>
+            <?php }?>
+
             </ul>
             <!-- <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">

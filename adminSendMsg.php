@@ -6,11 +6,15 @@
 
 <?php
 
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+//echo $_SESSION["TrackingURL"];
+confirmAdminLogin(); 
 
+?>
+
+<?php
 
         $msgQueryParameter = $_GET["id"];
-
-        
 
         global $ConnectingDB;
         $sql ="SELECT * FROM tenants WHERE id = '$msgQueryParameter'  ";

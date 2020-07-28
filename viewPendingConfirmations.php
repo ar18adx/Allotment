@@ -5,12 +5,16 @@
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
 
+<?php
+
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+//echo $_SESSION["TrackingURL"];
+confirmAdminLogin(); 
+
+?>
+
 <?php 
 $adminSiteName = $_SESSION["adminSiteName"];
-
-
-
-
 
 ?>
 

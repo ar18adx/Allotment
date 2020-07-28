@@ -5,6 +5,14 @@
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
 
+<?php
+
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+//echo $_SESSION["TrackingURL"];
+confirmAdminLogin(); 
+
+?>
+
 <?php 
     
                     $inspDetParameter = $_GET["id"];
@@ -15,6 +23,7 @@
                     $plotNumber          = $DataRows["plotNumber"];
                     $siteName           = $DataRows["siteName"];
                     $inspectionDate      = $DataRows["inspectionDate"];
+                    $inspectionReport      = $DataRows["inspectionReport"];
                     $inspectionOfficer      = $DataRows["inspectionOfficer"];
                     $tenantFirstName      = $DataRows["tenantFirstName"];
                     $tenantLastName       = $DataRows["tenantLastName"];
@@ -95,8 +104,15 @@
                             <span class="sr-only">Next</span>
                         </a>
                     </div>
+                </div>
+                    <div class="text-center mt-3 mb-5">
+                        <h2>Inspection Report</h2>
+                    </div>
+                        <div>
+                            <p><?php echo htmlentities($inspectionReport);?></p>
+                        </div>
                
-            </div>
+                
         </div>
         
         

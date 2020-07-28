@@ -11,11 +11,25 @@
 
 // echo $Result04
 
-        $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
-        $stmt04 = $ConnectingDB->prepare($sql04);
-        $stmt04->execute();
-        $Result04 = $stmt04->rowcount();
-        echo $Result04;
+        // $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+        // $stmt04 = $ConnectingDB->prepare($sql04);
+        // $stmt04->execute();
+        // $Result04 = $stmt04->rowcount();
+        // echo $Result04;
+        $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+        $stmtSm = $ConnectingDB->query($sqlSm);
+        $DataRows=$stmtSm->fetch();
+        $applicantId             = $DataRows["id"];
+        $applicantEmail          = $DataRows["emailAddress"];
+        $applicantUserId         = $DataRows["userId"];
+
+            $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+            $stmtC = $ConnectingDB->prepare($sqlC);
+            $ExecuteC=$stmtC->execute();
+
+        
+
+        echo $applicantUserId;
 
 
 // echo date("d-F-Y ");

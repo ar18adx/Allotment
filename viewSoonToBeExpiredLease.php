@@ -1,9 +1,16 @@
 <?php $pageTitle = "Soon To Be Expired Lease";?>
 
-
 <?php require_once("inc/db.php"); ?>
 <?php require_once("inc/sessions.php"); ?>
 <?php require_once("inc/functions.php"); ?>
+
+<?php
+
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+//echo $_SESSION["TrackingURL"];
+confirmAdminLogin(); 
+
+?>
 
 <?php 
         $adminSiteName = $_SESSION["adminSiteName"];
@@ -46,7 +53,11 @@
 
             <div class="container"> 
                 <div class="text-center mb-4 mt-4">
-                    <h2>Soon To Be Expired Lease</h2>
+                    <?php if($_SESSION["adminRole"] == "Super_Admin"){ ?>
+                    <h2>Soon To Be Expired Lease All Tenants</h2>
+                    <?php }elseif($_SESSION["adminRole"] == "Site_Manager"){?>
+                    <h2>Soon To Be Expired Lease (<?php echo htmlentities($adminSiteName)?>)</h2>
+                    <?php }?>
                 </div>
                 <div class="row">
                     <!-- Include Admin Sidebar -->
@@ -78,7 +89,12 @@
                             <?php 
                             if (isset($_GET["page"])) {
                                 global $ConnectingDB;
-                                $sql = "SELECT * FROM tenants WHERE expirationDate <= '$oneMonthFromToday' ";
+                                if($_SESSION["adminRole"] == "Super_Admin"){ 
+                                    $sql = "SELECT * FROM tenants WHERE expirationDate <= '$oneMonthFromToday' ";
+                                }elseif($_SESSION["adminRole"] == "Site_Manager"){
+                                    $sql = "SELECT * FROM tenants WHERE siteCity = '$adminSiteName' AND expirationDate <= '$oneMonthFromToday' ";
+                                }
+
                                 $stmt = $ConnectingDB->prepare($sql);
                                 $stmt->execute();
                                 $Page = $_GET["page"];
@@ -87,13 +103,23 @@
                             }else{
                                 $ShowPostFrom=($Page*10)-10;
                             }
-                                $sql = "SELECT * FROM tenants WHERE  expirationDate <= '$oneMonthFromToday' ORDER BY id LIMIT $ShowPostFrom,10";
+
+                                if($_SESSION["adminRole"] == "Super_Admin"){
+                                    $sql = "SELECT * FROM tenants WHERE  expirationDate <= '$oneMonthFromToday' ORDER BY id LIMIT $ShowPostFrom,10";
+                                }elseif($_SESSION["adminRole"] == "Site_Manager"){
+                                    $sql = "SELECT * FROM tenants WHERE siteCity = '$adminSiteName' AND expirationDate <= '$oneMonthFromToday' ORDER BY id LIMIT $ShowPostFrom,10";
+                                }
                                 $stmt=$ConnectingDB->query($sql);
                             }
 
                             // The default SQL query
                             else{
-                                $sql  = "SELECT * FROM tenants WHERE expirationDate <= '$oneMonthFromToday' ORDER BY id LIMIT $ShowPostFrom,10";
+                                if($_SESSION["adminRole"] == "Super_Admin"){
+                                    $sql  = "SELECT * FROM tenants WHERE expirationDate <= '$oneMonthFromToday' ORDER BY id LIMIT $ShowPostFrom,10";
+                                }elseif($_SESSION["adminRole"] == "Site_Manager"){
+                                    $sql  = "SELECT * FROM tenants WHERE siteCity = '$adminSiteName' AND expirationDate <= '$oneMonthFromToday' ORDER BY id LIMIT $ShowPostFrom,10";
+                                }
+
                                 $stmt =$ConnectingDB->query($sql);
                             }
                             $SrNo = 0;
@@ -167,7 +193,12 @@
                                         <?php } }?>
                                         <?php
                                         global $ConnectingDB;
-                                        $sql           = "SELECT COUNT(*) FROM tenants WHERE expirationDate <= '$oneMonthFromToday' ";
+                                        if($_SESSION["adminRole"] == "Super_Admin"){
+                                            $sql = "SELECT COUNT(*) FROM tenants WHERE expirationDate <= '$oneMonthFromToday' ";
+                                        }elseif($_SESSION["adminRole"] == "Site_Manager"){
+                                            $sql = "SELECT COUNT(*) FROM tenants WHERE siteCity = '$adminSiteName' AND expirationDate <= '$oneMonthFromToday' ";
+                                        }
+
                                         $stmt          = $ConnectingDB->query($sql);
                                         $RowPagination = $stmt->fetch();
                                         $TotalPosts    = array_shift($RowPagination);

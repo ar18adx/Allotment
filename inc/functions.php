@@ -136,6 +136,19 @@ function Redirect_to($New_Location){
   exit;
 }
 
+function CheckUserExistsOnWl($userId){
+  global $ConnectingDB;
+  $sql    = "SELECT userId FROM waitinglist WHERE userId=:userID";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':userID',$userId);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==1) {
+    return true;
+  }else {
+    return false;
+  }
+}
 
 function CheckEmailExistsOrNot($emailAddress){
   global $ConnectingDB;

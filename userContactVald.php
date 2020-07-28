@@ -14,7 +14,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 
         $userId = $_SESSION["userId"];
         global $ConnectingDB;
-        $sql ="SELECT * FROM users WHERE id='$userId'";
+        $sql ="SELECT * FROM users WHERE id = '$userId'";
         $stmt = $ConnectingDB->query($sql);
         $DataRows = $stmt->fetch();
         $id                             = $DataRows["id"];

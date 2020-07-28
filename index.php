@@ -83,6 +83,7 @@ if (isset($_POST["Submit"])) {
 
         <div class="row">
             <div class="col-md-8">
+                
             </div>
             <div class="col-md-4">
                 <form action="index.php" method="POST">
@@ -117,3 +118,7 @@ if (isset($_POST["Submit"])) {
     <!-- Footer Start -->
     <?php include("inc/footer.php") ;?>
     <!-- Footer End -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="/js/libs.min.js"></script>
+    
