@@ -32,7 +32,9 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         $tenantFullName  = $tenantFirstName." ".$tenantLastName;
 
     
-
+            $sqlx = "UPDATE messages SET readMsg = 1 WHERE userId = '$tenantId' AND msgFrom = 'Site Manager' ";
+            $stmtx = $ConnectingDB->prepare($sqlx);
+            $Executex=$stmtx->execute();
 
 ?>
 

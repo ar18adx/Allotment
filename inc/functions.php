@@ -376,6 +376,48 @@ function confirmAdminLogin(){
   
   }
 
+  function SoonToBeExpLease(){
+    global $ConnectingDB;
+    $sql ="SELECT * FROM tenants ";
+    $stmt = $ConnectingDB->query($sql);
+    $DataRows=$stmt->fetch();
+    $leaseDate              = $DataRows["leaseDate"];
+    $oneMonthFromToday = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 90 day "));
+    $sql = "SELECT COUNT(*) FROM tenants WHERE expirationDate <= '$oneMonthFromToday' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $SoonToBeExpLease=array_shift($TotalRows);
+    echo $SoonToBeExpLease;
+  
+  }
+
+  function SoonToBeExpLeaseSm(){
+    $adminSiteName = $_SESSION["adminSiteName"];
+    global $ConnectingDB;
+    $sql ="SELECT * FROM tenants ";
+    $stmt = $ConnectingDB->query($sql);
+    $DataRows=$stmt->fetch();
+    $leaseDate              = $DataRows["leaseDate"];
+    $oneMonthFromToday = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 90 day "));
+    $sql = "SELECT COUNT(*) FROM tenants WHERE siteCity = '$adminSiteName' AND expirationDate <= '$oneMonthFromToday' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $SoonToBeExpLeaseSm=array_shift($TotalRows);
+    echo $SoonToBeExpLeaseSm;
+  
+  }
+
+  function TotalUnreadMsg(){
+    $tenantId              = $_SESSION["userId"];
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM messages WHERE userId = '$tenantId' AND msgFrom = 'Site Manager' AND readMsg = 0  ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalUnreadMsg=array_shift($TotalRows);
+    echo $TotalUnreadMsg;
+  
+  }
+
   function TotalTenantsSm(){
     $adminCity = $_SESSION["adminSiteName"];
     global $ConnectingDB;

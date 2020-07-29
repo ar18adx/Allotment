@@ -132,14 +132,25 @@ confirmAdminLogin();
                         </div>
                     </div>
                     <?php }?>
+                    <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
                     <div class="col-sm-4">
                         <div class="card text-white bg-danger">
                         <div class="card-body">
-                            <h3 class="card-title">Tenant's lease will expire soon</h3>
+                            <h3 class="card-title"><?php SoonToBeExpLease()?> Tenant's lease will expire soon</h3>
                             <p class="card-text"></p>
                         </div>
                         </div>
                     </div>
+                    <?php }elseif($_SESSION["adminRole"] == "Site_Manager"){?>
+                    <div class="col-sm-4">
+                        <div class="card text-white bg-danger">
+                        <div class="card-body">
+                            <h3 class="card-title"><?php SoonToBeExpLeaseSm()?> Tenant's lease will expire soon</h3>
+                            <p class="card-text"></p>
+                        </div>
+                        </div>
+                    </div>
+                    <?php }?>
                     <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
                     <div class="col-sm-4">
                         <div class="card text-white bg-info">

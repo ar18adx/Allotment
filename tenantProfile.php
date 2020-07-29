@@ -37,6 +37,8 @@ confirmUserLogin()
     $expirationDate          = $DataRows["expirationDate"];
     $renewalStatus          = $DataRows["renewalStatus"];
 
+    $changeLeaseDateFormat       = date("F-d-Y", strtotime($leaseDate));
+    $changeExpDateFormat       = date("F-d-Y", strtotime($expirationDate));
 
     $expirationDateNotification        = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 90 day "));
 
@@ -111,10 +113,10 @@ confirmUserLogin()
             $stmtCpa = $ConnectingDB->prepare($sqlCpa);
             $ExecuteCpa=$stmtCpa->execute();
 
-            $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
-            $stmtSm = $ConnectingDB->query($sqlSm);
-            while ($DataRows=$stmtSm->fetch()) {
-            $applicantId                     = $DataRows["id"];
+            $sqlSk = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+            $stmtSk = $ConnectingDB->query($sqlSk);
+            while ($DataRows=$stmtSk->fetch()) {
+            $applicantId             = $DataRows["id"];
             $applicantEmail          = $DataRows["emailAddress"];
             }
 
@@ -237,81 +239,91 @@ if(isset($_POST["sixMonths"])){
 
 ?>
 
-<!-- Header Start -->
-<?php include("inc/header.php"); ?>
-<!-- header End -->
+<?php if($_SESSION["userStatus"] == "Tenant"){?>
 
-    <div class="container">
-        <div class="row">
-            <!-- User Sidebar -->
-            <?php include("inc/userSidebar.php");?>
-            <!-- User Sidebar End -->
-            <div class="col-md-9">
-                <div class="jumbotron mt-5">
-                    <h1 class="">Hello, <?php echo $_SESSION["userFirstName"]." ".$_SESSION["userLastName"]; ?></h1>
-                    <h3 class=""><b>You are a Tenant in : </b><?php echo htmlentities($siteCity)?></h3>
-                    <h3 class=""><b>Your Plot-Number is : </b><?php echo htmlentities($plotNumber)?></h3>
-                    <h3 class=""><b>Lease Date :</b> <?php echo htmlentities($leaseDate) ?></h3>
-                    <h3 class=""><b>Expiry Date :</b> <?php echo htmlentities($expirationDate) ?></h3>
-                            <br>
-                            <?php
-                            echo ErrorMessage();
-                            echo SuccessMessage();
-                            echo ErrorMessageForRg();
-                            ?>
-                    <!-- <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p> -->
-                    <hr class="my-4">
-                    <!-- <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> -->
-                    
-                    <?php if(date("Y-m-d") >= $oneMonthToExp){?>
-                        <div class="alert alert-danger" role="alert">
-                            <h4 class="alert-heading">Notice!</h4>
-                            <!-- Get the number of days remainig on lease when it is one month to expiry date -->
-                            <p>Your Account will expire in <?php echo htmlentities($diff->format("%a")) ; ?> days.</p>
-                            <p>You did not renew Your lease, So the plot will go to someone else after Your expiration date</p>
-                            <hr>
-                        </div>
-                    
-                    <?php }elseif(date("Y-m-d") >= $expirationDateNotification){?>
-                        <div class="alert alert-danger" role="alert">
-                            <h4 class="alert-heading">Notice!</h4>
-                            <!-- Get the number of days remainig on lease when it is one month to expiry date -->
-                            <p>Your Account will expire in <?php echo htmlentities($diff->format("%a")) ; ?> days.</p>
-                            <p><i>You will be unable to renew Your lease when it is 30 days to Your lease expiry date.</i></p>
-                            <p>Select Your duration of renewal below:</p>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="card alert-danger">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Renew For 1 Year</h5>
-                                        <p class="card-text"></p>
-                                        <form action="tenantProfile.php" method="POST">
-                                            <button type="submit" name="oneYear" class="btn btn-info">Renew For 1 Year</button>
-                                        </form>
+    <!-- Header Start -->
+    <?php include("inc/header.php"); ?>
+    <!-- header End -->
+
+        <div class="container">
+            <div class="row">
+                <!-- User Sidebar -->
+                <?php include("inc/userSidebar.php");?>
+                <!-- User Sidebar End -->
+                <div class="col-md-9">
+                    <div class="jumbotron mt-5">
+                        <h1 class="">Hello, <?php echo $_SESSION["userFirstName"]." ".$_SESSION["userLastName"]; ?></h1>
+                        <h3 class=""><b>You are a Tenant in : </b><?php echo htmlentities($siteCity)?></h3>
+                        <h3 class=""><b>Your Plot-Number is : </b><?php echo htmlentities($plotNumber)?></h3>
+                        <h3 class=""><b>Lease Date :</b> <?php echo htmlentities($changeLeaseDateFormat) ?></h3>
+                        <h3 class=""><b>Expiry Date :</b> <?php echo htmlentities($changeExpDateFormat) ?></h3>
+                                <br>
+                                <?php
+                                echo ErrorMessage();
+                                echo SuccessMessage();
+                                echo ErrorMessageForRg();
+                                ?>
+                        <!-- <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p> -->
+                        <hr class="my-4">
+                        <!-- <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> -->
+                        
+                        <?php if(date("Y-m-d") >= $oneMonthToExp){?>
+                            <div class="alert alert-danger" role="alert">
+                                <h4 class="alert-heading">Notice!</h4>
+                                <!-- Get the number of days remainig on lease when it is one month to expiry date -->
+                                <p>Your Account will expire in <?php echo htmlentities($diff->format("%a")) ; ?> days.</p>
+                                <p>You did not renew Your lease, So the plot will go to someone else after Your expiration date</p>
+                                <hr>
+                            </div>
+                        
+                        <?php }elseif(date("Y-m-d") >= $expirationDateNotification){?>
+                            <div class="alert alert-danger" role="alert">
+                                <h4 class="alert-heading">Notice!</h4>
+                                <!-- Get the number of days remainig on lease when it is one month to expiry date -->
+                                <p>Your Account will expire in <?php echo htmlentities($diff->format("%a")) ; ?> days.</p>
+                                <p><i>You will be unable to renew Your lease when it is 30 days to Your lease expiry date.</i></p>
+                                <p>Select Your duration of renewal below:</p>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="card alert-danger">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Renew For 1 Year</h5>
+                                            <p class="card-text"></p>
+                                            <form action="tenantProfile.php" method="POST">
+                                                <button type="submit" name="oneYear" class="btn btn-info">Renew For 1 Year</button>
+                                            </form>
+                                        </div>
+                                        </div>
                                     </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="card alert-danger">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Renew For 6 Months</h5>
-                                        <p class="card-text"></p>
-                                        <form action="tenantProfile.php" method="POST">
-                                            <button type="submit" name="sixMonths" class="btn btn-info">Renew For 6 Months</button>
-                                        </form>
-                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="card alert-danger">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Renew For 6 Months</h5>
+                                            <p class="card-text"></p>
+                                            <form action="tenantProfile.php" method="POST">
+                                                <button type="submit" name="sixMonths" class="btn btn-info">Renew For 6 Months</button>
+                                            </form>
+                                        </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    <?php }?>
-                    <!-- <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a> -->
+                        <?php }?>
+                        <!-- <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a> -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-<!-- Footer Start -->
-<?php include("inc/footer.php") ;?>
-<!-- Footer End -->
+    <!-- Footer Start -->
+    <?php include("inc/footer.php") ;?>
+    <!-- Footer End -->
+
+<?php
+
+}else{
+    Redirect_to("errorPage.php");
+} 
+
+?>

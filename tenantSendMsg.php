@@ -48,7 +48,12 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         
     
     
+            // $emailTo    = $tenantEmail;
+            // $subject    = "New Message Alert";
+            // $message    = "Hello ".$tenantFirstName."\n"." You have a new message ";
+            // $headers    = "From: "."Allotment";
 
+            // mail($emailTo, $subject, $message, $headers);
    
         // Query to insert new city in DB When everything is fine
         global $ConnectingDB;

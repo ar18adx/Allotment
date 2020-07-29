@@ -59,9 +59,9 @@ confirmAdminLogin();
                         <?php 
                         global $ConnectingDB;
                          if($_SESSION["adminRole"] == "Super_Admin" ){ 
-                            $sql = "SELECT * FROM cities ORDER BY id DESC";
+                            $sql = "SELECT * FROM cities ORDER BY cityName";
                          }elseif($_SESSION["adminRole"] == "Site_Manager"){
-                            $sql = "SELECT * FROM cities WHERE cityName ='$adminSiteName' ORDER BY id DESC";
+                            $sql = "SELECT * FROM cities WHERE cityName ='$adminSiteName'";
                          }
                         $Execute =$ConnectingDB->query($sql);
                         $SrNo = 0;

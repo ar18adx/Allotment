@@ -90,7 +90,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         date_default_timezone_set("Africa/Lagos");
         
         $leaseDate              = date("Y-m-d "); 
-        $expirationDate         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 366 day "));
+        $expirationDate         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 365 day "));
         $renewalStatus          = "Pending";
         $tenantStatus           = "Active";
         
@@ -155,6 +155,14 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
                 $applicantId             = $DataRows["id"];
                 $applicantEmail          = $DataRows["emailAddress"];
                 $applicantUserId         = $DataRows["userId"];
+                $applicantFirstName      = $DataRows["firstName"];
+
+                    // $emailTo    = $applicantEmail;
+                    // $subject    = "New Plot Availability Alert";
+                    // $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You ";
+                    // $headers    = "From: "."Allotment";
+    
+                    // mail($emailTo, $subject, $message, $headers);
 
                     $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
                     $stmtC = $ConnectingDB->prepare($sqlC);
@@ -187,18 +195,26 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
                         $stmt1x = $ConnectingDB->prepare($sql1x);
                         $Execute1x=$stmt1x->execute();
     
-                        $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
-                        $stmtSm = $ConnectingDB->query($sqlSm);
-                        while ($DataRows=$stmtSm->fetch()) {
-                        $applicantId                     = $DataRows["id"];
-                        $applicantEmail          = $DataRows["emailAddress"];
-                        $applicantUserId          = $DataRows["userId"];
+                        $sqlSmc = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                        $stmtSmc = $ConnectingDB->query($sqlSmc);
+                        $DataRows=$stmtSmc->fetch();
+                        $applicantIdDc                     = $DataRows["id"];
+                        $applicantEmailDc          = $DataRows["emailAddress"];
+                        $applicantUserIdDc          = $DataRows["userId"];
+                        $applicantFirstNameDc       = $DataRows["firstName"];
 
-                            $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+                            // $emailTo    = $applicantEmailDc;
+                            // $subject    = "New Plot Availability Alert";
+                            // $message    = "Hello ".$applicantFirstNameDc."\n"." There is a new plot available for You ";
+                            // $headers    = "From: "."Allotment";
+            
+                            // mail($emailTo, $subject, $message, $headers);
+
+                            $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserIdDc' ";
                             $stmtC2 = $ConnectingDB->prepare($sqlC2);
                             $ExecuteC2=$stmtC2->execute();
 
-                        }
+                        
     
     
                         $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";

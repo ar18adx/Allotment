@@ -1,4 +1,4 @@
-<?php $pageTitle = "Register User";?>
+<?php $pageTitle = "User Update Profile";?>
 
 
 <?php require_once("inc/db.php"); ?>
@@ -55,13 +55,13 @@
                     ?>
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Telephone Number</label>
+                            <label for="exampleInputEmail1">Email</label>
                             <input type="text" name="emailAddress" value="<?php echo htmlentities($emailAddress); ?>" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" >
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Email</label>
+                            <label for="exampleInputEmail1">Telephone</label>
                             <input type="text" name="telephone" value="<?php echo htmlentities($telephone); ?>" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         </div>
                     </div>
