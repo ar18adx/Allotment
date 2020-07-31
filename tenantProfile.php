@@ -10,9 +10,11 @@ confirmUserLogin()
 ?>
 
     <?php
-        // if($_SESSION["userStatus"] == "New_User"){
-        //     Redirect_to("applyForPlots.php");
-        //   }
+        if($_SESSION["userStatus"] == "Awaiting_Plot"){
+            Redirect_to("confirmOffer.php");
+        }elseif($_SESSION["userStatus"] == "New_User"){
+            Redirect_to("applyForPlots.php");
+        }
     ?>
 
     <?php
@@ -50,13 +52,6 @@ confirmUserLogin()
 
     $expirationDateMinus1 =    date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 1 day "));
 
-    // echo $expirationDateNotification. "<br>";
-    // echo $expirationDateTrigger. "<br>";
-    // echo date("Y-m-d"). "<br>";
-    
-    echo $oneMonthToExp . "<br>";
-    // echo $expirationDateTrnsf . "<br>";
-    // echo $expirationDateMinus1;
 
     
 
@@ -67,13 +62,6 @@ confirmUserLogin()
             //difference between two dates
             $diff = date_diff($start_date,$end_date);
 
-    // if(date("Y-m-d") == $expirationDateTrigger ){
-    //     global $ConnectingDB;
-    //     $sql = "UPDATE tenants SET renewalStatus = 'Will_Not_Renew' WHERE tenantId ='$tenantId' ";
-    //     $stmt = $ConnectingDB->prepare($sql);
-    //     $Execute=$stmt->execute();
-
-    // }
 
     if(date("Y-m-d") >= $oneMonthToExp){
         $sqlSv = "UPDATE plots SET plotStatus = 'Soon_Vacant' WHERE plotNumber ='$plotNumber' ";
@@ -82,17 +70,9 @@ confirmUserLogin()
 
     }
 
-    // if(date("Y-m-d") >= $expirationDateTrnsf){
-    //     $sqlTrn = "INSERT INTO formertenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteCity, plotNumber, leaseDate, expirationDate )";
-    //     $sqlTrn .= "VALUES('$tenantId', '$tenantFirstName', '$tenantLastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteCity', '$plotNumber', '$leaseDate', '$expirationDate')";
-    //     $stmtTrn = $ConnectingDB->prepare($sqlTrn);
-    //     $ExecuteTrn=$stmtTrn->execute();
-
-    // }
-
-            
     
     if(date("Y-m-d") >= $expirationDate){
+        // Insert Tenant's information into The formertenants table
         $sqlTrn = "INSERT INTO formertenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteCity, plotNumber, leaseDate, expirationDate )";
         $sqlTrn .= "VALUES('$tenantId', '$tenantFirstName', '$tenantLastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteCity', '$plotNumber', '$leaseDate', '$expirationDate')";
         $stmtTrn = $ConnectingDB->prepare($sqlTrn);
@@ -102,7 +82,7 @@ confirmUserLogin()
         $stmtExp = $ConnectingDB->prepare($sqlExp);
         $ExecuteExp=$stmtExp->execute();
 
-        // Code for users whoose city is the same as their site.
+        // Transfer the plot number to a user on the waitinglist whoose city is the same as their site.
         $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
         $stmt04 = $ConnectingDB->prepare($sql04);
         $stmt04->execute();
@@ -113,13 +93,24 @@ confirmUserLogin()
             $stmtCpa = $ConnectingDB->prepare($sqlCpa);
             $ExecuteCpa=$stmtCpa->execute();
 
+            // Send email to the user on the waiting list
             $sqlSk = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
             $stmtSk = $ConnectingDB->query($sqlSk);
             while ($DataRows=$stmtSk->fetch()) {
             $applicantId             = $DataRows["id"];
             $applicantEmail          = $DataRows["emailAddress"];
+            $applicantFirstName      = $DataRows["firstName"];
             }
 
+                $emailTo    = $applicantEmail;
+                $subject    = "New Plot Availability Alert";
+                $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
+                                ."\n"."Log into Your account below."
+                                ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                $headers    = "From: "."Allotment";
+
+                mail($emailTo, $subject, $message, $headers);
 
             $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumber' ";
             $stmtE2 = $ConnectingDB->prepare($sqlE2);
@@ -127,7 +118,9 @@ confirmUserLogin()
 
 
         }elseif($Result04 == 0){
-            // Code for users whoose city is different as their site.
+            // If there is no user on the waitinglist who lives in the same city as the site he/she applied for, then transfer 
+            // the plot to a  user whoose city is different as the site he/she applied for.
+
             $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
             $stmt07 = $ConnectingDB->prepare($sql07);
             $stmt07->execute();
@@ -141,17 +134,29 @@ confirmUserLogin()
                     $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
                     $stmtSm = $ConnectingDB->query($sqlSm);
                     while ($DataRows=$stmtSm->fetch()) {
-                    $applicantId                     = $DataRows["id"];
-                    $applicantEmail          = $DataRows["emailAddress"];
+                    $applicantIdDs                    = $DataRows["id"];
+                    $applicantEmailDs          = $DataRows["emailAddress"];
+                    $applicantFirstNameDs      = $DataRows["firstName"];
                     }
 
+                        $emailTo    = $applicantEmailDs;
+                        $subject    = "New Plot Availability Alert";
+                        $message    = "Hello ".$applicantFirstNameDs."\n"." There is a new plot available for You."
+                                        ."\n"."Log into Your account below."
+                                        ."\n\n"."http://allotment-com.stackstaging.com/";
+        
+                        $headers    = "From: "."Allotment";
+        
+                        mail($emailTo, $subject, $message, $headers);
 
                     $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumber' ";
                     $stmtE6 = $ConnectingDB->prepare($sqlE6);
                     $ExecuteE6=$stmtE6->execute();
 
                 }
-                
+
+                    // If there are no users on the waitinglist, then set the plot status to Vacant
+
                     if($Result07 == 0){
 
                         $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumber' ";
@@ -160,14 +165,17 @@ confirmUserLogin()
                     }
 
         }
-    
+            // Set the tenant's status to a new User
+
             $sqlUpd = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
             $stmtUpd = $ConnectingDB->prepare($sqlUpd);
             $ExecuteUpd=$stmtUpd->execute();
 
         
             if($ExecuteTrn){
-                    
+                    //If the tenant's records were successfully transfered to the formertenants table,
+                    //then delete the tenant from the tenants tabl and then log the tenant out
+
                 $sqlDel = "DELETE FROM tenants WHERE tenantId='$tenantId' ";
                 $stmtDel = $ConnectingDB->prepare($sqlDel);
                 $ExecuteDel=$stmtDel->execute();
@@ -184,7 +192,7 @@ confirmUserLogin()
     ?>
 
 <?php
-
+ //Renew lease for one year
 if(isset($_POST["oneYear"])){
     
     $renewLeaseForOneYear = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " + 365 day "));
@@ -210,6 +218,7 @@ if(isset($_POST["oneYear"])){
 
 } //Ending of oneYear Button If-Condition
 
+// Renew Lease For Six months
 if(isset($_POST["sixMonths"])){
     
     $renewLeaseForSixMonths = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " + 6 month "));
@@ -263,10 +272,11 @@ if(isset($_POST["sixMonths"])){
                                 echo SuccessMessage();
                                 echo ErrorMessageForRg();
                                 ?>
-                        <!-- <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p> -->
+
                         <hr class="my-4">
-                        <!-- <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> -->
                         
+                        <!-- Display a message to the tanant if the tenant did not renew his/her lease -->
+
                         <?php if(date("Y-m-d") >= $oneMonthToExp){?>
                             <div class="alert alert-danger" role="alert">
                                 <h4 class="alert-heading">Notice!</h4>
@@ -275,7 +285,9 @@ if(isset($_POST["sixMonths"])){
                                 <p>You did not renew Your lease, So the plot will go to someone else after Your expiration date</p>
                                 <hr>
                             </div>
-                        
+                            
+                        <!-- Display a message an options for the tenant to renew his/her lease -->
+
                         <?php }elseif(date("Y-m-d") >= $expirationDateNotification){?>
                             <div class="alert alert-danger" role="alert">
                                 <h4 class="alert-heading">Notice!</h4>
@@ -310,7 +322,6 @@ if(isset($_POST["sixMonths"])){
                                 </div>
                             </div>
                         <?php }?>
-                        <!-- <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a> -->
                     </div>
                 </div>
             </div>

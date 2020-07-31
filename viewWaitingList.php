@@ -16,6 +16,37 @@ confirmAdminLogin();
 <?php 
 $adminSiteName = $_SESSION["adminSiteName"];
 
+    if(isset($_POST["SendConVal"])){
+        date_default_timezone_set("Africa/Lagos");
+        $CurrentTime            =  time();
+        $datetime               = strftime("%B-%d-%Y at %I:%M:%p",$CurrentTime);
+
+            global $ConnectingDB;
+            $sqlMl ="SELECT * FROM Waitinglist ";
+            $stmtMl = $ConnectingDB->query($sqlMl);
+            while ($DataRows=$stmtMl->fetch()){;
+            $idMl                     = $DataRows["id"];
+            $emailAddressMl[]       = $DataRows["emailAddress"];
+
+            }
+            
+                $emailTo    = implode(", ", $emailAddressMl);
+                $subject    = "Contact And Interest Validation";
+                $message    = "Please click on the link below to update Your contact details"
+                                ."\n\n"."https://www.google.com";
+                $headers    = "From: "."Allotment";
+
+            if(mail($emailTo, $subject, $message, $headers)){
+            $_SESSION["SuccessMessage"]="Message was sent Successfully";
+            Redirect_to("viewWaitingList.php?page=1");
+            }else {
+            $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+            Redirect_to("viewWaitingList.php?page=1");
+            }
+        
+    } //Ending of Submit Button If-Condition
+
+
 ?>
 
 <!-- Admin Header Start -->
@@ -37,8 +68,18 @@ $adminSiteName = $_SESSION["adminSiteName"];
                     <div class="col-md-9">
                         <div class="text-center mb-4 mt-4">
                             <h2>Waiting List (All Sites)</h2>
-                            <div class="mb-3 mt-3">
-                                <a class="btn btn-success" href="closeOpenApplication.php" role="button">Close/Open Applications</a>
+                            <?php
+                            echo ErrorMessage();
+                            echo SuccessMessage();
+                            echo ErrorMessageForRg();
+                            ?>
+                            <div class="row text-center mb-3 mt-3" >
+                                <div class="col-md-6">
+                                    <a class="btn btn-success" href="closeOpenApplication.php" role="button">Close/Open Applications</a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a class="btn btn-warning" href="adminContactvalidation.php" role="button">Send Contact Validation</a>
+                                </div>
                             </div>
                         </div>
                         <table class="table table-bordered table-hover">
@@ -60,11 +101,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
                                 </tr>
                             </thead>
                             <?php 
-                            // global $ConnectingDB;
-                            // $sql = "SELECT * FROM waitinglist ORDER BY id asc";
-                            // $Execute =$ConnectingDB->query($sql);
-                            // $SrNo = 0;
-                            // while ($DataRows=$Execute->fetch()) {
+            
                             if (isset($_GET["page"])) {
                                 global $ConnectingDB;
                                 $sql = "SELECT * FROM waitinglist ";
@@ -217,11 +254,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
                                 </tr>
                             </thead>
                             <?php 
-                            // global $ConnectingDB;
-                            // $sql = "SELECT * FROM waitinglist WHERE siteCity = '$adminSiteName' ORDER BY id asc";
-                            // $Execute =$ConnectingDB->query($sql);
-                            // $SrNo = 0;
-                            // while ($DataRows=$Execute->fetch()) {
+                        
                             if (isset($_GET["page"])) {
                                 global $ConnectingDB;
                                 $sql = "SELECT * FROM waitinglist WHERE siteCity = '$adminSiteName' ORDER BY id ASC ";

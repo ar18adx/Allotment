@@ -13,11 +13,10 @@
   <body>
         <div class="container">
             <div class="jumbotron mt-5">
-                <h1 class="display-4">Error!!!</h1>
-                <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+                <h1 class="display-4">An Error Occured</h1>
+                <p class="lead">You do not have permissions to view this page</p>
                 <hr class="my-4">
-                <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-                <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+                <a class="btn btn-primary btn-lg" href="index.php" role="button">Home</a>
             </div>
         </div>
 

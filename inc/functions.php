@@ -1,5 +1,6 @@
 <?php 
 
+// Function to generate random plot Numbers
 
 function plotNameGen($length){
   
@@ -35,7 +36,7 @@ function plotNameGen($length){
 }
 
 
-
+// Function for a (1 hour ago) time format
 
 function time_ago($dateTime){
   
@@ -130,11 +131,15 @@ function time_ago($dateTime){
   }
 }
 
+// Function to redirect web pages
 
 function Redirect_to($New_Location){
   header("Location:".$New_Location);
   exit;
 }
+
+//Function to check if a user exists on the Waiting list
+//If a user exist on the waiting list, the application won't process.
 
 function CheckUserExistsOnWl($userId){
   global $ConnectingDB;
@@ -150,6 +155,9 @@ function CheckUserExistsOnWl($userId){
   }
 }
 
+// Function to check if email exists in the Users table during a New user registration
+//If email exists,  the registration will not be submitted
+
 function CheckEmailExistsOrNot($emailAddress){
   global $ConnectingDB;
   $sql    = "SELECT emailAddress FROM users WHERE emailAddress=:emailAddresS";
@@ -163,6 +171,10 @@ function CheckEmailExistsOrNot($emailAddress){
     return false;
   }
 }
+
+
+// Function to check if a city exists in the Cities table when adding a new city
+// If city exists, A duplicate city will not be added
 
 function CheckCityExistsOrNot($cityName){
   global $ConnectingDB;
@@ -178,6 +190,9 @@ function CheckCityExistsOrNot($cityName){
   }
 }
 
+// Function to check if the city short code (ABS, AKU, XYZ) exists in  the city table
+// Duplicate city short codes can't exist on the table
+
 function CheckCityCSCOrNot($cityShortCode){
   global $ConnectingDB;
   $sql    = "SELECT cityShortCode FROM cities WHERE cityShortCode=:cityShortCoDe";
@@ -192,19 +207,8 @@ function CheckCityCSCOrNot($cityShortCode){
   }
 }
 
-// function CheckUserNameExistsOrNot($Username){
-//   global $ConnectingDB;
-//   $sql    = "SELECT Username FROM admins WHERE Username=:userName";
-//   $stmt   = $ConnectingDB->prepare($sql);
-//   $stmt->bindValue(':userName',$Username);
-//   $stmt->execute();
-//   $Result = $stmt->rowcount();
-//   if ($Result==1) {
-//     return true;
-//   }else {
-//     return false;
-//   }
-// }
+// Function to check if a plot number is valid in the plots table
+// This is for users who have a specific plot number they are applying with
 
 function CheckPlotNumExistsOrNot($plotNumber){
   global $ConnectingDB;
@@ -221,6 +225,7 @@ function CheckPlotNumExistsOrNot($plotNumber){
 }
 
 // Check if plot Number exists in Tenant's table
+// This is to prevent two tenants from occupying the same plot
 
 function CheckPlotNumTnt($plotNumber){
   global $ConnectingDB;
@@ -235,6 +240,9 @@ function CheckPlotNumTnt($plotNumber){
     return false;
   }
 }
+
+// Function to check if a plot number is valid in the plots table
+// This is for users who have a specific plot number they are applying with
 
 function CheckPlotNumAppExistsOrNot($plotNumberApp){
   global $ConnectingDB;
@@ -251,41 +259,41 @@ function CheckPlotNumAppExistsOrNot($plotNumberApp){
 }
 
 
-// Function to make sure a user does not apply for a plot more than once.
-function checkUserIdPltExists($userId){
-  global $ConnectingDB;
-  $sql    = "SELECT userId FROM waitinglist WHERE userId=:userID";
-  $stmt   = $ConnectingDB->prepare($sql);
-  $stmt->bindValue(':userID',$userId);
-  $stmt->execute();
-  $Result = $stmt->rowcount();
-  if ($Result==2) {
-    return true;
-  }else {
-    return false;
-  }
-}
+// // Function to make sure a user does not apply for a plot more than once.
+// function checkUserIdPltExists($userId){
+//   global $ConnectingDB;
+//   $sql    = "SELECT userId FROM waitinglist WHERE userId=:userID";
+//   $stmt   = $ConnectingDB->prepare($sql);
+//   $stmt->bindValue(':userID',$userId);
+//   $stmt->execute();
+//   $Result = $stmt->rowcount();
+//   if ($Result==2) {
+//     return true;
+//   }else {
+//     return false;
+//   }
+// }
 
-// Function to check if A user has previously applied for a particular Plot
-function checkPltNumExists($userId, $plotNumberApp){
-  global $ConnectingDB;
-  $sql    = "SELECT userId AND plotNumberApp FROM waitinglist WHERE userId=:userID AND plotNumberApp=:plotNumberApP " ;
-  // $sql = "SELECT plotNumberApp FROM waitinglist WHERE userId = :userID OR plotNumberApp=:plotNumberApP";
-  // $sql    = "SELECT plotNumberApp FROM waitinglist WHERE plotNumberApp=:plotNumberApP";
-  $stmt   = $ConnectingDB->prepare($sql);
-  $stmt->bindValue(':userID',$userId);
-  $stmt->bindValue(':plotNumberApP',$plotNumberApp);
-  $stmt->execute();
-  $Result = $stmt->rowcount();
-  if ($Result == 1 ) {
-    return true;
-  }else {
-    return false;
-  }
-}
+// // Function to check if A user has previously applied for a particular Plot
+// function checkPltNumExists($userId, $plotNumberApp){
+//   global $ConnectingDB;
+//   $sql    = "SELECT userId AND plotNumberApp FROM waitinglist WHERE userId=:userID AND plotNumberApp=:plotNumberApP " ;
+//   // $sql = "SELECT plotNumberApp FROM waitinglist WHERE userId = :userID OR plotNumberApp=:plotNumberApP";
+//   // $sql    = "SELECT plotNumberApp FROM waitinglist WHERE plotNumberApp=:plotNumberApP";
+//   $stmt   = $ConnectingDB->prepare($sql);
+//   $stmt->bindValue(':userID',$userId);
+//   $stmt->bindValue(':plotNumberApP',$plotNumberApp);
+//   $stmt->execute();
+//   $Result = $stmt->rowcount();
+//   if ($Result == 1 ) {
+//     return true;
+//   }else {
+//     return false;
+//   }
+// }
 
 
-// User Login Function
+// User Login Authentication Function
 function userLoginAttempt($emailAddress){
   global $ConnectingDB;
   $sql = "SELECT * FROM users WHERE emailAddress = :emailAddresS LIMIT 1";
@@ -301,7 +309,7 @@ function userLoginAttempt($emailAddress){
   }
 }
 
-//Admin Login Function
+//Admin Login Authentication Function
 function adminLoginAttempt($emailAddress){
   global $ConnectingDB;
   $sql = "SELECT * FROM admins WHERE emailAddress = :emailAddresS LIMIT 1";
@@ -317,6 +325,8 @@ function adminLoginAttempt($emailAddress){
   }
 }
 
+// Confirm if a user is logged in, If not redirect the user to the login page
+
 function confirmUserLogin(){
 if (isset($_SESSION["userId"])) {
   return true;
@@ -326,14 +336,20 @@ if (isset($_SESSION["userId"])) {
 }
 }
 
+// Confirm if admin is logged in, If not redirect Admin to the admin login page
+
 function confirmAdminLogin(){
   if (isset($_SESSION["adminId"])) {
     return true;
   }  else {
     $_SESSION["ErrorMessage"]="Login Required !";
-    Redirect_to("index.php");
+    Redirect_to("adminLogin97.php");
   }
   }
+
+  
+
+// Count The total number of sites or Cities added
 
   function TotalSitesAdded(){
     global $ConnectingDB;
@@ -345,6 +361,8 @@ function confirmAdminLogin(){
 
   }
 
+  // Count the total number of Plots added
+
   function TotalPlotsAdded(){
     global $ConnectingDB;
     $sql = "SELECT COUNT(*) FROM plots ";
@@ -354,6 +372,8 @@ function confirmAdminLogin(){
     echo $TotalPlotsAdded;
   
   }
+
+// Count the total number of plots in a particular site for a site manager
 
   function TotalPlotsSm(){
     $adminCity = $_SESSION["adminSiteName"];
@@ -366,6 +386,8 @@ function confirmAdminLogin(){
   
   }
 
+  // Count the total number of tenants on the tenants table
+
   function TotalTenants(){
     global $ConnectingDB;
     $sql = "SELECT COUNT(*) FROM tenants ";
@@ -375,6 +397,8 @@ function confirmAdminLogin(){
     echo $TotalTenants;
   
   }
+
+  // Count the total number of tenants whose lease will expire in 90 days or below
 
   function SoonToBeExpLease(){
     global $ConnectingDB;
@@ -390,6 +414,8 @@ function confirmAdminLogin(){
     echo $SoonToBeExpLease;
   
   }
+
+  // Count the total number of tenants whose lease will expire in 90 days or below in a particular site
 
   function SoonToBeExpLeaseSm(){
     $adminSiteName = $_SESSION["adminSiteName"];
@@ -407,6 +433,8 @@ function confirmAdminLogin(){
   
   }
 
+  // Count the total number of unread messages for a tenant
+
   function TotalUnreadMsg(){
     $tenantId              = $_SESSION["userId"];
     global $ConnectingDB;
@@ -418,6 +446,20 @@ function confirmAdminLogin(){
   
   }
 
+  // Count the total number of unread messages for a tenant
+
+  function TotalUnreadMsgSm(){
+    $adminSiteName = $_SESSION["adminSiteName"];
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM messages WHERE siteName ='$adminSiteName' AND msgFrom != 'Site Manager' AND readMsg = 0  ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalUnreadMsgSm=array_shift($TotalRows);
+    echo $TotalUnreadMsgSm;
+  
+  }
+
+  // Count the total number of tenants in a particular site
   function TotalTenantsSm(){
     $adminCity = $_SESSION["adminSiteName"];
     global $ConnectingDB;
@@ -429,6 +471,7 @@ function confirmAdminLogin(){
   
   }
 
+// Count the total number of users on the waiting list
   function TotalWaitingListNum(){
     global $ConnectingDB;
     $sql = "SELECT COUNT(*) FROM waitinglist ";
@@ -438,6 +481,8 @@ function confirmAdminLogin(){
     echo $TotalWaitingListNum;
   
   }
+
+  // Count the total number of users on the waiting list for a particular site
 
   function TotalWaitingListSm(){
     $adminCity = $_SESSION["adminSiteName"];
@@ -450,6 +495,8 @@ function confirmAdminLogin(){
   
   }
 
+  //Count the total number of Site managers on the admin table
+
   function TotalSiteManager(){
     global $ConnectingDB;
     $sql = "SELECT COUNT(*) FROM admins WHERE adminRole = 'Site_Manager' ";
@@ -459,6 +506,8 @@ function confirmAdminLogin(){
     echo $TotalSiteManager;
   
   }
+
+  // Count the total number of plots per a particular site
 
   function TotalPlotsPerSite(){
     global $ConnectingDB;

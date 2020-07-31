@@ -5,22 +5,24 @@
 <?php require_once("inc/functions.php"); ?>
 
 <?php 
+
+
 confirmUserLogin();
-$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 ?>
 
     <?php
-        // if($_SESSION["userStatus"] == "New_User"){
-        //     Redirect_to("applyForPlots.php");
-        // }elseif($_SESSION["userStatus"] == "Applied_For_Plot"){
-        //     Redirect_to("confirmOffer.php");
-        // }
+        if($_SESSION["userStatus"] == "Tenant"){
+            Redirect_to("tenantProfile.php");
+        }elseif($_SESSION["userStatus"] == "New_User"){
+            Redirect_to("applyForPlots.php");
+        }
     ?>
 
     <?php
 
     $tenantId                 =   $_SESSION["userId"];
 
+    // Fetch all users on the waitinglist
     global $ConnectingDB;
     $sql ="SELECT * FROM waitinglist WHERE userId = '$tenantId'  ";
     $stmt = $ConnectingDB->query($sql);
@@ -46,6 +48,8 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 
     
     <?php
+
+    // Code for cancelling an existing Application
 
     if(isset($_POST["cancelApplication"])){
 
@@ -73,6 +77,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
     } //Ending of Cancel Application Button If-Condition
 
 
+    // Integrating the Accept button with the information to be sent to the Tenants table
 
     if(isset($_POST["Accept"])){
         
@@ -94,14 +99,15 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         $renewalStatus          = "Pending";
         $tenantStatus           = "Active";
         
-
+        // Check if the plot exists on the tenant table in order to avoid duplicate records
+         
         if (CheckPlotNumTnt($plotNumberApp)) {
             $_SESSION["ErrorMessage"]= "This Plot is occupied already !!! ";
             Redirect_to("confirmOffer.php");
         }else{
             
         
-            // Query to insert values in DB When everything is fine
+            // Query to insert values into the tenants table
             global $ConnectingDB;
             $sql = "INSERT INTO tenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteId, siteCity, plotId, plotNumber, leaseDate, expirationDate, renewalStatus, tenantStatus )";
             $sql .= "VALUES('$tenantId', '$firstName', '$lastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteIdNumRw', '$siteCity', '$plotIdNumRw', '$plotNumber', '$leaseDate', '$expirationDate', '$renewalStatus', '$tenantStatus' )";
@@ -133,12 +139,14 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         }
     } //Ending of Accept Button If-Condition
 
+    //Series of action to be taken when a user with an Offer count lower than 1 rejects a plot
+
     if(isset($_POST["Reject"])){
         
         if($offerCount <1){
-            // Query to insert values in DB When everything is fine
+            // Query to insert values in DB
             global $ConnectingDB;
-            // Code for users whoose city is the same as their site.
+            // Transfer the plot number to a user on the waitinglist whoose city is the SAME as their site.
             $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
             $stmt04 = $ConnectingDB->prepare($sql04);
             $stmt04->execute();
@@ -151,18 +159,22 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
     
                 $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
                 $stmtSm = $ConnectingDB->query($sqlSm);
-                $DataRows=$stmtSm->fetch();
+                while($DataRows=$stmtSm->fetch()){
                 $applicantId             = $DataRows["id"];
                 $applicantEmail          = $DataRows["emailAddress"];
                 $applicantUserId         = $DataRows["userId"];
                 $applicantFirstName      = $DataRows["firstName"];
 
-                    // $emailTo    = $applicantEmail;
-                    // $subject    = "New Plot Availability Alert";
-                    // $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You ";
-                    // $headers    = "From: "."Allotment";
+                }
+                    $emailTo    = $applicantEmail;
+                    $subject    = "New Plot Availability Alert";
+                    $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
+                                    ."\n"."Log into Your account below."
+                                    ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                    $headers    = "From: "."Allotment";
     
-                    // mail($emailTo, $subject, $message, $headers);
+                    mail($emailTo, $subject, $message, $headers);
 
                     $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
                     $stmtC = $ConnectingDB->prepare($sqlC);
@@ -184,7 +196,9 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
                 
                 
             }elseif($Result04 == 0){
-                // Code for users whoose city is different as their site.
+                // If there is no user on the waitinglist who lives in the same city as the site he/she applied for, then transfer 
+                // the plot to a  user whoose city is different as the site he/she applied for.
+                
                 $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
                 $stmt07 = $ConnectingDB->prepare($sql07);
                 $stmt07->execute();
@@ -197,18 +211,22 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
     
                         $sqlSmc = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
                         $stmtSmc = $ConnectingDB->query($sqlSmc);
-                        $DataRows=$stmtSmc->fetch();
+                        while($DataRows=$stmtSmc->fetch()){
                         $applicantIdDc                     = $DataRows["id"];
                         $applicantEmailDc          = $DataRows["emailAddress"];
                         $applicantUserIdDc          = $DataRows["userId"];
                         $applicantFirstNameDc       = $DataRows["firstName"];
 
-                            // $emailTo    = $applicantEmailDc;
-                            // $subject    = "New Plot Availability Alert";
-                            // $message    = "Hello ".$applicantFirstNameDc."\n"." There is a new plot available for You ";
-                            // $headers    = "From: "."Allotment";
+                        }
+                            $emailTo    = $applicantEmailDc;
+                            $subject    = "New Plot Availability Alert";
+                            $message    = "Hello ".$applicantFirstNameDc."\n"." There is a new plot available for You. "
+                                            ."\n"."Log into Your account below."
+                                            ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                            $headers    = "From: "."Allotment";
             
-                            // mail($emailTo, $subject, $message, $headers);
+                            mail($emailTo, $subject, $message, $headers);
 
                             $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserIdDc' ";
                             $stmtC2 = $ConnectingDB->prepare($sqlC2);
@@ -221,12 +239,11 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
                         $stmtE6 = $ConnectingDB->prepare($sqlE6);
                         $ExecuteE6=$stmtE6->execute();
 
-                        // $sqlPc = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
-                        // $stmtPc = $ConnectingDB->prepare($sqlPc);
-                        // $ExecutePc=$stmtPc->execute();
     
                     }
                     
+                    // If There are no users on the waitinglist, then set plot status to Vacant
+
                         if($Result07 == 0){
     
                             $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumberApp' ";
@@ -246,6 +263,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
             Redirect_to("confirmOffer.php");
             }
 
+            //Series of actions to be taken if a user with an Offer count of 1 Rejects a plot
         }elseif($offerCount >=1){
             $sqlSt8 = "UPDATE plots SET plotStatus = 'Vacant', dateLastModified = '$dateApplied' WHERE plotNumber ='$plotNumberApp' ";
             $stmtSt8 = $ConnectingDB->prepare($sqlSt8);
@@ -277,6 +295,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
     } //Ending of Reject Button If-Condition
 
 
+        // Fourteen days count function
 
         $daysCountFourteen         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateApplied)). " + 14 day "));
         $start_dateF = date_create(date("Y-m-d"));
@@ -284,9 +303,6 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         
         //difference between two dates
         $diff4 = date_diff($start_dateF,$end_dateF);
-
-        echo $daysCountFourteen ."<br>";
-        echo $plotNumberApp;
     
 
         if(date("Y-m-d") >= $daysCountFourteen && $offerCount <1){
@@ -295,7 +311,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
             $stmtD14 = $ConnectingDB->prepare($sqlD14);
             $ExecuteD14=$stmtD14->execute();
 
-            $sqlU4 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity = '$siteCity', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = 'None' ORDER BY id ASC LIMIT 1 ";
+            $sqlU4 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity = '$siteCity', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity=sitecity ORDER BY id ASC LIMIT 1 ";
             $stmtU4 = $ConnectingDB->prepare($sqlU4);
             $ExecuteU4=$stmtU4->execute();
 
@@ -314,7 +330,7 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
             $stmtD1 = $ConnectingDB->prepare($sqlD1);
             $ExecuteD1=$stmtD1->execute();
 
-            $sqlB14 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND siteCity = '$siteCity' ORDER BY id ASC LIMIT 1 ";
+            $sqlB14 = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
             $stmtB14 = $ConnectingDB->prepare($sqlB14);
             $ExecuteB14=$stmtB14->execute();
 
@@ -339,29 +355,18 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 
         
 
-        // if($offerCount >= 1){
-        //     $sqlDelof = "DELETE FROM waitinglist WHERE tenantId = '$tenantId' ";
-        //     $stmtDelof = $ConnectingDB->prepare($sqlDelof);
-        //     $ExecuteDelof=$stmtDelof->execute();
-        // }
-
             $sqlRc ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' ORDER BY id ASC ";
             $stmtRc = $ConnectingDB->prepare($sqlRc);
             $stmtRc->execute();
             $ResultRc = $stmtRc->rowcount();
-
-            // $sqlUps ="SELECT COUNT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND id <'$id' ";
-            // $stmtUps = $ConnectingDB->prepare($sqlUps);
-            // $stmtUps->execute();
-            // $ResultUps = $stmtUps->rowcount();
+            
+            // Count a User's position on waiting list
 
             $sql = "SELECT COUNT(*) FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND id<=$id ";
             $stmt = $ConnectingDB->query($sql);
             $TotalRows= $stmt->fetch();
             $userPositionOnList=array_shift($TotalRows);
 
-            // echo $ResultUps ."<br>";
-            // echo $ResultUps;
     ?>
 
 
@@ -372,13 +377,13 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 
     <div class="container">
     
-        <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
+        <h1 class="mt-4">Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
         <?php if ($applicationStatus == "Awaiting_Plot"){?>
             <h3>Your Application for a plot was successful. You are in number <?php echo $userPositionOnList ?> position on the Waiting List out of <?php echo $ResultRc ?> applicants</h3>
 
                 <div class="mt-3">
                     <h4>Cancel Application?</h4>
-                    <p><i>cancelling this application will make You apply as a New User</i></p>
+                    <p><i>Cancelling this application will make You apply as a New User</i></p>
 
                         <div class="card alert-warning">
                             <div class="card-body">

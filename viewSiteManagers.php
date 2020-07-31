@@ -64,9 +64,7 @@ confirmAdminLogin();
                                 </tr>
                             </thead>
                             <?php 
-                            // global $ConnectingDB;
-                            // $sql = "SELECT * FROM admins WHERE adminRole ='Site_Manager' ORDER BY id ASC";
-                            // $Execute =$ConnectingDB->query($sql);
+                            
                             if (isset($_GET["page"])) {
                                 global $ConnectingDB;
                                 $sql = "SELECT * FROM admins WHERE adminRole ='Site_Manager' ORDER BY id ";

@@ -17,7 +17,7 @@ if (isset($_POST["Submit"])) {
 
   if (empty($emailAddress)||empty($password)) {
     $_SESSION["ErrorMessage"]= "All fields must be filled out";
-    Redirect_to("index.php");
+    Redirect_to("adminLogin97.php");
   }else {
     // code for checking email and password from Database
   

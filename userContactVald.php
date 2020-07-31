@@ -6,8 +6,10 @@
 <?php require_once("inc/functions.php"); ?>
 
 <?php 
-confirmUserLogin();
+
 $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+
+confirmUserLogin();
 ?>
 
 <?php
@@ -29,6 +31,11 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
             global $ConnectingDB;
             $sql ="UPDATE users SET emailAddress='$emailAddress', telephone = '$telephone' WHERE id='$userId' ";
             $Execute=$ConnectingDB->query($sql);
+
+            // Update the user's status to "Updated"
+            $sql12 = "UPDATE waitinglist SET validationStatus = 'Updated' WHERE applicationStatus = 'Awaiting_Plot' AND userId = '$userId' ";
+            $stmtC12 = $ConnectingDB->prepare($sql12);
+            $Execute12=$stmtC12->execute();
                 
             if($Execute){
                 $_SESSION["SuccessMessage"]="Your contact details and interest validation were updated successfully";

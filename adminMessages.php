@@ -16,6 +16,10 @@ confirmAdminLogin();
         
         $adminSiteName = $_SESSION["adminSiteName"];
 
+        $sqlx = "UPDATE messages SET readMsg = 1 WHERE siteName ='$adminSiteName' AND msgFrom != 'Site Manager' ";
+        $stmtx = $ConnectingDB->prepare($sqlx);
+        $Executex=$stmtx->execute();
+
 ?>
 
     

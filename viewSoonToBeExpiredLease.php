@@ -33,15 +33,6 @@ confirmAdminLogin();
         $renewalStatus          = $DataRows["renewalStatus"];
         $tenantStatus           = $DataRows["tenantStatus"];
 
-        // $start_date = date_create(date("Y-m-d"));
-        // $end_date   = date_create($expirationDate);
-        
-        // //difference between two dates
-        // $diff = date_diff($start_date,$end_date);
-
-        // $diffResult = $diff->format("%a");
-
-        // $oneMonthToExp        = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDate)). " - 30 day "));
 
         $oneMonthFromToday = date("Y-m-d", strtotime(date("Y-m-d", strtotime($leaseDate)). " + 90 day "));
 

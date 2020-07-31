@@ -131,7 +131,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <?php }?>
                         </table>
                         <div class="mb-3 mt-4 text-center">
-                            <a class="btn btn-warning btn-lg" href="viewSoonTobeExpiredLease.php?page=1" role="button">Soon To Be Expired Lease</a>
+                            <a class="btn btn-warning btn-lg" href="viewSoonToBeExpiredLease.php?page=1" role="button">Soon To Be Expired Lease</a>
                         </div>
                         <!-- Pagination -->
                         <div class="col-lg-4 offset-lg-4 col-md-4 offset-md-4 col-sm-12 mt-4">
@@ -306,7 +306,7 @@ $adminSiteName = $_SESSION["adminSiteName"];
                             <?php }?>
                         </table>
                         <div class="mb-3 mt-4 text-center">
-                            <a class="btn btn-warning btn-lg" href="viewSoonTobeExpiredLease.php?page=1" role="button">Soon To Be Expired Lease</a>
+                            <a class="btn btn-warning btn-lg" href="viewSoonToBeExpiredLease.php?page=1" role="button">Soon To Be Expired Lease</a>
                         </div>
                         <!-- Pagination -->
                         <div class="col-lg-4 offset-lg-4 col-md-4 offset-md-4 col-sm-12 mt-4">

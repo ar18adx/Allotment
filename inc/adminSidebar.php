@@ -3,7 +3,7 @@
         <a class="btn btn-success" href="adminDashboard99.php" role="button">Dashboard</a>
     </div>
     <div class="mb-3">
-        <a class="btn btn-success" href="adminMessages.php" role="button">Messages</a>
+        <a class="btn btn-success" href="adminMessages.php" role="button">Messages<span class="badge badge-light"><?php TotalUnreadMsgSm()?></span></a>
     </div>
     <div class="mb-3">
         <a class="btn btn-success" href="inspectionReport.php" role="button">Inspection Report</a>

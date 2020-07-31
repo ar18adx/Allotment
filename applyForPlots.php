@@ -9,9 +9,17 @@
 
 confirmUserLogin();
 
+
+
+if($_SESSION["userStatus"] == "Tenant"){
+    Redirect_to("tenantProfile.php");
+}
+
 ?>
 
 <?php
+
+    // Integrating the Apply Button with the data to be sent to the database
 
     if(isset($_POST["Apply"])){
         date_default_timezone_set("Africa/Lagos");
@@ -28,11 +36,15 @@ confirmUserLogin();
         // $applicationStatus      = "Pending";
         $offerCount             = 0;
         
+            // Check if a user has previously applied for a plot on the waiting list
+
             if (CheckUserExistsOnWl($userId)) {
                 $_SESSION["ErrorMessage"]= "You have previously applied for a plot !!! ";
                 Redirect_to("applyForPlots.php");
             }
             
+            // Ckeck if the plot number to be submitted is valid. This is for users who want to apply and wait for a specific plot
+
             if(!empty($plotNumberApp)){
 
                 if (CheckPlotNumExistsOrNot($plotNumberApp)) {
@@ -40,6 +52,7 @@ confirmUserLogin();
                     Redirect_to("applyForPlots.php");
                 }
 
+                //Query to get the plotid and other plot information
                 global $ConnectingDB;
                 $sql ="SELECT * FROM plots WHERE plotNumber = '$plotNumberApp'  ";
                 $stmt = $ConnectingDB->query($sql);
@@ -50,9 +63,9 @@ confirmUserLogin();
                 $siteIdNumRw1         = $DataRows["siteIdNum"];
 
 
-                // Query to insert values in DB
-                $sqlA1 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
-                $sqlA1 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNumRw1', '$plotSiteRw1', '$PlotId', '$plotNumberApp', 'Awaiting_Specific_Plot', '$offerCount', '$dateApplied'  )";
+                // Query to insert values in DB For Users awaiting a specific Plot
+                $sqlA1 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied, validationStatus )";
+                $sqlA1 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNumRw1', '$plotSiteRw1', '$PlotId', '$plotNumberApp', 'Awaiting_Specific_Plot', '$offerCount', '$dateApplied', 'Not_Updated')";
                 $stmtA1 = $ConnectingDB->prepare($sqlA1);
                 $ExecuteA1=$stmtA1->execute();
 
@@ -61,10 +74,12 @@ confirmUserLogin();
                     Redirect_to("applyForPlots.php");
                 }
 
+                // Code for the users applying without a plot number
+
             }elseif(empty($plotNumberApp)){
             
            
-
+                // Check if there is a vacant plot or not
                 $userCity = $_SESSION["userCity"];
                 global $ConnectingDB;
                 $sql ="SELECT * FROM plots WHERE plotSite ='$siteCity' AND plotStatus = 'Vacant' ORDER BY RAND() LIMIT 1 ";
@@ -85,9 +100,9 @@ confirmUserLogin();
                 
            
         
-                    // Query to insert values in DB
-                    $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
-                    $sql .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNum', '$siteCity', '$plotIdNum', '$plotNumberApp', 'Pending_Confirmation', '$offerCount', '$dateApplied'  )";
+                    // Query to insert values in DB If there is a vacant plot
+                    $sql = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied, validationStatus )";
+                    $sql .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', '$siteIdNum', '$siteCity', '$plotIdNum', '$plotNumberApp', 'Pending_Confirmation', '$offerCount', '$dateApplied', 'Not_Updated')";
                     $stmt = $ConnectingDB->prepare($sql);
                     $Execute=$stmt->execute();
                     // if($plotStatus == "Vacant"){
@@ -103,16 +118,17 @@ confirmUserLogin();
 
                     Redirect_to("confirmOffer.php");
         
+                // Check if there are no vacant Plots
+
                 }elseif($Result == 0){
 
                     $noValEmpty    = "None";
                     
-                    // if(empty($plotNumberApp)){
-                    //     $plotNumberApp = $noValEmpty;
-                    // } 
+                    
+                    // Query to insert values into db if there is no vacant plot 
 
-                    $sql77 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied )";
-                    $sql77 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', 'None', '$siteCity', 'None', 'None', 'Awaiting_Plot', '$offerCount', '$dateApplied'  )";
+                    $sql77 = "INSERT INTO waitinglist( userId, firstName, lastName, emailAddress, telephoneNumber, userCity, siteIdNum, siteCity, plotIdNum, plotNumberApp, applicationStatus, offerCount, dateApplied, validationStatus )";
+                    $sql77 .= "VALUES('$userId', '$firstName', '$lastName', '$emailAddress', '$telephoneNumber', '$userCity', 'None', '$siteCity', 'None', 'None', 'Awaiting_Plot', '$offerCount', '$dateApplied', 'Not_Updated')";
                     $stmt77 = $ConnectingDB->prepare($sql77);
                     $Execute77=$stmt77->execute();
 
@@ -145,7 +161,7 @@ confirmUserLogin();
 
     <div class="container">
     
-        <h1>Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
+        <h1 class="mt-4">Hello, <?php echo $_SESSION["userFirstName"]; ?> !</h1>
         <h3>You haven't applied for a plot yet. Complete the form below to apply</h3>
                     <br>
                     <?php
@@ -153,10 +169,12 @@ confirmUserLogin();
                     echo SuccessMessage();
                     echo ErrorMessageForRg();
                     ?>
+
         <form action="applyForPlots.php" method="POST">
             <div class="row">
                 <div class="form-group col-md-4">
                     <label for="exampleInputEmail1">Plot Site</label>
+                    <!-- Cities dropdown -->
                     <select name="siteCity" class="custom-select">
                         <?php
                         //Fetching all cities from table
@@ -172,7 +190,7 @@ confirmUserLogin();
                     </select>
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="exampleInputEmail1">Plot Number</label>
+                    <label for="exampleInputEmail1">Plot Number (Optional)</label>
                     <input type="text" name="plotNumberApp" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                 </div>
                 <div class="form-group col-md-4">
@@ -180,6 +198,9 @@ confirmUserLogin();
                         <div class="">
                             <button type="submit" name="Apply" class="btn btn-success">Apply</button>
                         </div>
+                </div>
+                <div class="mt-3">
+                    <h3><i>You can apply without a Plot Number</i></h3>
                 </div>
             </div>
         </form>
