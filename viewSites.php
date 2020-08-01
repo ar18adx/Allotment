@@ -26,10 +26,18 @@ confirmAdminLogin();
                 <?php include("inc/adminSidebar.php");?>
                 <!-- Include Admin Sidebar -->    
                 <div class="col-md-9">
-                    <div class="mb-4 text-center">
-                        <h1>Sites</h1>
-                        <a class="btn btn-success" href="addCity.php" role="button">Add New Site</a>
-                    </div>
+                    
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a class="btn btn-success" href="addCity.php" role="button">Add New Site</a>
+                            </div>
+                            <div class="col-md-3">
+                                <a class="btn btn-danger" href="deleteExistingSite.php" role="button">Delete Existing Site</a>
+                            </div>       
+                        </div>
+                        <div class="mb-4 text-center">
+                            <h1>Sites</h1>
+                        </div>
                     <div class="row">
                         <?php
                             if (isset($_GET["page"])) {

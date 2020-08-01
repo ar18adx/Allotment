@@ -29,7 +29,10 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
         $tenantCity           = $DataRows["tenantCity"];
         $siteCity          = $DataRows["siteCity"];
         
+        
 
+            
+        
 
     if(isset($_POST["Send"])){
         date_default_timezone_set("Africa/Lagos");
@@ -46,15 +49,21 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 
         $textMessage               = $_POST["textMessage"];
         
-    
-    
-            // $emailTo    = $tenantEmail;
-            // $subject    = "New Message Alert";
-            // $message    = "Hello ".$tenantFirstName."\n"." You have a new message ";
-            // $headers    = "From: "."Allotment";
+                $sql ="SELECT * FROM admins WHERE siteName = '$siteCity' OR siteName = 'All' ";
+                $stmt = $ConnectingDB->query($sql);
+                while($DataRows=$stmt->fetch()){
+                $idRow                     = $DataRows["id"];
+                $adminEmail[]                     = $DataRows["emailAddress"];
+                
+                }
 
-            // mail($emailTo, $subject, $message, $headers);
-   
+            $emailTo    = implode(", ", $adminEmail);
+            $subject    = "New Message Notification";
+            $message    = "Hello, You have a new message on Your dashboard"
+                            ."\n\n"."http://allotment-com.stackstaging.com/adminLogin97.php";
+            $headers    = "From: "."Allotment";
+            mail($emailTo, $subject, $message, $headers);
+
         // Query to insert new city in DB When everything is fine
         global $ConnectingDB;
         $sql = "INSERT INTO messages(tenantId, userId, tenantFirstName, tenantLastName, tenantEmail, siteName, smName, msgFrom, textMessage, datetime )";

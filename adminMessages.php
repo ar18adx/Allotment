@@ -42,7 +42,11 @@ confirmAdminLogin();
                     </div>
                         <?php
                             global $ConnectingDB;
-                            $sql ="SELECT * FROM messages WHERE siteName = '$adminSiteName' ORDER BY id DESC ";
+                            if($_SESSION["adminRole"] == "Super_Admin"){
+                                $sql ="SELECT * FROM messages ORDER BY id DESC ";
+                            }elseif($_SESSION["adminRole"] == "Site_Manager"){
+                                $sql ="SELECT * FROM messages WHERE siteName = '$adminSiteName' ORDER BY id DESC ";
+                            }
                             $stmt = $ConnectingDB->query($sql);
                             while ($DataRows = $stmt->fetch()) {
                                 $id                     = $DataRows["id"];

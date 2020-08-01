@@ -126,7 +126,7 @@ if(isset($_POST["Submit"])){
                                 <?php
                                 //Fetching all cities from table
                                 global $ConnectingDB;
-                                $sql = "SELECT id, cityName FROM cities";
+                                $sql = "SELECT id, cityName FROM cities ORDER BY cityName";
                                 $stmt = $ConnectingDB->query($sql);
                                 while ($DataRows = $stmt->fetch()) {
                                 $Id = $DataRows["id"];
