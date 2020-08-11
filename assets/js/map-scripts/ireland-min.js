@@ -1,6 +1,6 @@
-﻿var iejsconfig = {
+var iejsconfig = {
     "iejs1": {
-        "hover": "ANTRIM",
+        "hover": "<b><u>ANTRIM</u></b><br><span style='color: #bcbcbc;'>Number OF Plots: 2</span><br>&nbsp;<br><span style='color: #bcbcbc;'>Number Of Users On The Waiting List: 1</span><br>&nbsp;<br><span style='color: #bcbcbc;'>Soon To Be Vacant Plots: 1",
         "url": "",
         "target": "same_window",
         "upColor": "#FFFFF3",
@@ -18,7 +18,7 @@
         "active": !0
     },
     "iejs3": {
-        "hover": "<b><u>CARLOW</u></b><br><span style='color: #bcbcbc;'>Street Address:</span><br>&nbsp;321 Example, Address 54321<br><span style='color: #bcbcbc;'>Telephone:</span><br>&nbsp;(256) 555-4321 / (256) 555-1234",
+        "hover": "<b><u>CARLOW</u></b><br><span style='color: #bcbcbc;'>Number OF Plots: 2</span><br>&nbsp;<br><span style='color: #bcbcbc;'>Number Of Users On The Waiting List: 1</span><br>&nbsp;<br><span style='color: #bcbcbc;'>Soon To Be Vacant Plots: 1",
         "url": "",
         "target": "same_window",
         "upColor": "#d7f57a",
@@ -27,7 +27,7 @@
         "active": !0
     },
     "iejs4": {
-        "hover": "<b><u>CAVAN</u></b><br><span style='color: #999;'>*Click to open a webpage*</span>",
+        "hover": "<b><u>CAVAN</u></b><br><span style='color: #bcbcbc;'>Number OF Plots: 2</span><br>&nbsp;<br><span style='color: #bcbcbc;'>Number Of Users On The Waiting List: 1</span><br>&nbsp;<br><span style='color: #bcbcbc;'>Soon To Be Vacant Plots: 1",
         "url": "",
         "target": "same_window",
         "upColor": "#f1ffc8",
@@ -213,7 +213,7 @@
         "upColor": "#E0E2E2",
         "overColor": "#ECFFB3",
         "downColor": "#cae9af",
-        "active": !1
+        "active": !0
     },
     "iejs25": {
         "hover": "<b><u>ROSCOMMON</u></b><br>Write any text and load images<br><img src='assets/images/example.png'>",

@@ -14,10 +14,10 @@ confirmAdminLogin();
 
 <?php
 
-        $msgQueryParameter = $_GET["id"];
+        $msgQueryParameter = $_GET["tenantId"];
 
         global $ConnectingDB;
-        $sql ="SELECT * FROM tenants WHERE id = '$msgQueryParameter'  ";
+        $sql ="SELECT * FROM tenants WHERE tenantId = '$msgQueryParameter'  ";
         $stmt = $ConnectingDB->query($sql);
         $DataRows=$stmt->fetch();
         $id                   = $DataRows["id"];
@@ -47,8 +47,19 @@ confirmAdminLogin();
         $msgFrom                   = "Site Manager";
 
         $textMessage               = $_POST["textMessage"];
+
+        if(empty($textMessage)){
+            $_SESSION["ErrorMessage"]= "Please enter a message !";
+            Redirect_to("adminSendMsg.php?tenantId=".$msgQueryParameter);
+        }
+
+            $emailTo    = $tenantEmailRow;
+            $subject    = "New Message Notification";
+            $message    = "Hello, You have a new message"
+                            ."\n\n"."http://allotment-com.stackstaging.com/";
+            $headers    = "From: "."Allotment";
+            mail($emailTo, $subject, $message, $headers);
         
-    
     
 
    
@@ -64,10 +75,10 @@ confirmAdminLogin();
         $Execute=$stmt->execute();
         if($Execute){
         $_SESSION["SuccessMessage"]="New Message Sent Successfully";
-        Redirect_to("adminSendMsg.php?id=".$msgQueryParameter);
+        Redirect_to("adminSendMsg.php?tenantId=".$msgQueryParameter);
         }else {
         $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
-        Redirect_to("adminSendMsg.php".$msgQueryParameter);
+        Redirect_to("adminSendMsg.php?tenantId=".$msgQueryParameter);
         }
     
     } //Ending of Submit Button If-Condition
@@ -90,7 +101,7 @@ confirmAdminLogin();
             <!-- User Sidebar End -->
             <div class="col-md-9">
                 <div class="jumbotron mt-5">
-                <form action="adminSendMsg.php?id=<?php echo $id; ?>" method="POST">
+                <form action="adminSendMsg.php?tenantId=<?php echo $tenantId; ?>" method="POST">
                     <div class="form-group">
                     <p><b>Tenant Name :</b> <?php echo $tenantFirstName." ".$tenantLastName ;?></p>
                         <label for="exampleFormControlTextarea1">Message</label>

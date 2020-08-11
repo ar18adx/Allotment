@@ -79,35 +79,35 @@ if(isset($_POST["Send"])){
             <div class="row">
                 <div class="form-group col-md-4">
                     <label for="exampleInputEmail1">First Name</label>
-                    <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                 </div>
                 <div class="form-group col-md-4">
                     <label for="exampleInputEmail1">Last Name</label>
-                    <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                 </div>
             </div>
       
             <div class="row">
                 <div class="form-group col-md-4">
                     <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                 </div>
                 <div class="form-group col-md-4">
                     <label for="exampleInputEmail1">Telephone</label>
-                    <input type="text" name="telephone" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="text" name="telephone" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-8">
                     <label for="exampleInputEmail1">Subject</label>
-                    <input type="text" name="subjectMsg" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="text" name="subjectMsg" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-8">
                     <label for="exampleInputEmail1">Message</label>
-                    <textarea placeholder="Message" name="textMessage" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                    <textarea placeholder="Message" name="textMessage" class="form-control" id="exampleFormControlTextarea1" rows="3" required></textarea>
                 </div>
             </div>
             

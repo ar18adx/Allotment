@@ -248,7 +248,7 @@ if(isset($_POST["sixMonths"])){
 
 ?>
 
-<?php if($_SESSION["userStatus"] == "Tenant"){?>
+<?php //if($_SESSION["userStatus"] == "Tenant"){?>
 
     <!-- Header Start -->
     <?php include("inc/header.php"); ?>
@@ -286,7 +286,7 @@ if(isset($_POST["sixMonths"])){
                                 <hr>
                             </div>
                             
-                        <!-- Display a message an options for the tenant to renew his/her lease -->
+                        <!-- Display a message an options for the tenant to renew his/her Lease -->
 
                         <?php }elseif(date("Y-m-d") >= $expirationDateNotification){?>
                             <div class="alert alert-danger" role="alert">
@@ -333,8 +333,8 @@ if(isset($_POST["sixMonths"])){
 
 <?php
 
-}else{
-    Redirect_to("errorPage.php");
-} 
+// }else{
+//     Redirect_to("errorPage.php");
+// } 
 
 ?>

@@ -10,6 +10,10 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 //echo $_SESSION["TrackingURL"];
 confirmAdminLogin(); 
 
+if($_SESSION["adminRole"] != "Super_Admin"){
+  Redirect_to("errorPage.php");
+}
+
 ?>
 
 <?php
@@ -73,37 +77,45 @@ if(isset($_POST["Submit"])){
     <!-- header End -->
 
     <div class="container">
-        <div class="mt-4">
-            <h1>Add New Site</h1>
-        </div>
+      <div class="row">
+          <!-- Include Admin Sidebar -->
+          <?php include("inc/adminSidebar.php");?>
+          <!-- Include Admin Sidebar -->
 
-                <form action="addCity.php" method="POST">
-                <br>
-                <?php
-                    echo ErrorMessage();
-                    echo SuccessMessage();
-                    echo ErrorMessageForRg();
-                ?>
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">Site Name</label>
-                            <input type="text" name="cityName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                            <small id="emailHelp" class="form-text text-muted">.</small>
-                        </div>
-                    </div>
-          
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="exampleInputEmail1">City Short Code</label>
-                            <input type="text" name="cityShortCode" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                            <small id="emailHelp" class="form-text text-muted"><i>IKJ, ABC, WST, GGE </i></small>
-                        </div>
-                        <!-- Must Be in Caps -->
-                    </div>
-                    <button type="submit" name="Submit" class="btn btn-success">Add City</button>
+          <div class='col-md-9'>
+            <div class="mt-4">
+                <h1>Add New Site</h1>
+            </div>
 
-                </form>
-                
+            <form action="addCity.php" method="POST">
+              <br>
+              <?php
+                  echo ErrorMessage();
+                  echo SuccessMessage();
+                  echo ErrorMessageForRg();
+              ?>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label for="exampleInputEmail1">Site Name</label>
+                        <input type="text" name="cityName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                        <small id="emailHelp" class="form-text text-muted">.</small>
+                    </div>
+                </div>
+      
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label for="exampleInputEmail1">City Short Code</label>
+                        <input type="text" name="cityShortCode" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                        <small id="emailHelp" class="form-text text-muted"><i>IKJ, ABC, WST, GGE </i></small>
+                    </div>
+                    <!-- Must Be in Caps -->
+                </div>
+                <button type="submit" name="Submit" class="btn btn-success">Add City</button>
+
+            </form>
+          </div> 
+      </div>
+
     </div>
 
     <!-- Admin Footer Start -->

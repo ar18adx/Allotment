@@ -6,8 +6,6 @@
 
 <?php
 
-$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
-//echo $_SESSION["TrackingURL"];
 confirmAdminLogin(); 
 
 ?>

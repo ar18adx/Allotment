@@ -17,7 +17,6 @@
         $emailAddress[]       = $DataRows["emailAddress"];
 
         }
-            echo $emailAddress;
             $emailTo    = implode(", ", $emailAddress);
             $subject    = "Contact And Interest Validation";
             $message    = "Please click on the link below to update Your contact details"

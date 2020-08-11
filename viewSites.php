@@ -7,9 +7,11 @@
 
 <?php
 
-$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
-//echo $_SESSION["TrackingURL"];
 confirmAdminLogin(); 
+
+if($_SESSION["adminRole"] != "Super_Admin"){
+    Redirect_to("errorPage.php");
+}
 
 ?>
 
@@ -28,21 +30,32 @@ confirmAdminLogin();
                 <div class="col-md-9">
                     
                         <div class="row">
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-12 text-center mb-3">
                                 <a class="btn btn-success" href="addCity.php" role="button">Add New Site</a>
-                            </div>
-                            <div class="col-md-3">
-                                <a class="btn btn-danger" href="deleteExistingSite.php" role="button">Delete Existing Site</a>
-                            </div>       
+                            </div>    
                         </div>
                         <div class="mb-4 text-center">
                             <h1>Sites</h1>
+                        </div>
+                        <div class="mb-4 text-center">
+                            <form action="searchSiteResults.php" method="GET">
+                                <input type="hidden" name="page" value="1">
+                                <div class="row text-center mb-3">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-4">
+                                        <input type="text" name="siteDetails" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="submit" name="SearchSite" class="btn btn-success">Search Site</button> 
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     <div class="row">
                         <?php
                             if (isset($_GET["page"])) {
                                 global $ConnectingDB;
-                                $sql = "SELECT * FROM cities ";
+                                $sql = "SELECT * FROM cities ORDER BY cityName ";
                                 $stmt = $ConnectingDB->prepare($sql);
                                 $stmt->execute();
                                 $Page = $_GET["page"];
@@ -51,13 +64,13 @@ confirmAdminLogin();
                             }else{
                                 $ShowPostFrom=($Page*6)-6;
                             }
-                                $sql = "SELECT * FROM cities ORDER BY id LIMIT $ShowPostFrom,6";
+                                $sql = "SELECT * FROM cities ORDER BY cityName LIMIT $ShowPostFrom,6";
                                 $stmt=$ConnectingDB->query($sql);
                             }
 
                             // The default SQL query
                             else{
-                                $sql  = "SELECT * FROM cities ORDER BY id LIMIT $ShowPostFrom,6";
+                                $sql  = "SELECT * FROM cities ORDER BY cityName LIMIT $ShowPostFrom,6";
                                 $stmt =$ConnectingDB->query($sql);
                             }
                         
@@ -96,7 +109,9 @@ confirmAdminLogin();
                                 <h4 class="card-text"><?php echo htmlentities($ResultCt); ?> Total <?php if($ResultCt <=1){echo "Plot";}elseif($ResultCt >1){echo "Plots";}?> </h4>
                                 <h5 class="card-text"><?php echo htmlentities($ResultTc); ?> <?php if($ResultTc <=1){echo "Tenant";}elseif($ResultTc >1){echo "Tenants";}?></h5>
                                 <h5 class="card-text"><?php echo htmlentities($ResultVc); ?> Vacant <?php if($ResultVc <=1){echo "Plot";}elseif($ResultVc >1){echo "Plots";}?> </h5>
-                                <h5 class="card-text"><?php echo htmlentities($ResultWl); ?> <?php if($ResultWl <=1){echo "Plot";}elseif($ResultWl >1){echo "Plots";}?> <?php if($ResultWl <=1){echo "is";}elseif($ResultWl >1){echo "are";}?> on the Waiting List</h5> 
+                                <h5 class="card-text"><?php echo htmlentities($ResultWl); ?> <?php if($ResultWl <=1){echo "User";}elseif($ResultWl >1){echo "Users";}?> <?php if($ResultWl <=1){echo "is";}elseif($ResultWl >1){echo "are";}?> on the Waiting List</h5> 
+                                <h5 class="card-text mt-3"><td><a class="btn btn-danger delConfirmMsg" href="deleteSiteFrmTb.php?id=<?php echo $id?>" role="button">Delete Site</a></td></h5> 
+                                
                             </div>
                             </div>
                             </a> 
@@ -164,6 +179,13 @@ confirmAdminLogin();
     <!-- Admin Footer Start -->
     <?php include("inc/adminFooter.php"); ?>
     <!-- Admin Footer End -->
+
+     <!-- Javascript for the delete Site -->
+     <script type="text/javascript">
+        $('.delConfirmMsg').on('click', function () {
+            return confirm('Are You Sure You Want To Delete this Site?');
+        })    
+    </script>
 
 <?php 
 }else{

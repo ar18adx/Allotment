@@ -10,9 +10,17 @@ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 //echo $_SESSION["TrackingURL"];
 confirmAdminLogin(); 
 
+if($_SESSION["adminRole"] != "Super_Admin"){
+    Redirect_to("errorPage.php");
+}
+
 ?>
 
 <?php
+
+if($_SESSION["adminRole"] != "Super_Admin"){
+    Redirect_to("errorPage.php");
+}
 
 if(isset($_POST["Submit"])){
 
@@ -83,48 +91,52 @@ if(isset($_POST["Submit"])){
     <!-- header End -->
 
         <div class="container">
-            
-            <h1>Add New Allotment officer</h1>
+            <div class="row">
+                <!-- Include Admin Sidebar -->
+                <?php include("inc/adminSidebar.php");?>
+                <!-- Include Admin Sidebar --> 
+                <div class="col-md-9">
+                    <h1>Add New Allotment officer</h1>
 
                     <form class="mb-5" action="addNewAdmin.php" method="POST">
-                    <br>
-                    <?php
-                        echo ErrorMessage();
-                        echo SuccessMessage();
-                        echo ErrorMessageForRg();
-                    ?>
+                        <br>
+                        <?php
+                            echo ErrorMessage();
+                            echo SuccessMessage();
+                            echo ErrorMessageForRg();
+                        ?>
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="exampleInputEmail1">First Name</label>
-                                <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                                 <small id="emailHelp" class="form-text text-muted"></small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="exampleInputEmail1">Last Name</label>
-                                <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                                 <small id="emailHelp" class="form-text text-muted"></small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="exampleInputEmail1">Email address</label>
-                                <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                                 <small id="emailHelp" class="form-text text-muted"></small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="exampleInputEmail1">Telephone</label>
-                                <input type="text" name="telephone" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="text" name="telephone" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                                 <small id="emailHelp" class="form-text text-muted"></small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="exampleInputEmail1">Home Address</label>
-                                <input type="text" name="homeAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="text" name="homeAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                                 <small id="emailHelp" class="form-text text-muted"></small>
                             </div>
                         </div>
@@ -140,24 +152,24 @@ if(isset($_POST["Submit"])){
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="exampleInputEmail1">Password</label>
-                                <input type="password" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="password" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                                 <small id="emailHelp" class="form-text text-muted"></small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="exampleInputEmail1">Confirm Password</label>
-                                <input type="password" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <input type="password" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                                 <small id="emailHelp" class="form-text text-muted"></small>
                             </div>
                         </div>
                         
                         
-                        <button type="submit" name="Submit" class="btn btn-success">Register</button>
+                        <button type="submit" name="Submit" class="btn btn-success">Add Allotment Officer</button>
 
                     </form>
-                    
-
+                </div>
+            </div>
 
         </div>
 

@@ -16,7 +16,7 @@
                 <h1 class="display-4">An Error Occured</h1>
                 <p class="lead">You do not have permissions to view this page</p>
                 <hr class="my-4">
-                <a class="btn btn-primary btn-lg" href="index.php" role="button">Home</a>
+                <!-- <a class="btn btn-primary btn-lg" href="index.php" role="button">Home</a> -->
             </div>
         </div>
 

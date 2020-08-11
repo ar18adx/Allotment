@@ -7,8 +7,6 @@
 
 <?php
 
-$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
-//echo $_SESSION["TrackingURL"];
 confirmAdminLogin(); 
 
 ?>
@@ -26,7 +24,7 @@ confirmAdminLogin();
 
         
         global $ConnectingDB;
-        $sql    = "SELECT tenantFirstName, tenantLastName, siteCity FROM tenants WHERE plotNumber ='$plotNumber' ";
+        $sql    = "SELECT tenantFirstName, tenantLastName, tenantId, plotId, siteId, siteCity FROM tenants WHERE plotNumber ='$plotNumber' ";
         $stmt   = $ConnectingDB->prepare($sql);
         // $stmt->bindValue(':plotNumbeR',$plotNumber);
         $stmt->execute();
@@ -34,12 +32,18 @@ confirmAdminLogin();
         $id                     = $DataRows["id"];
         $tenantFnRow              = $DataRows["tenantFirstName"];
         $tenantLnRow              = $DataRows["tenantLastName"];
+        $tenantIdRow              = $DataRows["tenantId"];
         $siteCityRow              = $DataRows["siteCity"];
+        $plotIdRow              = $DataRows["plotId"];
+        $siteIdRow              = $DataRows["siteId"];
 
         $tenantFirstName       = $tenantFnRow;
         $tenantLastName         = $tenantLnRow;
+        $tenantId               = $tenantIdRow;
         $adminId                = $_SESSION["adminId"];
         $siteCity               = $siteCityRow;
+        $plotIdNum              = $plotIdRow;
+        $siteId                 = $siteIdRow;
 
         $evidence        = $_FILES['evidence']['tmp_name'];
                     foreach($_FILES['evidence']['name'] as $i => $name) {
@@ -61,12 +65,12 @@ confirmAdminLogin();
 
                             }else {
 
-                                $allowed = array('jpg','jpeg','gif','bmp','png', 'PNG');
+                                $allowed = array('jpg', 'JPG', 'jpeg', 'JPEG', 'gif', 'GIF', 'bmp', 'BMP', 'png', 'PNG', 'MP4','mp4' );
 
-                                $max_size = 6000000; // 6MB
+                                $max_size = 60000000; // 60MB
 
                                 if(in_array($ext, $allowed) === false) {
-                                    $_SESSION["ErrorMessage"] = 'The file '.$name.' extension is not allowed.';
+                                    $_SESSION["ErrorMessage"] = 'The file, '.$name.' extension is not allowed.';
                                     Redirect_to("inspectionReport.php");
                                 }
 
@@ -107,17 +111,20 @@ confirmAdminLogin();
                         }
 
 
-        if(empty($plotNumber)){
+        if(empty($plotNumber) ||empty($inspectionReport) ||empty($inspectionOfficer)){
             $_SESSION["ErrorMessage"]= "All fields must be filled out";
             Redirect_to("inspectionReport.php");
         }elseif (CheckPlotNumExistsOrNot($plotNumber)) {
-            $_SESSION["ErrorMessage"]= "Plot Number Does Not Exists.!! ";
+            $_SESSION["ErrorMessage"]= "Plot Number Does Not Exist.!! ";
+            Redirect_to("inspectionReport.php");
+        }elseif (checkPlotOccupied($plotNumber)) {
+            $_SESSION["ErrorMessage"]= "This plot is not occupied. Inspection can only be made on a plot occupied by a tenant.!! ";
             Redirect_to("inspectionReport.php");
         }else{
             // Query to insert new Plot in DB When everything is fine
             global $ConnectingDB;
-            $sql = "INSERT INTO inspectionreport(siteName, plotNumber, inspectionDate, tenantFirstName, tenantLastName, adminId, inspectionOfficer, inspectionReport, evidence)";
-            $sql .= "VALUES( '$siteCity', :plotNumbeR, '$inspectionDate', '$tenantFirstName', '$tenantLastName', '$adminId', '$inspectionOfficer', '$inspectionReport', '$evidence' )";
+            $sql = "INSERT INTO inspectionreport(siteName, siteIdNum, plotNumber, plotIdNum, inspectionDate, tenantFirstName, tenantLastName, tenantId, adminId, inspectionOfficer, inspectionReport, evidence)";
+            $sql .= "VALUES( '$siteCity', '$siteId', :plotNumbeR, '$plotIdNum', '$inspectionDate', '$tenantFirstName', '$tenantLastName', '$tenantId', '$adminId', '$inspectionOfficer', '$inspectionReport', '$evidence' )";
             $stmt = $ConnectingDB->prepare($sql);
             $stmt->bindValue(':plotNumbeR', $plotNumber);
             
@@ -170,7 +177,7 @@ confirmAdminLogin();
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Plot Number</label>
-                            <input type="text" name="plotNumber" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="text" name="plotNumber" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                             <small id="emailHelp" class="form-text text-muted">Please enter a correct plot Number.</small>
                         </div>
                         <div class="form-group col-md-4">
@@ -183,7 +190,7 @@ confirmAdminLogin();
                     <div class="row">
                         <div class="form-group col-md-8">
                             <label for="exampleInputEmail1">Inspection Report</label>
-                            <textarea placeholder="Inspection Report" name="inspectionReport" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                            <textarea placeholder="Inspection Report" name="inspectionReport" class="form-control" id="exampleFormControlTextarea1" rows="3" required></textarea>
                         </div>
                     </div>
                     

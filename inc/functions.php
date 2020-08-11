@@ -156,7 +156,7 @@ function CheckUserExistsOnWl($userId){
 }
 
 // Function to check if email exists in the Users table during a New user registration
-//If email exists,  the registration will not be submitted
+//If email exists,  the User details will not be submitted
 
 function CheckEmailExistsOrNot($emailAddress){
   global $ConnectingDB;
@@ -224,6 +224,41 @@ function CheckPlotNumExistsOrNot($plotNumber){
   }
 }
 
+//Function to check if a plot is occupied
+
+function checkPlotOccupied($plotNumber){
+  global $ConnectingDB;
+  $sql    = "SELECT plotNumber FROM tenants WHERE plotNumber = :plotNuMber";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':plotNuMber',$plotNumber);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==0) {
+    return true;
+  }else {
+    return false;
+  }
+}
+
+// Function to check if a plot is vacant
+
+function CheckPlotVacant($plotNumberAssign){
+  global $ConnectingDB;
+  $sql    = "SELECT plotNumber FROM plots WHERE plotNumber=:plotNuMberAssign AND plotStatus = 'Vacant' ";
+  $stmt   = $ConnectingDB->prepare($sql);
+  $stmt->bindValue(':plotNuMberAssign',$plotNumberAssign);
+  $stmt->execute();
+  $Result = $stmt->rowcount();
+  if ($Result==0) {
+    return true;
+  }else {
+    return false;
+  }
+}
+
+
+
+
 // Check if plot Number exists in Tenant's table
 // This is to prevent two tenants from occupying the same plot
 
@@ -257,40 +292,6 @@ function CheckPlotNumAppExistsOrNot($plotNumberApp){
     return false;
   }
 }
-
-
-// // Function to make sure a user does not apply for a plot more than once.
-// function checkUserIdPltExists($userId){
-//   global $ConnectingDB;
-//   $sql    = "SELECT userId FROM waitinglist WHERE userId=:userID";
-//   $stmt   = $ConnectingDB->prepare($sql);
-//   $stmt->bindValue(':userID',$userId);
-//   $stmt->execute();
-//   $Result = $stmt->rowcount();
-//   if ($Result==2) {
-//     return true;
-//   }else {
-//     return false;
-//   }
-// }
-
-// // Function to check if A user has previously applied for a particular Plot
-// function checkPltNumExists($userId, $plotNumberApp){
-//   global $ConnectingDB;
-//   $sql    = "SELECT userId AND plotNumberApp FROM waitinglist WHERE userId=:userID AND plotNumberApp=:plotNumberApP " ;
-//   // $sql = "SELECT plotNumberApp FROM waitinglist WHERE userId = :userID OR plotNumberApp=:plotNumberApP";
-//   // $sql    = "SELECT plotNumberApp FROM waitinglist WHERE plotNumberApp=:plotNumberApP";
-//   $stmt   = $ConnectingDB->prepare($sql);
-//   $stmt->bindValue(':userID',$userId);
-//   $stmt->bindValue(':plotNumberApP',$plotNumberApp);
-//   $stmt->execute();
-//   $Result = $stmt->rowcount();
-//   if ($Result == 1 ) {
-//     return true;
-//   }else {
-//     return false;
-//   }
-// }
 
 
 // User Login Authentication Function
@@ -343,11 +344,90 @@ function confirmAdminLogin(){
     return true;
   }  else {
     $_SESSION["ErrorMessage"]="Login Required !";
-    Redirect_to("adminLogin97.php");
+    Redirect_to("adminLogin.php");
   }
   }
 
+ //MAP FUNCTIONALITY START /////////
+ //Total number of plots
+ function TotalNumberPlots($cityName){
+  global $ConnectingDB;
+  $sql = "SELECT COUNT(*) FROM plots WHERE plotSite ='$cityName' ";
+  $stmt = $ConnectingDB->query($sql);
+  $TotalRows= $stmt->fetch();
+  $TotalNumberPlots=array_shift($TotalRows);
+  echo $TotalNumberPlots;
+
+}
+
+function TotalWlNum($cityName){
+  global $ConnectingDB;
+  $sql = "SELECT COUNT(*) FROM waitinglist WHERE siteCity = '$cityName' ";
+  $stmt = $ConnectingDB->query($sql);
+  $TotalRows= $stmt->fetch();
+  $TotalWlNum=array_shift($TotalRows);
+  echo $TotalWlNum;
+
+}
+
+function TotalSoonVacantPlots($cityName){
+  global $ConnectingDB;
+  $sql = "SELECT COUNT(*) FROM plots WHERE plotSite = '$cityName' AND plotStatus ='Soon_Vacant' ";
+  $stmt = $ConnectingDB->query($sql);
+  $TotalRows= $stmt->fetch();
+  $TotalSoonVacantPlots=array_shift($TotalRows);
+  echo $TotalSoonVacantPlots;
+
+}
+
+function TotalVacantPlotsMp($cityName){
+  global $ConnectingDB;
+  $sql = "SELECT COUNT(*) FROM plots WHERE plotSite = '$cityName' AND plotStatus ='Vacant' ";
+  $stmt = $ConnectingDB->query($sql);
+  $TotalRows= $stmt->fetch();
+  $TotalSoonVacantPlots=array_shift($TotalRows);
+  echo $TotalSoonVacantPlots;
+
+}
+
+
+
+ //MAP FUNCTIONALITY END ///////////////
+
+ //Total Tenant search results
+ function TotalTenantSearchResults(){
+  $adminSiteName = $_SESSION["adminSiteName"];
+  if(isset($_GET["SearchTenant"])){
+    $tenantNameSearch = $_GET["tenantName"];
   
+    global $ConnectingDB;
+    if($_SESSION["adminRole"] == "Super_Admin"){
+      $sql = "SELECT COUNT(*) FROM tenants WHERE tenantFirstName LIKE :tenantNameSearch OR tenantLastName LIKE :tenantNameSearch ";
+    }elseif($_SESSION["adminRole"] == "Site_Manager"){
+      $sql = "SELECT COUNT(*) FROM tenants WHERE tenantFirstName LIKE :tenantNameSearch OR tenantLastName LIKE :tenantNameSearch AND siteCity = '$adminSiteName' ";
+    }
+    
+    $stmt = $ConnectingDB->prepare($sql);
+    $stmt->bindValue(':tenantNameSearch','%'.$tenantNameSearch.'%');
+    $TotalRows= $stmt->fetch();
+    $TotalTenantSearchResults=array_shift($TotalRows);
+    echo $TotalTenantSearchResults;
+  }
+}
+
+//Total Plot Search Results
+function TotalPlotSearchResults(){
+  if(isset($_GET["SearchPlot"])){
+    $plotNumberSearch = $_GET["PlotNumberSh"];
+    
+    global $ConnectingDB;
+    $sql = "SELECT COUNT(*) FROM plots WHERE plotNumber = '$plotNumberSearch' ";
+    $stmt = $ConnectingDB->query($sql);
+    $TotalRows= $stmt->fetch();
+    $TotalPlotSearchResults=array_shift($TotalRows);
+    echo $TotalPlotSearchResults;
+  }
+}
 
 // Count The total number of sites or Cities added
 
@@ -519,34 +599,856 @@ function confirmAdminLogin(){
   
   }
 
-  // function userPositionOnList(){
-  //   global $ConnectingDB;
-  //   $sql = "SELECT COUNT(*) FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND id = ";
-  //   $stmt = $ConnectingDB->query($sql);
-  //   $TotalRows= $stmt->fetch();
-  //   $userPositionOnList=array_shift($TotalRows);
-  //   echo $userPositionOnList;
-  
-  // }
+// Function to send emails to tenant whose lease will expire in 30 days
+  function tenantNotificationFor30Days(){
+      global $ConnectingDB;
+      $sql ="SELECT * FROM tenants";
+      $stmt = $ConnectingDB->query($sql);
+      $DataRows=$stmt->fetch();
+      $id                     = $DataRows["id"];
+      $tenantFirstNameRow          = $DataRows["tenantFirstName"];
+      $tenantLastNameRow          = $DataRows["tenantLastName"];
+      $leaseDateRow          = $DataRows["leaseDate"];
+      $expirationDateRow         = $DataRows["expirationDate"];
 
+      $oneMonthToExp        = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDateRow)). " - 30 day "));
+      
+      $todayDate = date("Y-m-d");
+      
+      global $ConnectingDB;
+      $sql ="SELECT * FROM tenants WHERE '$todayDate' = '$oneMonthToExp' ";
+      $stmt = $ConnectingDB->query($sql);
+      while($DataRows=$stmt->fetch()){
+      $id                     = $DataRows["id"];
+      $tenantFirstName          = $DataRows["tenantFirstName"];
+      $tenantEmailAddress[]	          = $DataRows["tenantEmailAddress"];
+      $leaseDate          = $DataRows["leaseDate"];
+      $expirationDate          = $DataRows["expirationDate"];
+
+
+          if(!empty($id) && !empty($tenantEmailAddress) && !empty($leaseDate) && !empty($expirationDate)){
+
+              $emailTo    = implode(", ", $tenantEmailAddress);
+              $subject    = "Lease Expiration Alert";
+              $message    = "Hello ".$tenantFirstName."\n"." Your Lease Will expire in one month."
+                              ."\n"."You did not renew Your lease, So Your plot will be vacant after the expiration of your lease";
+                              
+
+              $headers    = "From: "."Allotment";
+
+            if(mail($emailTo, $subject, $message, $headers)){
+
+                  echo "Message Sent"."<br>";
+            
+              }
+          
+          
+          }else{
+              echo "No Lease";
+          }
+      
+
+      }
+    
+  }
+
+// Function to send emails to tenant whose lease will expire in 90 days
+function tenantNotificationFor90Days(){
+      global $ConnectingDB;
+      $sql ="SELECT * FROM tenants";
+      $stmt = $ConnectingDB->query($sql);
+      $DataRows=$stmt->fetch();
+      $id                     = $DataRows["id"];
+      $tenantFirstNameRow          = $DataRows["tenantFirstName"];
+      $tenantLastNameRow          = $DataRows["tenantLastName"];
+      $leaseDateRow          = $DataRows["leaseDate"];
+      $expirationDateRow         = $DataRows["expirationDate"];
+
+      $expirationDate90        = date("Y-m-d", strtotime(date("Y-m-d", strtotime($expirationDateRow)). " - 90 day "));
+
+      $todayDate = date("Y-m-d");
+
+      global $ConnectingDB;
+      $sql ="SELECT * FROM tenants WHERE '$todayDate' = '$expirationDate90' ";
+      $stmt = $ConnectingDB->query($sql);
+      while($DataRows=$stmt->fetch()){
+      $id                     = $DataRows["id"];
+      $tenantFirstName          = $DataRows["tenantFirstName"];
+      $tenantEmailAddress[]	        = $DataRows["tenantEmailAddress"];
+      $leaseDate              = $DataRows["leaseDate"];
+      $expirationDate          = $DataRows["expirationDate"];
+
+          if(!empty($id) && !empty($tenantEmailAddress) && !empty($leaseDate) && !empty($expirationDate)){
+
+              $emailTo    = implode(", ", $tenantEmailAddress);
+              $subject    = "Lease Expiration Alert";
+              $message    = "Hello ".$tenantFirstName."\n"." Your Lease Will expire soon."
+                              ."\n"."Log into Your account below If You are interested in renewing Your lease."
+                              ."\n\n"."http://allotment-com.stackstaging.com/";
+
+              $headers    = "From: "."Allotment";
+
+            if(mail($emailTo, $subject, $message, $headers)){
+
+                  echo "Message Sent"."<br>";
+            
+              }
+          
+          
+          }else{
+              echo "No Lease";
+          }
+      
+
+      }
+}
+
+  // Function to send Contact validation Emails to Users on the waiting list
+  function sendContactValidationToUsers(){
+      global $ConnectingDB;
+      $sql ="SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' ";
+      $stmt = $ConnectingDB->query($sql);
+      while ($DataRows=$stmt->fetch()){;
+      $id                     = $DataRows["id"];
+      $emailAddress[]       = $DataRows["emailAddress"];
+
+      }
+
+      if(!empty($emailAddress)){
+          
+          $emailTo    = implode(", ", $emailAddress);
+          $subject    = "Contact And Interest Validation";
+          $message    = "Please click on the link below to update Your contact details"
+                          ."\n\n"."http://allotment-com.stackstaging.com/userContactVald.php";
+          $headers    = "From: "."Allotment";
+
+      
+
+            if(mail($emailTo, $subject, $message, $headers)){
+                echo "Contact Validation Sent";
+            }else {
+                echo "Something Went Wrong";
+            }
+      
+        }else{
+          echo "No User On Waiting list";
+        }
+
+  
+  }
+
+
+  // Fourteen days count function for a user Who does not accept the plot within 14 days and Offercount is LESS than 1
+  function fourteenDaysCountLess1(){
+        global $ConnectingDB;
+        $sql ="SELECT * FROM waitinglist WHERE applicationStatus ='Pending_Confirmation' LIMIT 1";
+        $stmt = $ConnectingDB->query($sql);
+        while($DataRows=$stmt->fetch()){
+        $id                     = $DataRows["id"];
+        $tenantId              = $DataRows["userId"];
+        $firstName          = $DataRows["firstName"];
+        $lastName          = $DataRows["lastName"];
+        $emailAddress	          = $DataRows["emailAddress"];
+        $telephoneNumber          = $DataRows["telephoneNumber"];
+        $userCity          = $DataRows["userCity"];
+        $siteIdNum           = $DataRows["siteIdNum"];
+        $siteCity          = $DataRows["siteCity"];
+        $plotIdNum          = $DataRows["plotIdNum"];
+        $plotNumberApp          = $DataRows["plotNumberApp"];
+        $applicationStatus          = $DataRows["applicationStatus"];
+        $offerCount          = $DataRows["offerCount"];
+        $dateApplied        =   $DataRows["dateApplied"];
+        $dateRecvRow        =   $DataRows["dateRecv"];
+        $dateRecv               = date("Y-m-d");
+
+        $daysCountFourteen         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateRecvRow)). " + 14 day "));
+        
+        $todayDate = date("Y-m-d");
+        }
+
+    // Query to insert values in DB
+    global $ConnectingDB;
+    // Transfer the plot number to a user on the waitinglist whose city is the SAME as their site.
+    $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+    $stmt04 = $ConnectingDB->prepare($sql04);
+    $stmt04->execute();
+    $Result04 = $stmt04->rowcount();
+    if($Result04 > 0) {
+
+        $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+        $stmtCpa = $ConnectingDB->prepare($sqlCpa);
+        $ExecuteCpa=$stmtCpa->execute();
+
+        $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+        $stmtSm = $ConnectingDB->query($sqlSm);
+        while($DataRows=$stmtSm->fetch()){
+        $applicantId             = $DataRows["id"];
+        $applicantEmail          = $DataRows["emailAddress"];
+        $applicantUserId         = $DataRows["userId"];
+        $applicantFirstName      = $DataRows["firstName"];
+
+        }
+
+        if(!empty($applicantId) && !empty($applicantEmail) && !empty($applicantUserId) && !empty($applicantFirstName)){
+
+            $emailTo    = $applicantEmail;
+            $subject    = "New Plot Availability Alert";
+            $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
+                            ."\n"."Log into Your account below."
+                            ."\n\n"."http://allotment-com.stackstaging.com/";
+
+            $headers    = "From: "."Allotment";
+
+            mail($emailTo, $subject, $message, $headers);
+
+            $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+            $stmtC = $ConnectingDB->prepare($sqlC);
+            $ExecuteC=$stmtC->execute();
+        
+        }
+
+        
+        $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+        $stmtE2 = $ConnectingDB->prepare($sqlE2);
+        $ExecuteE2=$stmtE2->execute();
+
+        $sqlG4 = "UPDATE users SET userStatus = 'Awaiting_Plot' WHERE id ='$tenantId' ";
+        $stmtG4 = $ConnectingDB->prepare($sqlG4);
+        $ExecuteG4=$stmtG4->execute();
+
+        $sqlRjc = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = '$siteCity', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', dateRecv = 'None', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+        $stmtRjc = $ConnectingDB->prepare($sqlRjc);
+        $ExecuteRjc=$stmtRjc->execute();
+
+        
+        
+    }elseif($Result04 == 0){
+        // If there is no user on the waitinglist who lives in the same city as the site he/she applied for, then transfer 
+        // the plot to a  user whoose city is different as the site he/she applied for.
+        
+        $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
+        $stmt07 = $ConnectingDB->prepare($sql07);
+        $stmt07->execute();
+        $Result07 = $stmt07->rowcount();
+            if ($Result07 > 0) {
+
+                $sql1x = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                $stmt1x = $ConnectingDB->prepare($sql1x);
+                $Execute1x=$stmt1x->execute();
+
+                $sqlSmc = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                $stmtSmc = $ConnectingDB->query($sqlSmc);
+                while($DataRows=$stmtSmc->fetch()){
+                $applicantIdDc                     = $DataRows["id"];
+                $applicantEmailDc          = $DataRows["emailAddress"];
+                $applicantUserIdDc          = $DataRows["userId"];
+                $applicantFirstNameDc       = $DataRows["firstName"];
+
+                }
+
+                if(!empty($applicantIdDc) && !empty($applicantEmailDc) && !empty($applicantUserIdDc) && !empty($applicantFirstNameDc)){
+                    $emailTo    = $applicantEmailDc;
+                    $subject    = "New Plot Availability Alert";
+                    $message    = "Hello ".$applicantFirstNameDc."\n"." There is a new plot available for You. "
+                                    ."\n"."Log into Your account below."
+                                    ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                    $headers    = "From: "."Allotment";
+    
+                    mail($emailTo, $subject, $message, $headers);
+                
+
+                    $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserIdDc' ";
+                    $stmtC2 = $ConnectingDB->prepare($sqlC2);
+                    $ExecuteC2=$stmtC2->execute();
+                
+                  }
+
+                
+                $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+                $stmtE6 = $ConnectingDB->prepare($sqlE6);
+                $ExecuteE6=$stmtE6->execute();
+
+                $sqlRj9 = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = '$siteCity', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', dateRecv = 'None', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+                $stmtRj9 = $ConnectingDB->prepare($sqlRj9);
+                $ExecuteRj9=$stmtRj9->execute();
+
+
+            }
+            
+            // If There are no users on the waitinglist, then set plot status to Vacant
+
+                if($Result07 == 0){
+
+                    $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumberApp' ";
+                    $stmt92 = $ConnectingDB->prepare($sql92);
+                    $Execute92=$stmt92->execute();
+                
+                $sqlRjz = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = '$siteCity', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', dateRecv = 'None', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+                $stmtRjz = $ConnectingDB->prepare($sqlRjz);
+                $ExecuteRjz=$stmtRjz->execute();
+                }
+
+    }
+        
+}
+
+// Fourteen days count function for a user Who does not accept the plot within 14 days and Offercount is GREATER than 1
+function fourteenDaysCountGt1(){
+
+  global $ConnectingDB;
+  $sql ="SELECT * FROM waitinglist WHERE applicationStatus ='Pending_Confirmation' LIMIT 1";
+  $stmt = $ConnectingDB->query($sql);
+  while($DataRows=$stmt->fetch()){
+  $id                     = $DataRows["id"];
+  $tenantId                     = $DataRows["userId"];
+  $firstName          = $DataRows["firstName"];
+  $lastName          = $DataRows["lastName"];
+  $emailAddress	          = $DataRows["emailAddress"];
+  $telephoneNumber          = $DataRows["telephoneNumber"];
+  $userCity          = $DataRows["userCity"];
+  $siteIdNum           = $DataRows["siteIdNum"];
+  $siteCity          = $DataRows["siteCity"];
+  $plotIdNum          = $DataRows["plotIdNum"];
+  $plotNumberApp          = $DataRows["plotNumberApp"];
+  $applicationStatus          = $DataRows["applicationStatus"];
+  $offerCount          = $DataRows["offerCount"];
+  $dateApplied        =   $DataRows["dateApplied"];
+  $dateRecvRow        =   $DataRows["dateRecv"];
+  $dateRecv               = date("Y-m-d");
+
+  $daysCountFourteen         = date("Y-m-d", strtotime(date("Y-m-d", strtotime($dateRecvRow)). " + 14 day "));
+  $start_dateF = date_create(date("Y-m-d"));
+  $end_dateF   = date_create($daysCountFourteen);
+
+  //difference between two dates
+  $diff4 = date_diff($start_dateF,$end_dateF);
+  $todayDate = date("Y-m-d");
+
+  }
+  // Transfer the plot number to a user on the waitinglist whose city is the SAME as their site.
+  $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+  $stmt04 = $ConnectingDB->prepare($sql04);
+  $stmt04->execute();
+  $Result04 = $stmt04->rowcount();
+  if($Result04 > 0) {
+
+      $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+      $stmtCpa = $ConnectingDB->prepare($sqlCpa);
+      $ExecuteCpa=$stmtCpa->execute();
+
+      $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+      $stmtSm = $ConnectingDB->query($sqlSm);
+      while($DataRows=$stmtSm->fetch()){
+      $applicantId             = $DataRows["id"];
+      $applicantEmail          = $DataRows["emailAddress"];
+      $applicantUserId         = $DataRows["userId"];
+      $applicantFirstName      = $DataRows["firstName"];
+
+      }
+
+          if(!empty($applicantId) && !empty($applicantEmail) && !empty($applicantUserId) && !empty($applicantFirstName)){
+              $emailTo    = $applicantEmail;
+              $subject    = "New Plot Availability Alert";
+              $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
+                              ."\n"."Log into Your account below."
+                              ."\n\n"."http://allotment-com.stackstaging.com/";
+
+              $headers    = "From: "."Allotment";
+
+              mail($emailTo, $subject, $message, $headers);
+
+              $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+              $stmtC = $ConnectingDB->prepare($sqlC);
+              $ExecuteC=$stmtC->execute();
+          }
+
+      
+          $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+          $stmtE2 = $ConnectingDB->prepare($sqlE2);
+          $ExecuteE2=$stmtE2->execute();
+
+          $sqlG4 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+          $stmtG4 = $ConnectingDB->prepare($sqlG4);
+          $ExecuteG4=$stmtG4->execute();
+
+          $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+          $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+          $ExecuteDel2=$stmtDel2->execute();
+          
+          if($ExecuteDel2){
+            echo "Plot transfered - The user is now a new user";
+          }else{
+            echo "No Plot was transfered";
+          }
+
+      
+      
+  }elseif($Result04 == 0){
+      // If there is no user on the waitinglist who lives in the same city as the site he/she applied for, then transfer 
+      // the plot to a  user whoose city is different as the site he/she applied for.
+      
+      $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
+      $stmt07 = $ConnectingDB->prepare($sql07);
+      $stmt07->execute();
+      $Result07 = $stmt07->rowcount();
+          if ($Result07 > 0) {
+
+              $sql1x = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+              $stmt1x = $ConnectingDB->prepare($sql1x);
+              $Execute1x=$stmt1x->execute();
+
+              $sqlSmc = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+              $stmtSmc = $ConnectingDB->query($sqlSmc);
+              while($DataRows=$stmtSmc->fetch()){
+              $applicantIdDc                     = $DataRows["id"];
+              $applicantEmailDc          = $DataRows["emailAddress"];
+              $applicantUserIdDc          = $DataRows["userId"];
+              $applicantFirstNameDc       = $DataRows["firstName"];
+
+              }
+
+              if(!empty($applicantIdDc) && !empty($applicantEmailDc) && !empty($applicantUserIdDc) && !empty($applicantFirstNameDc)){
+                  $emailTo    = $applicantEmailDc;
+                  $subject    = "New Plot Availability Alert";
+                  $message    = "Hello ".$applicantFirstNameDc."\n"." There is a new plot available for You. "
+                                  ."\n"."Log into Your account below."
+                                  ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                  $headers    = "From: "."Allotment";
+  
+                  mail($emailTo, $subject, $message, $headers);
+
+                  $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserIdDc' ";
+                  $stmtC2 = $ConnectingDB->prepare($sqlC2);
+                  $ExecuteC2=$stmtC2->execute();
+              }
+
+              
+              $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+              $stmtE6 = $ConnectingDB->prepare($sqlE6);
+              $ExecuteE6=$stmtE6->execute();
+
+              $sqlG4 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+              $stmtG4 = $ConnectingDB->prepare($sqlG4);
+              $ExecuteG4=$stmtG4->execute();
+
+              $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+              $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+              $ExecuteDel2=$stmtDel2->execute();
+
+                  if($ExecuteDel2){
+                  echo "Plot Transfered - The user is now a new user";
+                  }else{
+                  echo "No Plot transfered";
+                  }
+
+          }
+          
+          // If There are no users on the waitinglist, then set plot status to Vacant
+
+              if($Result07 == 0){
+
+                  $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumberApp' ";
+                  $stmt92 = $ConnectingDB->prepare($sql92);
+                  $Execute92=$stmt92->execute();
+
+                  $sqlG4 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+                  $stmtG4 = $ConnectingDB->prepare($sqlG4);
+                  $ExecuteG4=$stmtG4->execute();
+
+                  $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                  $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+                  $ExecuteDel2=$stmtDel2->execute();
+
+              }
+
+            echo "The Plot has been transfered";
+
+            }else {
+            echo "No plot transfered";
+            }
+
+}
+
+  // Waiting list function for a user Who rejects with an Offercount LESS than 1
+  function waitingListPlotTransferOcLess1(){
+
+        $tenantId                 =   $_SESSION["userId"];
+
+        // Fetch users details on the waitinglist
+        global $ConnectingDB;
+        $sql ="SELECT * FROM waitinglist WHERE userId = '$tenantId'  ";
+        $stmt = $ConnectingDB->query($sql);
+        $DataRows=$stmt->fetch();
+        $id                     = $DataRows["id"];
+        // $userIdRow                     = $DataRows["userId"];
+        $firstName          = $DataRows["firstName"];
+        $lastName          = $DataRows["lastName"];
+        $emailAddress	          = $DataRows["emailAddress"];
+        $telephoneNumber          = $DataRows["telephoneNumber"];
+        $userCity          = $DataRows["userCity"];
+        $siteIdNum           = $DataRows["siteIdNum"];
+        $siteCity          = $DataRows["siteCity"];
+        $plotIdNum          = $DataRows["plotIdNum"];
+        $plotNumberApp          = $DataRows["plotNumberApp"];
+        $applicationStatus          = $DataRows["applicationStatus"];
+        $offerCount          = $DataRows["offerCount"];
+        $dateApplied        =   $DataRows["dateApplied"];
+        $dateRecvRow        =   $DataRows["dateRecv"];
+        $dateRecv               = date("Y-m-d");
+
+        //Fetch Site City with plot Number
+        $sql2t    = "SELECT plotSite FROM plots WHERE plotNumber=:plotNumberApP";
+        $stmt2t   = $ConnectingDB->prepare($sql2t);
+        $stmt2t->bindValue(':plotNumberApP',$plotNumberApp);
+        $stmt2t->execute();
+        $DataRows2t = $stmt2t->fetch();
+        $plotNumberRw              = $DataRows2t["plotNumber"];
+        $plotSiteRow          = $DataRows2t["plotSite"];
+
+        // Query to insert values in DB
+        global $ConnectingDB;
+        // Transfer the plot number to a user on the waitinglist whose city is the SAME as their site.
+        $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+        $stmt04 = $ConnectingDB->prepare($sql04);
+        $stmt04->execute();
+        $Result04 = $stmt04->rowcount();
+        if($Result04 > 0) {
+
+
+            $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+            $stmtSm = $ConnectingDB->query($sqlSm);
+            while($DataRows=$stmtSm->fetch()){
+            $applicantId             = $DataRows["id"];
+            $applicantEmail          = $DataRows["emailAddress"];
+            $applicantUserId         = $DataRows["userId"];
+            $applicantFirstName      = $DataRows["firstName"];
+
+            }
+
+            if(!empty($applicantId) && !empty($applicantEmail) && !empty($applicantUserId) && !empty($applicantFirstName)){
+
+                $emailTo    = $applicantEmail;
+                $subject    = "New Plot Availability Alert";
+                $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
+                                ."\n"."Log into Your account below."
+                                ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                $headers    = "From: "."Allotment";
+
+                mail($emailTo, $subject, $message, $headers);
+
+                $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+                $stmtC = $ConnectingDB->prepare($sqlC);
+                $ExecuteC=$stmtC->execute();
+            
+            }
+
+            $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity ='$plotSiteRow', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+            $stmtCpa = $ConnectingDB->prepare($sqlCpa);
+            $ExecuteCpa=$stmtCpa->execute();
+            
+            $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+            $stmtE2 = $ConnectingDB->prepare($sqlE2);
+            $ExecuteE2=$stmtE2->execute();
+
+            $sqlG4 = "UPDATE users SET userStatus = 'Awaiting_Plot' WHERE id ='$tenantId' ";
+            $stmtG4 = $ConnectingDB->prepare($sqlG4);
+            $ExecuteG4=$stmtG4->execute();
+
+            $sqlRjc = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = '$siteCity', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', dateRecv = 'None', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+            $stmtRjc = $ConnectingDB->prepare($sqlRjc);
+            $ExecuteRjc=$stmtRjc->execute();
+
+            
+            
+        }elseif($Result04 == 0){
+            // If there is no user on the waitinglist who lives in the same city as the site he/she applied for, then transfer 
+            // the plot to a  user whoose city is different as the site he/she applied for.
+            
+            $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
+            $stmt07 = $ConnectingDB->prepare($sql07);
+            $stmt07->execute();
+            $Result07 = $stmt07->rowcount();
+                if ($Result07 > 0) {
+
+                    $sqlSmc = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                    $stmtSmc = $ConnectingDB->query($sqlSmc);
+                    while($DataRows=$stmtSmc->fetch()){
+                    $applicantIdDc                     = $DataRows["id"];
+                    $applicantEmailDc          = $DataRows["emailAddress"];
+                    $applicantUserIdDc          = $DataRows["userId"];
+                    $applicantFirstNameDc       = $DataRows["firstName"];
+
+                    }
+
+                    if(!empty($applicantIdDc) && !empty($applicantEmailDc) && !empty($applicantUserIdDc) && !empty($applicantFirstNameDc)){
+
+                        $emailTo    = $applicantEmailDc;
+                        $subject    = "New Plot Availability Alert";
+                        $message    = "Hello ".$applicantFirstNameDc."\n"." There is a new plot available for You. "
+                                        ."\n"."Log into Your account below."
+                                        ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                        $headers    = "From: "."Allotment";
+        
+                        mail($emailTo, $subject, $message, $headers);
+
+                        $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserIdDc' ";
+                        $stmtC2 = $ConnectingDB->prepare($sqlC2);
+                        $ExecuteC2=$stmtC2->execute();
+
+                    }
+
+                    $sql1x = "UPDATE waitinglist SET siteIdNum = '$siteIdNum',siteCity ='$plotSiteRow', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                    $stmt1x = $ConnectingDB->prepare($sql1x);
+                    $Execute1x=$stmt1x->execute();
+                    
+                    $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+                    $stmtE6 = $ConnectingDB->prepare($sqlE6);
+                    $ExecuteE6=$stmtE6->execute();
+
+                    $sqlRj9 = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = '$siteCity', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', dateRecv = 'None', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+                    $stmtRj9 = $ConnectingDB->prepare($sqlRj9);
+                    $ExecuteRj9=$stmtRj9->execute();
+
+
+                }
+                
+                // If There are no users on the waitinglist, then set plot status to Vacant
+
+                    if($Result07 == 0){
+
+                        $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumberApp' ";
+                        $stmt92 = $ConnectingDB->prepare($sql92);
+                        $Execute92=$stmt92->execute();
+                    }
+                    $sqlRjz = "UPDATE waitinglist SET siteIdNum  = 'None', siteCity = '$siteCity', plotIdNum = 'None', plotNumberApp = 'None', applicationStatus = 'Awaiting_Plot', dateRecv = 'None', offerCount = offerCount + 1 WHERE userId = '$tenantId' ";
+                    $stmtRjz = $ConnectingDB->prepare($sqlRjz);
+                    $ExecuteRjz=$stmtRjz->execute();
+
+        }
+            
+        if($ExecuteRjc){
+            
+        $_SESSION["SuccessMessage"]="You have Rejected the plot";
+        Redirect_to("applyForPlots.php");
+
+        }else {
+        $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+        Redirect_to("confirmOffer.php");
+        }
+    
+  }
+
+ 
+
+  // Waiting list function for a user Who rejects with an Offercount Greater than 1
+   function waitingListPlotTransferOcg1(){
+        global $ConnectingDB;
+
+        $tenantId                 =   $_SESSION["userId"];
+
+        // Fetch users details on the waitinglist
+        global $ConnectingDB;
+        $sql ="SELECT * FROM waitinglist WHERE userId = '$tenantId'  ";
+        $stmt = $ConnectingDB->query($sql);
+        $DataRows=$stmt->fetch();
+        $id                     = $DataRows["id"];
+        // $userIdRow                     = $DataRows["userId"];
+        $firstName          = $DataRows["firstName"];
+        $lastName          = $DataRows["lastName"];
+        $emailAddress	          = $DataRows["emailAddress"];
+        $telephoneNumber          = $DataRows["telephoneNumber"];
+        $userCity          = $DataRows["userCity"];
+        $siteIdNum           = $DataRows["siteIdNum"];
+        $siteCity          = $DataRows["siteCity"];
+        $plotIdNum          = $DataRows["plotIdNum"];
+        $plotNumberApp          = $DataRows["plotNumberApp"];
+        $applicationStatus          = $DataRows["applicationStatus"];
+        $offerCount          = $DataRows["offerCount"];
+        $dateApplied        =   $DataRows["dateApplied"];
+        $dateRecvRow        =   $DataRows["dateRecv"];
+        $dateRecv               = date("Y-m-d");
+
+        //Fetch Site City with plot Number
+        $sql2t    = "SELECT plotSite FROM plots WHERE plotNumber=:plotNumberApP";
+        $stmt2t   = $ConnectingDB->prepare($sql2t);
+        $stmt2t->bindValue(':plotNumberApP',$plotNumberApp);
+        $stmt2t->execute();
+        $DataRows2t = $stmt2t->fetch();
+        $plotNumberRw              = $DataRows2t["plotNumber"];
+        $plotSiteRow          = $DataRows2t["plotSite"];
+
+        // Transfer the plot number to a user on the waitinglist whose city is the SAME as their site.
+        $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+        $stmt04 = $ConnectingDB->prepare($sql04);
+        $stmt04->execute();
+        $Result04 = $stmt04->rowcount();
+        if($Result04 > 0) {
+
+            $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+            $stmtSm = $ConnectingDB->query($sqlSm);
+            while($DataRows=$stmtSm->fetch()){
+            $applicantId             = $DataRows["id"];
+            $applicantEmail          = $DataRows["emailAddress"];
+            $applicantUserId         = $DataRows["userId"];
+            $applicantFirstName      = $DataRows["firstName"];
+
+            }
+
+                if(!empty($applicantId) && !empty($applicantEmail) && !empty($applicantUserId) && !empty($applicantFirstName)){
+                    $emailTo    = $applicantEmail;
+                    $subject    = "New Plot Availability Alert";
+                    $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
+                                    ."\n"."Log into Your account below."
+                                    ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                    $headers    = "From: "."Allotment";
+
+                    mail($emailTo, $subject, $message, $headers);
+
+                    $sqlC = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserId' ";
+                    $stmtC = $ConnectingDB->prepare($sqlC);
+                    $ExecuteC=$stmtC->execute();
+                }
+
+                $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity ='$plotSiteRow', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+                $stmtCpa = $ConnectingDB->prepare($sqlCpa);
+                $ExecuteCpa=$stmtCpa->execute();
+            
+                $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+                $stmtE2 = $ConnectingDB->prepare($sqlE2);
+                $ExecuteE2=$stmtE2->execute();
+
+                $sqlG4 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+                $stmtG4 = $ConnectingDB->prepare($sqlG4);
+                $ExecuteG4=$stmtG4->execute();
+
+                $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+                $ExecuteDel2=$stmtDel2->execute();
+                
+                if($ExecuteDel2){
+
+                  $_SESSION["userStatus"] = 'New_User';
+
+                $_SESSION["SuccessMessage"]="You have Rejected the 2 plots that were allocated to You. You will have to apply as a new user in order to get a plot";
+                Redirect_to("applyForPlots.php");
+                }else{
+                $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+                Redirect_to("confirmOffer.php");
+                }
+
+            
+            
+        }elseif($Result04 == 0){
+            // If there is no user on the waitinglist who lives in the same city as the site he/she applied for, then transfer 
+            // the plot to a  user whoose city is different as the site he/she applied for.
+            
+            $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
+            $stmt07 = $ConnectingDB->prepare($sql07);
+            $stmt07->execute();
+            $Result07 = $stmt07->rowcount();
+                if ($Result07 > 0) {
+
+                    $sqlSmc = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                    $stmtSmc = $ConnectingDB->query($sqlSmc);
+                    while($DataRows=$stmtSmc->fetch()){
+                    $applicantIdDc                     = $DataRows["id"];
+                    $applicantEmailDc          = $DataRows["emailAddress"];
+                    $applicantUserIdDc          = $DataRows["userId"];
+                    $applicantFirstNameDc       = $DataRows["firstName"];
+
+                    }
+
+                    if(!empty($applicantIdDc) && !empty($applicantEmailDc) && !empty($applicantUserIdDc) && !empty($applicantFirstNameDc)){
+
+                        $emailTo    = $applicantEmailDc;
+                        $subject    = "New Plot Availability Alert";
+                        $message    = "Hello ".$applicantFirstNameDc."\n"." There is a new plot available for You. "
+                                        ."\n"."Log into Your account below."
+                                        ."\n\n"."http://allotment-com.stackstaging.com/";
+
+                        $headers    = "From: "."Allotment";
+        
+                        mail($emailTo, $subject, $message, $headers);
+
+                        $sqlC2 = "UPDATE users SET userStatus = 'Pending_Confirmation' WHERE id ='$applicantUserIdDc' ";
+                        $stmtC2 = $ConnectingDB->prepare($sqlC2);
+                        $ExecuteC2=$stmtC2->execute();
+                    
+                      }
+
+                    $sql1x = "UPDATE waitinglist SET siteIdNum = '$siteIdNum', siteCity ='$plotSiteRow', plotIdNum = '$plotIdNum', plotNumberApp = '$plotNumberApp', applicationStatus ='Pending_Confirmation', dateRecv ='$dateRecv' WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                    $stmt1x = $ConnectingDB->prepare($sql1x);
+                    $Execute1x=$stmt1x->execute();
+                    
+                    $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumberApp' ";
+                    $stmtE6 = $ConnectingDB->prepare($sqlE6);
+                    $ExecuteE6=$stmtE6->execute();
+
+                    $sqlG4 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+                    $stmtG4 = $ConnectingDB->prepare($sqlG4);
+                    $ExecuteG4=$stmtG4->execute();
+
+                    $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                    $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+                    $ExecuteDel2=$stmtDel2->execute();
+
+                        if($ExecuteDel2){
+
+                          $_SESSION["userStatus"] = 'New_User';
+
+                        $_SESSION["SuccessMessage"]="You have Rejected the 2 plots that were allocated to You. You will have to apply as a new user in order to get a plot";
+                        Redirect_to("applyForPlots.php");
+                        }else{
+                        $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+                        Redirect_to("confirmOffer.php");
+                        }
+
+                }
+                
+                // If There are no users on the waitinglist, then set plot status to Vacant
+
+                    if($Result07 == 0){
+
+                        $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumberApp' ";
+                        $stmt92 = $ConnectingDB->prepare($sql92);
+                        $Execute92=$stmt92->execute();
+
+                        $sqlG4 = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
+                        $stmtG4 = $ConnectingDB->prepare($sqlG4);
+                        $ExecuteG4=$stmtG4->execute();
+
+                        $sqlDel2 = "DELETE FROM waitinglist WHERE userId = '$tenantId' ";
+                        $stmtDel2 = $ConnectingDB->prepare($sqlDel2);
+                        $ExecuteDel2=$stmtDel2->execute();
+
+                    }
+
+                    $_SESSION["userStatus"] = 'New_User';
+
+          $_SESSION["SuccessMessage"]="You have Rejected the 2 plots that were allocated to You. You will have to apply as a new user in order to get a plot";
+          Redirect_to("applyForPlots.php");
+
+          }else {
+          $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+          Redirect_to("confirmOffer.php");
+          }
+    
+  
+  }
+
+  //Function to handle an expired lease
   function AutomatedExpPlotTrnsf(){
     
         global $ConnectingDB;
-        $sql ="SELECT * FROM tenants ";
-        $stmt = $ConnectingDB->query($sql);
-        while($DataRows=$stmt->fetch()){
-        $id                       = $DataRows["id"];
-        $plotId                 = $DataRows["plotId"];
-        $plotNumber             = $DataRows["plotNumber"];
-        $leaseDate              = $DataRows["leaseDate"];
-        $expirationDate         = $DataRows["expirationDate"];
-        }
-
+        
         $todayDate = date("Y-m-d ");
-
-        if($todayDate >= $expirationDate){
-
-            $sql ="SELECT * FROM tenants WHERE '$todayDate' >= '$expirationDate' LIMIT 1 ";
+        
+            $sql ="SELECT * FROM tenants WHERE expirationDate <= '$todayDate' LIMIT 1 ";
             $stmt = $ConnectingDB->query($sql);
             while($DataRows=$stmt->fetch()){
 
@@ -566,52 +1468,142 @@ function confirmAdminLogin(){
                 $renewalStatus          = $DataRows["renewalStatus"];
                 $tenantStatus           = $DataRows["tenantStatus"];
 
-            }
+                //Fetch Site City with plot Number
+                $sql2t    = "SELECT plotSite FROM plots WHERE plotNumber=:plotNumberApP";
+                $stmt2t   = $ConnectingDB->prepare($sql2t);
+                $stmt2t->bindValue(':plotNumberApP',$plotNumberApp);
+                $stmt2t->execute();
+                $DataRows2t = $stmt2t->fetch();
+                $plotNumberRw              = $DataRows2t["plotNumber"];
+                $plotSiteRow          = $DataRows2t["plotSite"];
 
+            }    
+            
+            
+            if(!empty($tenantId) && $todayDate >= $expirationDate){
+                // Insert Tenant's information into The formertenants table
+                $sqlTrn = "INSERT INTO formertenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteCity, plotNumber, leaseDate, expirationDate )";
+                $sqlTrn .= "VALUES('$tenantId', '$tenantFirstName', '$tenantLastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteCity', '$plotNumber', '$leaseDate', '$expirationDate')";
+                $stmtTrn = $ConnectingDB->prepare($sqlTrn);
+                $ExecuteTrn=$stmtTrn->execute();
+        
+                $sqlExp = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumber' ";
+                $stmtExp = $ConnectingDB->prepare($sqlExp);
+                $ExecuteExp=$stmtExp->execute();
+        
+                // Transfer the plot number to a user on the waitinglist whoose city is the same as their site.
+                $sql04 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity = siteCity ";
+                $stmt04 = $ConnectingDB->prepare($sql04);
+                $stmt04->execute();
+                $Result04 = $stmt04->rowcount();
+                if ($Result04 > 0) {
+      
+                  // Send email to the user on the waiting list
+                  $sqlSk = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+                  $stmtSk = $ConnectingDB->query($sqlSk);
+                  while ($DataRows=$stmtSk->fetch()) {
+                  $applicantId             = $DataRows["id"];
+                  $applicantEmail          = $DataRows["emailAddress"];
+                  $applicantFirstName      = $DataRows["firstName"];
+                  }
+      
+                  if(!empty($applicantId) && !empty($applicantEmail) && !empty($applicantUserId) && !empty($applicantFirstName)){
 
-          
-
-              $sqlTrn = "INSERT INTO formertenants(tenantId, tenantFirstName, tenantLastName, tenantEmailAddress, tenantPhoneNum, tenantCity, siteCity, plotNumber, leaseDate, expirationDate )";
-              $sqlTrn .= "VALUES('$tenantId', '$tenantFirstName', '$tenantLastName', '$tenantEmailAddress', '$tenantPhoneNum', '$tenantCity', '$siteCity', '$plotNumber', '$leaseDate', '$expirationDate')";
-              $stmtTrn = $ConnectingDB->prepare($sqlTrn);
-              $ExecuteTrn=$stmtTrn->execute();
-
-              $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteId', plotIdNum = '$plotId', plotNumberApp = '$plotNumber', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
-              $stmtCpa = $ConnectingDB->prepare($sqlCpa);
-              $ExecuteCpa=$stmtCpa->execute();
-
-              // Send email to the user on the waiting list
-              $sqlSk = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
-              $stmtSk = $ConnectingDB->query($sqlSk);
-              while ($DataRows=$stmtSk->fetch()) {
-              $applicantId             = $DataRows["id"];
-              $applicantEmail          = $DataRows["emailAddress"];
-              $applicantFirstName      = $DataRows["firstName"];
-              }
-
-                  $emailTo    = $applicantEmail;
-                  $subject    = "New Plot Availability Alert";
-                  $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
-                                  ."\n"."Log into Your account below."
-                                  ."\n\n"."http://allotment-com.stackstaging.com/";
-
-                  $headers    = "From: "."Allotment";
+                      $emailTo    = $applicantEmail;
+                      $subject    = "New Plot Availability Alert";
+                      $message    = "Hello ".$applicantFirstName."\n"." There is a new plot available for You."
+                                      ."\n"."Log into Your account below."
+                                      ."\n\n"."http://allotment-com.stackstaging.com/";
+      
+                      $headers    = "From: "."Allotment";
+      
+                      mail($emailTo, $subject, $message, $headers);
                   
-                  mail($emailTo, $subject, $message, $headers);
+                  }
 
                   $sqlE2 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumber' ";
                   $stmtE2 = $ConnectingDB->prepare($sqlE2);
                   $ExecuteE2=$stmtE2->execute();
 
+                  $sqlCpa = "UPDATE waitinglist SET siteIdNum = '$siteId', siteCity = '$plotSiteRow', plotIdNum = '$id', plotNumberApp = '$plotNumber', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity = siteCity ORDER BY id ASC LIMIT 1 ";
+                  $stmtCpa = $ConnectingDB->prepare($sqlCpa);
+                  $ExecuteCpa=$stmtCpa->execute();
+      
+      
+              }elseif($Result04 == 0){
+                  // If there is no user on the waitinglist who lives in the same city as the site he/she applied for, then transfer 
+                  // the plot to a  user whoose city is different as the site he/she applied for.
+      
+                  $sql07 ="SELECT * FROM waitinglist WHERE applicationStatus ='Awaiting_Plot' AND userCity !='siteCity' ";
+                  $stmt07 = $ConnectingDB->prepare($sql07);
+                  $stmt07->execute();
+                  $Result07 = $stmt07->rowcount();
+                      if ($Result07 > 0) {
+      
+                          $sqlSm = "SELECT * FROM waitinglist WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                          $stmtSm = $ConnectingDB->query($sqlSm);
+                          while ($DataRows=$stmtSm->fetch()) {
+                          $applicantIdDs                    = $DataRows["id"];
+                          $applicantEmailDs          = $DataRows["emailAddress"];
+                          $applicantFirstNameDs      = $DataRows["firstName"];
+                          }
+      
+                          if(!empty($applicantIdDs) && !empty($applicantEmailDs) && !empty($applicantUserIdDs) && !empty($applicantFirstNameDs)){
+
+                              $emailTo    = $applicantEmailDs;
+                              $subject    = "New Plot Availability Alert";
+                              $message    = "Hello ".$applicantFirstNameDs."\n"." There is a new plot available for You."
+                                              ."\n"."Log into Your account below."
+                                              ."\n\n"."http://allotment-com.stackstaging.com/";
+              
+                              $headers    = "From: "."Allotment";
+              
+                              mail($emailTo, $subject, $message, $headers);
+
+                          }
+      
+                          $sqlE6 = "UPDATE plots SET plotStatus = 'On_Offer' WHERE plotNumber ='$plotNumber' ";
+                          $stmtE6 = $ConnectingDB->prepare($sqlE6);
+                          $ExecuteE6=$stmtE6->execute();
+
+                          $sql1x = "UPDATE waitinglist SET siteIdNum = '$siteId', siteCity = '$plotSiteRow', plotIdNum = '$id', plotNumberApp = '$plotNumber', applicationStatus ='Pending_Confirmation' WHERE applicationStatus = 'Awaiting_Plot' AND userCity != siteCity ORDER BY id ASC LIMIT 1 ";
+                          $stmt1x = $ConnectingDB->prepare($sql1x);
+                          $Execute1x=$stmt1x->execute();
+      
+                      }
+      
+                          // If there are no users on the waitinglist, then set the plot status to Vacant
+      
+                          if($Result07 == 0 && !empty($plotNumber)){
+      
+                              $sql92 = "UPDATE plots SET plotStatus = 'Vacant' WHERE plotNumber ='$plotNumber' ";
+                              $stmt92 = $ConnectingDB->prepare($sql92);
+                              $Execute92=$stmt92->execute();
+                          }
+      
+              }
+                  // Set the tenant's status to a new User
+      
                   $sqlUpd = "UPDATE users SET userStatus = 'New_User' WHERE id ='$tenantId' ";
                   $stmtUpd = $ConnectingDB->prepare($sqlUpd);
                   $ExecuteUpd=$stmtUpd->execute();
+      
+              
+                  if($ExecuteTrn){
+                          //If the tenant's records were successfully transfered to the formertenants table,
+                          //then delete the tenant from the tenants tabl and then log the tenant out
+      
+                      $sqlDel = "DELETE FROM tenants WHERE tenantId='$tenantId' ";
+                      $stmtDel = $ConnectingDB->prepare($sqlDel);
+                      $ExecuteDel=$stmtDel->execute();
+      
+                  }
 
-                  $sqlDel = "DELETE FROM tenants WHERE tenantId='$tenantId' ";
-                  $stmtDel = $ConnectingDB->prepare($sqlDel);
-                  $ExecuteDel=$stmtDel->execute();
-
-           }
+                  echo "Tenant Deleted";
+      
+            }else{
+              echo "No Expired Tenant";
+            }
   
   }
 

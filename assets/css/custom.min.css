@@ -1063,7 +1063,7 @@ input, textarea {
 }
 @media screen and (min-width:768px) {
     .taller #map_base svg {
-        height: 480px
+        height: 580px
     }
 }
 @media screen and (min-width:768px) {

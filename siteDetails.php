@@ -6,9 +6,11 @@
 
 <?php
 
-$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
-//echo $_SESSION["TrackingURL"];
 confirmAdminLogin(); 
+
+if($_SESSION["adminRole"] != "Super_Admin"){
+  Redirect_to("errorPage.php");
+}
 
 ?>
 
@@ -34,6 +36,9 @@ confirmAdminLogin();
                         <h1>Plots</h1>
                         <a class="btn btn-success" href="addNewPlot.php" role="button">Add New Plot</a>
                         <h2><?php echo htmlentities($_GET["cityName"])?></h2>
+                            <!-- Plot search form Start -->
+                            <?php include("plotSearchForm.php");?>
+                            <!-- Plot search form End -->
                     </div>
                     <div class="row">
                         <?php
@@ -68,20 +73,54 @@ confirmAdminLogin();
                             $plotStatus                    = $DataRows["plotStatus"];
                             $addedBy                     = $DataRows["addedBy"];
                             
+                            global $ConnectingDB;
+                            $sql6 ="SELECT * FROM tenants WHERE plotNumber = '$plotNumber' ";
+                            $stmt6 = $ConnectingDB->query($sql6);
+                            $DataRows6=$stmt6->fetch();
+                            $tntRowId                     = $DataRows6["id"];
+                            $tenantIdUn                    = $DataRows6["tenantId"];
+                            $tenantFirstName          = $DataRows6["tenantFirstName"];
+                            $tenantLastName          = $DataRows6["tenantLastName"];
+                            $tenantFullName = $tenantFirstName." ".$tenantLastName;
 
-                        
+                            $sql97 ="SELECT * FROM waitinglist WHERE plotNumberApp = '$plotNumber' AND applicationStatus ='Pending_Confirmation' ";
+                            $stmt97 = $ConnectingDB->query($sql97);
+                            $DataRows97=$stmt97->fetch();
+                            $userRowId                     = $DataRows97["id"];
+                            $userIdUn                    = $DataRows97["userId"];
+                            $userFirstName          = $DataRows97["firstName"];
+                            $userLastName          = $DataRows97["lastName"];
+                            $userFullName = $userFirstName." ".$userLastName;
+
+                            $sql042 ="SELECT * FROM inspectionreport WHERE plotNumber ='$plotNumber' ";
+                            $stmt042 = $ConnectingDB->prepare($sql042);
+                            $stmt042->execute();
+                            $Result042 = $stmt042->rowcount();
+                            
+                            $sqlIr ="SELECT * FROM inspectionreport WHERE plotNumber ='$plotNumber' ";
+                            $stmtIr = $ConnectingDB->query($sqlIr);
+                            $DataRowsIr=$stmtIr->fetch();
+                            $idIr                     = $DataRowsIr["id"];
+                            $tenantIdIr               = $DataRowsIr["tenantId"];
                                 
                             ?>
-                        <div class="col-sm-6 mb-4">
+                        <div class="col-md-6 mb-4">
                             <div class="card text-white bg-dark">
                             <div class="card-body">
                                 <h2 class="card-title"><?php echo htmlentities($plotNumber)?></h2>
                                 <h5 class="card-text"><?php echo htmlentities($plotSize)?> </h5>
                                 <h5 class="card-text"><?php echo htmlentities($plotDescription)?> </h5>
-                                <h5 class="card-text"><?php echo htmlentities($plotStatus)?> </h5>
+                                <h5 class="card-text"><?php if($plotStatus =='Occupied'){?>Occupied By <a class="" href="viewTenantProfile.php?tenantId=<?php echo $tenantIdUn?>" role="button"><?php echo htmlentities($tenantFullName); ?></a> 
+                                <?php }elseif($plotStatus =='On_Offer'){?> <b>On Offer With :</b> <?php echo htmlentities($userFullName);?>
+                                <?php }else{ echo htmlentities($plotStatus); }?></h5>
                                 <h5 class="card-text"><b>Added By:</b> <?php echo htmlentities($addedBy)?> </h5>
-                                    
-                                <h5 class="card-text"><?php ?> </h5>
+                                <?php if($Result042 < 1){?>
+                                <h5 class="card-text">No Inspection Report available</h5>
+                                <?php }elseif($Result042 >0){?>
+                                <h5 class="card-text mt-2"><a class="btn btn-warning" href="viewTenantInspectionRecord.php?page=1&tenantId=<?php echo $tenantIdIr?>" role="button">View Inspection Report</a></h5>
+                                <?php }?>
+
+                                
                                 
                             </div>
                             </div>

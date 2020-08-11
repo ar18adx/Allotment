@@ -3,7 +3,16 @@
 <?php require_once("inc/functions.php"); ?>
 
 
+
+
 <?php
+
+if($_SESSION["adminRole"] != "Super_Admin"){ 
+  Redirect_to("errorPage.php");
+}
+
+
+
 if(isset($_GET["id"])){
   $QueryParameter = $_GET["id"];
   global $ConnectingDB;

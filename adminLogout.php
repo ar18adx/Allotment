@@ -3,4 +3,4 @@
 <?php
 $_SESSION["adminId"]=null;
 session_destroy();
-Redirect_to("adminLogin97.php");
+Redirect_to("adminLogin.php");

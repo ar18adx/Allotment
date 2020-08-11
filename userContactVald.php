@@ -10,6 +10,14 @@
 $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
 
 confirmUserLogin();
+
+
+if($_SESSION["userStatus"] == "Tenant"){
+    Redirect_to("tenantProfile.php");
+}elseif($_SESSION["userStatus"] == "New_User"){
+    Redirect_to("applyForPlots.php");
+}
+
 ?>
 
 <?php
@@ -25,23 +33,28 @@ confirmUserLogin();
 
         if (isset($_POST["Yes"])) {
         
-            $emailAddress           = $_POST["emailAddress"];
-            $telephone          = $_POST["telephone"];
+            $emailAddressNew           = $_POST["emailAddress"];
+            $telephoneNew         = $_POST["telephone"];
 
             global $ConnectingDB;
-            $sql ="UPDATE users SET emailAddress='$emailAddress', telephone = '$telephone' WHERE id='$userId' ";
-            $Execute=$ConnectingDB->query($sql);
+            $sql ="UPDATE users SET emailAddress='$emailAddressNew', telephone = '$telephoneNew' WHERE id='$userId' ";
+            $stmt = $ConnectingDB->prepare($sql);
+            $Execute=$stmt->execute();
 
             // Update the user's status to "Updated"
             $sql12 = "UPDATE waitinglist SET validationStatus = 'Updated' WHERE applicationStatus = 'Awaiting_Plot' AND userId = '$userId' ";
             $stmtC12 = $ConnectingDB->prepare($sql12);
             $Execute12=$stmtC12->execute();
                 
-            if($Execute){
-                $_SESSION["SuccessMessage"]="Your contact details and interest validation were updated successfully";
-                Redirect_to("userContactVald.php");
+            if($Execute && $Execute12){
+                //Redirect user to the index page
+                $_SESSION["userId"]=null;
+                session_destroy();
+                session_start();
+                $_SESSION["WarningMessage"]="Your contact details and interest validation were updated successfully";
+                Redirect_to("index.php");
                 }else {
-                $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
+                $_SESSION["ErrorMessageForRg"]= "Something went wrong. Try Again !";
                 Redirect_to("userContactVald.php");
             }
 
@@ -59,9 +72,13 @@ confirmUserLogin();
                 $sqlD2 = "DELETE FROM waitinglist WHERE userId = '$userId' ";
                 $stmtD2 = $ConnectingDB->prepare($sqlD2);
                 $ExecuteD2=$stmtD2->execute();
-
-                $_SESSION["SuccessMessage"]="You have been removed from the waiting list. You can now apply for a plot as a new user";
-                Redirect_to("applyForPlots.php");
+                //Redirect user to the index Page
+                $_SESSION["userStatus"] = 'New_User';
+                $_SESSION["userId"]=null;
+                session_destroy();
+                session_start();
+                $_SESSION["WarningMessage"]="You have been removed from the waiting list. You can now apply for a plot as a new user";
+                Redirect_to("index.php");
                 }else {
                 $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
                 Redirect_to("userContactVald.php");
@@ -83,7 +100,7 @@ confirmUserLogin();
             <div class="mt-4 mb-4">
                 <h1>Contact and interest validation</h1>
             </div>
-        <h3>Hello, <?php echo $_SESSION["userFirstName"]; ?> !, Please indicate your interest below</h3>
+        <h3>Hello, <?php echo $_SESSION["userFirstName"]; ?> !, Kindly revalidate your interest to get a plot</h3>
         
                     <br>
                     <?php

@@ -22,6 +22,7 @@ confirmAdminLogin();
                     $DataRows = $stmt->fetch();
                     $plotNumber          = $DataRows["plotNumber"];
                     $siteName           = $DataRows["siteName"];
+                    $tenantId           = $DataRows["tenantId"];
                     $inspectionDate      = $DataRows["inspectionDate"];
                     $inspectionReport      = $DataRows["inspectionReport"];
                     $inspectionOfficer      = $DataRows["inspectionOfficer"];
@@ -90,7 +91,12 @@ confirmAdminLogin();
                                         foreach ($evdIM as $key => $evidence) {
                                     ?>
                             <div class="carousel-item">
-                                <img style="max-height:500px;" src="Uploads/Reports/<?php echo htmlentities($evidence); ?>" class="d-block w-100" alt="...">
+                                <?php if(!empty($evidence)){?>
+                                    <iframe style="height:600px;" scrolling="no" width="100%" src="Uploads/Reports/<?php echo htmlentities($evidence); ?>" class="d-block w-100" alt="...">
+                                    </iframe>
+                                <?php }else{?>
+                                  <h3>No Evidence available</h3>
+                                <?php }?>
                             </div>
                             <?php }?>
                             
@@ -126,14 +132,6 @@ confirmAdminLogin();
 <!-- Admin Footer End -->
 
 <script type="text/javascript">
-    // $('.carousel-indicators > :first-child > :first-child')
-    // .addClass("selected");
-
-    // $('.carousel-inner > :first-child')
-    // .addClass("active");
-
-    // $('.carousel-indicators > :first-child')
-    // .addClass("active");
 
         const demoClasses = document.querySelectorAll('.carousel-item');
         demoClasses[0].className +=" active";

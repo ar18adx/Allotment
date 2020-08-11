@@ -38,17 +38,26 @@
             $_SESSION["ErrorMessage"]= "Your email address exists in our system";
             Redirect_to("registerUser.php");
         }else{
-            // Query to insert new city in DB When everything is fine
+
+            // Send email to new user to check if email is correct
+                $emailTo    = $emailAddress;
+                $subject    = "Email Address Validation";
+                $message    = "Hello, ".$firstName."\n\n"." Your registration was successful.";
+                $headers    = "From: "."Allotment";
+
+                mail($emailTo, $subject, $message, $headers);
+
+            // Query to insert new User in DB When everything is fine
             global $ConnectingDB;
             $sql = "INSERT INTO users(datetime, firstName, lastName, emailAddress, telephone, homeAddress, city, gender, password, userStatus )";
             $sql .= "VALUES(:dateTIme, :firstNAme, :lastNAme, :emailADdress, :telePhone, :homeADdress, :citY, :gendeR, :passworD, :userStatuS)";
             $stmt = $ConnectingDB->prepare($sql);
             $stmt->bindValue(':dateTIme', $datetime);
-            $stmt->bindValue(':firstNAme', $firstName);
-            $stmt->bindValue(':lastNAme', $lastName);
+            $stmt->bindValue(':firstNAme', ucfirst($firstName));
+            $stmt->bindValue(':lastNAme', ucfirst($lastName));
             $stmt->bindValue(':emailADdress', $emailAddress);
             $stmt->bindValue(':telePhone', $telephone);
-            $stmt->bindValue(':homeADdress', $homeAddress);
+            $stmt->bindValue(':homeADdress', ucfirst($homeAddress));
             $stmt->bindValue(':citY', $city);
             $stmt->bindValue(':gendeR', $gender);
             $stmt->bindValue(':passworD', $hash);
@@ -56,7 +65,7 @@
             
             $Execute=$stmt->execute();
             if($Execute){
-            $_SESSION["SuccessMessage"]="New User added Successfully";
+            $_SESSION["SuccessMessage"]="Your registration was successful, A verification message has been sent to Your mail";
             Redirect_to("index.php");
             }else {
             $_SESSION["ErrorMessage"]= "Something went wrong. Try Again !";
@@ -87,32 +96,32 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">First Name</label>
-                            <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Last Name</label>
-                            <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Email address</label>
-                            <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="email" name="emailAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                             <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Telephone</label>
-                            <input type="text" name="telephone" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="text" name="telephone" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Address</label>
-                            <input type="text" name="homeAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="text" name="homeAddress" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                         </div>
                     </div>
                     <div class="row">
@@ -145,13 +154,13 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Password</label>
-                            <input type="password" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="password" name="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label for="exampleInputEmail1">Confirm Password</label>
-                            <input type="password" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            <input type="password" name="confirmPassword" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                             
                         </div>
                     </div>

@@ -7,9 +7,12 @@
 
 <?php
 
-$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
-//echo $_SESSION["TrackingURL"];
 confirmAdminLogin(); 
+
+
+if($_SESSION["adminRole"] != "Super_Admin"){
+    Redirect_to("errorPage.php");
+}
 
 ?>
 

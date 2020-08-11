@@ -38,7 +38,7 @@ confirmAdminLogin();
             <div class="col-md-9">
                 <div class="jumbotron mt-5">
                     <div class="mb-3">
-                        <a class="btn btn-warning" href="#" role="button">Send Message</a>
+                        <a class="btn btn-warning" href="viewTenants.php?page=1" role="button">Send Message</a>
                     </div>
                         <?php
                             global $ConnectingDB;
@@ -54,7 +54,7 @@ confirmAdminLogin();
                                 $msgFrom          = $DataRows["msgFrom"];
                                 $smName          = $DataRows["smName"];
                                 $textMessage          = $DataRows["textMessage"];
-                                $tenantId          = $DataRows["tenantId"];
+                                $tenantId          = $DataRows["userId"];
                                 $textSender         = $msgFrom." (".$smName.")";
                                 $dateTime           = $DataRows["datetime"];
                                 
@@ -71,7 +71,7 @@ confirmAdminLogin();
                             <?php if($msgFrom !="Site Manager") {?>
                             <div class="row">
                                 <div class="col-md-6">
-                                <p class="text-white"><a href=""><a class="btn btn-info" href="adminSendMsg.php?id=<?php echo $tenantId; ?>" role="button">Reply</a></p>
+                                <p class="text-white"><a href=""><a class="btn btn-info" href="adminSendMsg.php?tenantId=<?php echo $tenantId; ?>" role="button">Reply</a></p>
                                 </div>
                                 <div class="col-md-6 text-right">
                                 <p class="card-text"><i><?php echo htmlentities(time_ago( $dateTime )); ?></i></p>

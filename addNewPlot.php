@@ -50,7 +50,7 @@ if(isset($_POST["Submit"])){
   
   
 
-  if(empty($plotDescription)){
+  if(empty($plotDescription) ||empty($plotSize)){
     $_SESSION["ErrorMessage"]= "All fields must be filled out";
     Redirect_to("addNewPlot.php");
   }else{
@@ -90,16 +90,21 @@ if(isset($_POST["Submit"])){
 <!-- header End -->
 
 <div class="container">
-    <div class="mt-4 mb-4">
-        <h1>Add New Plot</h1>
-    </div>
+    <div class="row">
+        <!-- Include Admin Sidebar -->
+        <?php include("inc/adminSidebar.php");?>
+        <!-- Include Admin Sidebar -->
+        <div class="col-md-9">
+            <div class="mt-4 mb-4">
+                <h1>Add New Plot</h1>
+            </div>
             <form class="mb-4 mt-4" action="addNewPlot.php" method="POST">
-            <br>
-            <?php
-                echo ErrorMessage();
-                echo SuccessMessage();
-                echo ErrorMessageForRg();
-            ?>
+                <br>
+                <?php
+                    echo ErrorMessage();
+                    echo SuccessMessage();
+                    echo ErrorMessageForRg();
+                ?>
                 <!-- <div class="row">
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Plot Number</label>
@@ -109,13 +114,13 @@ if(isset($_POST["Submit"])){
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Plot Size</label>
-                        <input type="text" name="plotSize" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <input type="text" name="plotSize" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="exampleInputEmail1">Plot Description</label>
-                        <input type="text" name="plotDescription" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <input type="text" name="plotDescription" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                     </div>
                 </div>
                 <?php if($_SESSION["adminRole"] == "Super_Admin"){?>
@@ -143,9 +148,8 @@ if(isset($_POST["Submit"])){
                 </div>
 
             </form>
-            
-
-
+        </div>  
+    </div>
 </div>
    
 <!-- Admin Footer Start -->
